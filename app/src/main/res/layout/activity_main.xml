@@ -13,8 +13,8 @@
         android:name="androidx.navigation.fragment.NavHostFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:navGraph="@navigation/nav_graph"
-        app:defaultNavHost="true" />
+        app:defaultNavHost="true"
+        app:navGraph="@navigation/nav_graph" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab_add"
@@ -23,6 +23,6 @@
         android:contentDescription="@string/add_batch"
         app:srcCompat="@drawable/ic_add"
         app:layout_anchor="@id/nav_host_fragment"
-        app:layout_anchorGravity="bottom|end"
-        android:layout_margin="@dimen/fab_margin"/>
+        app:layout_anchorGravity="bottom|end" />
+
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -37,6 +37,13 @@ interface BatchDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertStage(stage: Stage)
 
+    @Update
+    suspend fun updateStage(stage: Stage)
+
+    // If needed, add for Photo
+    @Update
+    suspend fun updatePhoto(photo: Photo)
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertPhoto(photo: Photo)
 

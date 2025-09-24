@@ -14,7 +14,7 @@ import java.util.UUID
 )
 data class Stage(
     @PrimaryKey val id: String = UUID.randomUUID().toString(),
-    val batchId: String,
+    val batchId: String?,
     val name: String,
     val durationHours: Long, // длительность в часах
     val startTime: Long? = null,

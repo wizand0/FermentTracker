@@ -18,4 +18,12 @@
     <string name="qr_image">QR image</string>
     <string name="share">Share</string>
     <string name="title_qr">QR-сканер</string>
+    <string name="product_cured_meat">Cured meat</string>
+    <string name="product_cured_sausage">Cured sausage</string>
+    <string name="product_cheese">Cheese</string>
+    <string name="product_sauerkraut">Sauerkraut</string>
+    <string name="product_kombucha">Kombucha</string>
+    <string name="product_pickles">Pickles</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

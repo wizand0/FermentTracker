@@ -1,49 +1,61 @@
 <?xml version="1.0" encoding="utf-8"?>
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/batchList">
+    app:startDestination="@id/batchListFragment">
 
     <fragment
-        android:id="@+id/batchList"
+        android:id="@+id/batchListFragment"
         android:name="ru.wizand.fermenttracker.ui.batches.BatchListFragment"
-        android:label="@string/app_name">
-        <action
-            android:id="@+id/action_batchList_to_createBatch"
-            app:destination="@id/createBatch" />
+        tools:layout="@layout/fragment_batch_list">
         <action
             android:id="@+id/action_batchList_to_batchDetail"
-            app:destination="@id/batchDetail" />
-    </fragment>
-
-    <fragment
-        android:id="@+id/createBatch"
-        android:name="ru.wizand.fermenttracker.ui.batches.CreateBatchFragment"
-        android:label="@string/title_create_batch" >
+            app:destination="@id/batchDetailFragment">
+            <argument
+                android:name="batchId"
+                app:argType="string"
+                android:defaultValue="default" />
+        </action>
         <action
-            android:id="@+id/action_createBatch_to_batchList"
-            app:destination="@id/batchList"
-            app:popUpTo="@id/batchList"
-            app:popUpToInclusive="true" />
+            android:id="@+id/action_to_createBatch"
+            app:destination="@id/createBatchFragment" />
     </fragment>
 
     <fragment
-        android:id="@+id/batchDetail"
+        android:id="@+id/createBatchFragment"
+        android:name="ru.wizand.fermenttracker.ui.batches.CreateBatchFragment"
+        tools:layout="@layout/fragment_create_batch" />
+
+    <fragment
+        android:id="@+id/batchDetailFragment"
         android:name="ru.wizand.fermenttracker.ui.batches.BatchDetailFragment"
-        android:label="@string/title_batch_detail" >
+        tools:layout="@layout/fragment_batch_detail">
         <argument
             android:name="batchId"
-            app:argType="string" />
-        <!-- Action to QR fragment -->
+            app:argType="string"
+            android:defaultValue="default" />
+        <action
+            android:id="@+id/action_batchDetail_to_batchTemplate"
+            app:destination="@id/batchTemplateFragment" />
         <action
             android:id="@+id/action_batchDetail_to_qrFragment"
-            app:destination="@id/qrFragment" />
+            app:destination="@id/qrFragment">
+            <argument
+                android:name="batchId"
+                app:argType="string" />
+        </action>
     </fragment>
+
+    <fragment
+        android:id="@+id/batchTemplateFragment"
+        android:name="ru.wizand.fermenttracker.ui.batches.BatchTemplateFragment"
+        tools:layout="@layout/fragment_batch_template" />
 
     <fragment
         android:id="@+id/qrFragment"
         android:name="ru.wizand.fermenttracker.ui.batches.QRFragment"
-        android:label="@string/title_qr">
+        tools:layout="@layout/fragment_qr">
         <argument
             android:name="batchId"
             app:argType="string" />

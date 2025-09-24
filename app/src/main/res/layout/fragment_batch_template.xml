@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
+
+    <ScrollView
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <!-- Template Name -->
+            <EditText
+                android:id="@+id/etTemplateName"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:hint="Template Name"
+                android:inputType="text"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginBottom="8dp" />
+
+            <!-- Stage Count -->
+            <EditText
+                android:id="@+id/etStageCount"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:hint="Number of Stages"
+                android:inputType="number"
+                app:layout_constraintTop_toBottomOf="@id/etTemplateName"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginBottom="8dp" />
+
+            <!-- Stages Input (Multi-line) -->
+            <EditText
+                android:id="@+id/etStages"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:hint="Enter stages (e.g., Stage1: 24h, Stage2: 48h)"
+                android:inputType="textMultiLine"
+                android:gravity="top"
+                app:layout_constraintTop_toBottomOf="@id/etStageCount"
+                app:layout_constraintBottom_toTopOf="@id/btnSaveTemplate"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginBottom="16dp" />
+
+            <!-- Save Button -->
+            <Button
+                android:id="@+id/btnSaveTemplate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Save Template"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
+</androidx.constraintlayout.widget.ConstraintLayout>

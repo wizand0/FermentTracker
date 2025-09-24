@@ -5,21 +5,21 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.viewModels
+import android.widget.Toast
+import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
-import ru.wizand.fermenttracker.R
+import androidx.recyclerview.widget.ItemTouchHelper
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import ru.wizand.fermenttracker.databinding.FragmentBatchListBinding
 import ru.wizand.fermenttracker.ui.adapters.BatchAdapter
 import ru.wizand.fermenttracker.vm.BatchListViewModel
-
 
 class BatchListFragment : Fragment() {
 
     private var _binding: FragmentBatchListBinding? = null
     private val binding get() = _binding!!
-
-    private val viewModel: BatchListViewModel by viewModels()
-    private lateinit var adapter: BatchAdapter
+    private val viewModel: BatchListViewModel by activityViewModels()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentBatchListBinding.inflate(inflater, container, false)
@@ -27,19 +27,32 @@ class BatchListFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        adapter = BatchAdapter { batch ->
-            // click -> открыть детали
+        super.onViewCreated(view, savedInstanceState)
+
+        val adapter = BatchAdapter { batch ->
             val action = BatchListFragmentDirections.actionBatchListToBatchDetail(batch.id)
             findNavController().navigate(action)
         }
+        binding.rvBatches.layoutManager = LinearLayoutManager(requireContext())
         binding.rvBatches.adapter = adapter
 
-        viewModel.batches.observe(viewLifecycleOwner) { list ->
-            adapter.submitList(list)
-            binding.tvEmpty.visibility = if (list.isEmpty()) View.VISIBLE else View.GONE
+        viewModel.batches.observe(viewLifecycleOwner) { batches ->
+            adapter.submitList(batches)
         }
 
-        // example: pull to refresh or filters can be added
+        val itemTouchHelper = ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT) {
+            override fun onMove(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder): Boolean = false
+
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                val position = viewHolder.adapterPosition
+                if (position != RecyclerView.NO_POSITION) {
+                    val batch = adapter.currentList[position]
+                    viewModel.deleteBatch(batch)
+                    Toast.makeText(context, "Batch ${batch.name} deleted", Toast.LENGTH_SHORT).show()
+                }
+            }
+        })
+        itemTouchHelper.attachToRecyclerView(binding.rvBatches)
     }
 
     override fun onDestroyView() {

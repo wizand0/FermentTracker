@@ -19,4 +19,10 @@
     <string name="qr_image">QR image</string>
     <string name="share">Share</string>
     <string name="title_qr">QR-сканер</string>
+    <string name="product_cured_meat">Сыровяленое мясо</string>
+    <string name="product_cured_sausage">Сыровяленая колбаса</string>
+    <string name="product_cheese">Домашний сыр</string>
+    <string name="product_sauerkraut">Квашеная капуста</string>
+    <string name="product_kombucha">Комбуча</string>
+    <string name="product_pickles">Солёные огурцы</string>
 </resources>

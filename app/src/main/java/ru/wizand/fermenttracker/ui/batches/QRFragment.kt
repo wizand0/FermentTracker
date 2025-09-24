@@ -21,7 +21,7 @@ class QRFragment : Fragment() {
 
     private var _binding: FragmentQrBinding? = null
     private val binding get() = _binding!!
-    private val args: QRFragmentArgs by navArgs() // если используете Safe Args
+    private val args: QRFragmentArgs by navArgs()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentQrBinding.inflate(inflater, container, false)
@@ -29,7 +29,7 @@ class QRFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        val batchId = try { args.batchId } catch (e: Exception) { requireArguments().getString("batchId") }
+        val batchId = args.batchId
         val text = batchId ?: "no-id"
         val qrBitmap = createQRCodeBitmap(text, 800)
         binding.ivQr.setImageBitmap(qrBitmap)

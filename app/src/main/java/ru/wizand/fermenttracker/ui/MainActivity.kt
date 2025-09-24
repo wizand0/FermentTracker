@@ -18,8 +18,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         binding.fabAdd.setOnClickListener {
-            // Переход к CreateBatch (nav_graph должен содержать этот action)
-            findNavController(R.id.nav_host_fragment).navigate(R.id.action_batchList_to_createBatch)
+            findNavController(R.id.nav_host_fragment).navigate(R.id.action_to_createBatch)
         }
 
         // Пример регистрации периодического воркера (раскомментируйте и импортируйте WorkManager,
