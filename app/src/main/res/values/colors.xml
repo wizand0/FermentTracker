@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Primary -->
+    <color name="md_theme_primary">#6B4EFF</color>
+    <color name="md_theme_onPrimary">#FFFFFF</color>
+    <color name="md_theme_primaryContainer">#E8DEFF</color>
+    <color name="md_theme_onPrimaryContainer">#1D0057</color>
+
+    <!-- Secondary -->
+    <color name="md_theme_secondary">#006C5B</color>
+    <color name="md_theme_onSecondary">#FFFFFF</color>
+    <color name="md_theme_secondaryContainer">#A7F0E4</color>
+    <color name="md_theme_onSecondaryContainer">#002019</color>
+
+    <!-- Tertiary -->
+    <color name="md_theme_tertiary">#0061A3</color>
+    <color name="md_theme_onTertiary">#FFFFFF</color>
+
+    <!-- Background / Surface -->
+    <color name="md_theme_background">#FFFFFF</color>
+    <color name="md_theme_onBackground">#1C1B1F</color>
+
+    <color name="md_theme_surface">#FFFFFF</color>
+    <color name="md_theme_onSurface">#1C1B1F</color>
+
+    <color name="md_theme_surfaceVariant">#F3EEFF</color>
+    <color name="md_theme_onSurfaceVariant">#322A4A</color>
+
+    <!-- Error (пример) -->
+    <color name="md_theme_error">#B00020</color>
+    <color name="md_theme_onError">#FFFFFF</color>
+
+    <!-- Доп. цвета -->
+    <color name="ct_accent">#FFB86B</color>
+    <color name="ct_gray_100">#F5F6F7</color>
+    <color name="ct_gray_900">#121212</color>
+</resources>

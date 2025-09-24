@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- Основная тема приложения (Material3, поддержка DayNight) -->
+    <style name="Theme.FermentTracker" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Применяем цветовые токены (определены в colors.xml / values-night/colors.xml) -->
+        <item name="colorPrimary">@color/md_theme_primary</item>
+        <item name="colorOnPrimary">@color/md_theme_onPrimary</item>
+        <item name="colorPrimaryContainer">@color/md_theme_primaryContainer</item>
+        <item name="colorOnPrimaryContainer">@color/md_theme_onPrimaryContainer</item>
+
+        <item name="colorSecondary">@color/md_theme_secondary</item>
+        <item name="colorOnSecondary">@color/md_theme_onSecondary</item>
+        <item name="colorSecondaryContainer">@color/md_theme_secondaryContainer</item>
+        <item name="colorOnSecondaryContainer">@color/md_theme_onSecondaryContainer</item>
+
+        <item name="colorTertiary">@color/md_theme_tertiary</item>
+        <item name="colorOnTertiary">@color/md_theme_onTertiary</item>
+
+<!--        <item name="colorBackground">@color/md_theme_background</item>-->
+        <item name="colorOnBackground">@color/md_theme_onBackground</item>
+
+        <item name="colorSurface">@color/md_theme_surface</item>
+        <item name="colorOnSurface">@color/md_theme_onSurface</item>
+
+        <!-- Surface variant for Cards/Sheets -->
+        <item name="colorSurfaceVariant">@color/md_theme_surfaceVariant</item>
+        <item name="colorOnSurfaceVariant">@color/md_theme_onSurfaceVariant</item>
+
+        <!-- Elevation overlay (optional) -->
+        <item name="android:navigationBarColor">?attr/colorSurface</item>
+        <item name="android:statusBarColor">?attr/colorPrimary</item>
+
+        <!-- Material 3 component defaults -->
+        <item name="materialButtonStyle">@style/Widget.Material3.Button</item>
+<!--        <item name="materialCardViewStyle">@style/Widget.Material3.CardView</item>-->
+
+        <!-- Use system UI light/dark contrast automatically -->
+        <item name="android:forceDarkAllowed">true</item>
+    </style>
+
+    <!-- Тема для окон/диалогов (если нужно) -->
+    <style name="Theme.FermentTracker.Dialog" parent="Theme.Material3.DayNight.Dialog.Alert">
+        <item name="colorPrimary">@color/md_theme_primary</item>
+    </style>
+
+</resources>

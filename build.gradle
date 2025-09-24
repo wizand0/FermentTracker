@@ -1,0 +1,18 @@
+// Top-level build file where you can add configuration options common to all sub-projects/modules.
+
+// Сначала buildscript: добавляем classpath для safe-args
+buildscript {
+    repositories {
+        google()
+        mavenCentral()
+    }
+    dependencies {
+        classpath "androidx.navigation:navigation-safe-args-gradle-plugin:2.9.4"
+    }
+}
+
+// Затем plugins {} (как вы использовали ранее)
+plugins {
+    alias(libs.plugins.android.application) apply false
+    alias(libs.plugins.kotlin.android) apply false
+}
