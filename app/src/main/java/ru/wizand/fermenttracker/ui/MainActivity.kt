@@ -7,18 +7,23 @@ import ru.wizand.fermenttracker.R
 import ru.wizand.fermenttracker.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
+
     private lateinit var binding: ActivityMainBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        // Убедитесь, что этот стиль определён в res/values/themes.xml
-        setTheme(R.style.Theme_FermentTracker)
-
         super.onCreate(savedInstanceState)
+
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         binding.fabAdd.setOnClickListener {
-            findNavController(R.id.nav_host_fragment).navigate(R.id.action_to_createBatch)
+            findNavController(R.id.nav_host_fragment)
+                .navigate(R.id.action_batchList_to_createBatch)
+        }
+
+        binding.fabScanQr.setOnClickListener {
+            findNavController(R.id.nav_host_fragment)
+                .navigate(R.id.action_batchList_to_qr)
         }
 
         // Пример регистрации периодического воркера (раскомментируйте и импортируйте WorkManager,

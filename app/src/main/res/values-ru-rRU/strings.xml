@@ -25,4 +25,15 @@
     <string name="product_sauerkraut">Квашеная капуста</string>
     <string name="product_kombucha">Комбуча</string>
     <string name="product_pickles">Солёные огурцы</string>
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string-array name="fermentation_types">
+        <item>Сыровяленое мясо</item>
+        <item>Сыровяленая колбаса</item>
+        <item>Пиво</item>
+        <item>Вино</item>
+        <item>Квас</item>
+        <item>Кимчи</item>
+        <item>Квашеная капуста</item>
+        <item>Другое</item>
+    </string-array>
 </resources>

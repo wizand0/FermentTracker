@@ -33,6 +33,14 @@
             app:layout_constraintStart_toStartOf="parent"
             tools:text="48 h" />
 
+        <EditText
+            android:id="@+id/etDuration"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/tvStageName"
+            app:layout_constraintEnd_toEndOf="parent"
+            tools:text="48 h" />
+
         <!-- Current Weight -->
         <TextView
             android:id="@+id/tvCurrentWeight"
@@ -71,49 +79,6 @@
             app:layout_constraintStart_toStartOf="parent"
             android:layout_marginTop="4dp"
             tools:text="Time Left: 24 h" />
-
-        <!-- Photos RecyclerView -->
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rvPhotos"
-            android:layout_width="match_parent"
-            android:layout_height="100dp"
-            app:layout_constraintTop_toBottomOf="@id/tvTimeLeft"
-            app:layout_constraintStart_toStartOf="parent"
-            android:layout_marginTop="8dp"
-            android:orientation="horizontal"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
-
-        <!-- Action Buttons -->
-        <Button
-            android:id="@+id/btnAddWeight"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Add Weight"
-            app:layout_constraintTop_toBottomOf="@id/rvPhotos"
-            app:layout_constraintStart_toStartOf="parent"
-            android:layout_marginTop="8dp" />
-
-        <Button
-            android:id="@+id/btnAddPhoto"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Add Photo"
-            app:layout_constraintTop_toBottomOf="@id/rvPhotos"
-            app:layout_constraintStart_toEndOf="@id/btnAddWeight"
-            android:layout_marginTop="8dp"
-            android:layout_marginStart="8dp" />
-
-        <Button
-            android:id="@+id/btnNextStage"
-            android:layout_width="60dp"
-            android:layout_height="wrap_content"
-            android:text="Next"
-            android:backgroundTint="@android:color/holo_red_dark"
-            android:textSize="12sp"
-            app:layout_constraintTop_toBottomOf="@id/rvPhotos"
-            app:layout_constraintStart_toEndOf="@id/btnAddPhoto"
-            android:layout_marginTop="8dp"
-            android:layout_marginStart="8dp" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.cardview.widget.CardView>

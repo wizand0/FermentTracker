@@ -1,68 +1,74 @@
 package ru.wizand.fermenttracker.ui.batches
 
-import android.content.Intent
-import android.graphics.Bitmap
-import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.content.FileProvider
+import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
-import androidx.navigation.fragment.navArgs
+import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
+import kotlinx.coroutines.launch
+import ru.wizand.fermenttracker.R
 import ru.wizand.fermenttracker.databinding.FragmentQrBinding
-import com.google.zxing.BarcodeFormat
-import com.google.zxing.MultiFormatWriter
-import com.google.zxing.common.BitMatrix
-import java.io.File
-import java.io.FileOutputStream
+import ru.wizand.fermenttracker.vm.BatchListViewModel
 
-class QRFragment : Fragment() {
+class QrFragment : Fragment() {
 
     private var _binding: FragmentQrBinding? = null
     private val binding get() = _binding!!
-    private val args: QRFragmentArgs by navArgs()
+    private val viewModel: BatchListViewModel by activityViewModels()
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
         _binding = FragmentQrBinding.inflate(inflater, container, false)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        val batchId = args.batchId
-        val text = batchId ?: "no-id"
-        val qrBitmap = createQRCodeBitmap(text, 800)
-        binding.ivQr.setImageBitmap(qrBitmap)
-
-        binding.btnShare.setOnClickListener { shareBitmap(qrBitmap, "qr_${text}.png") }
-        binding.btnSave.setOnClickListener { saveBitmapToCache(qrBitmap, "qr_${text}.png") }
+        super.onViewCreated(view, savedInstanceState)
+        setupQrScanner()
     }
 
-    private fun createQRCodeBitmap(text: String, size: Int): Bitmap {
-        val bitMatrix: BitMatrix = MultiFormatWriter().encode(text, BarcodeFormat.QR_CODE, size, size)
-        val width = bitMatrix.width
-        val height = bitMatrix.height
-        val bmp = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
-        for (x in 0 until width) for (y in 0 until height) bmp.setPixel(x, y, if (bitMatrix[x, y]) android.graphics.Color.BLACK else android.graphics.Color.WHITE)
-        return bmp
+    private fun setupQrScanner() {
+        // Placeholder for testing
+        handleQrResult("test_qr_code")
     }
 
-    private fun saveBitmapToCache(bitmap: Bitmap, filename: String): Uri? {
-        val cachePath = File(requireContext().cacheDir, "images")
-        cachePath.mkdirs()
-        val file = File(cachePath, filename)
-        FileOutputStream(file).use { out -> bitmap.compress(Bitmap.CompressFormat.PNG, 100, out) }
-        return FileProvider.getUriForFile(requireContext(), requireContext().packageName + ".fileprovider", file)
-    }
-
-    private fun shareBitmap(bitmap: Bitmap, filename: String) {
-        val uri = saveBitmapToCache(bitmap, filename) ?: return
-        val share = Intent(Intent.ACTION_SEND).apply {
-            type = "image/png"
-            putExtra(Intent.EXTRA_STREAM, uri)
-            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+    private fun handleQrResult(qrCode: String) {
+        lifecycleScope.launch {
+            try {
+                val batch = viewModel.findBatchByQrCode(qrCode)
+                if (batch != null) {
+                    val action = QrFragmentDirections.actionQrToBatchDetail(batch.id)
+                    findNavController().navigate(action)
+                } else {
+                    showNotFoundDialog(qrCode)
+                }
+            } catch (e: Exception) {
+                showErrorMessage("Ошибка поиска: ${e.message}")
+            }
         }
-        startActivity(Intent.createChooser(share, null))
+    }
+
+    private fun showNotFoundDialog(qrCode: String) {
+        AlertDialog.Builder(requireContext())
+            .setTitle("Продукт не найден")
+            .setMessage("QR-код $qrCode не найден в базе данных")
+            .setPositiveButton("OK", null)
+            .setNegativeButton("Создать новый") { _, _ ->
+                findNavController().navigate(R.id.action_qr_to_createBatch)
+            }
+            .show()
+    }
+
+    private fun showErrorMessage(message: String) {
+        Toast.makeText(context, message, Toast.LENGTH_LONG).show()
     }
 
     override fun onDestroyView() {

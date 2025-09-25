@@ -6,10 +6,13 @@ import java.util.UUID
 
 @Entity(tableName = "batches")
 data class Batch(
-    @PrimaryKey val id: String = UUID.randomUUID().toString(),
+    @PrimaryKey(autoGenerate = false) // Changed: no auto-gen, use UUID
+    val id: String = UUID.randomUUID().toString(), // Changed: String UUID
     val name: String,
-    val productType: String,
-    val startDate: Long = System.currentTimeMillis(),
-    val startWeightGr: Double,
-    val status: String = "active" // "active", "finished"
+    val type: String, // Оставляем type
+    val startDate: Long,
+    val currentStage: String,
+    val notes: String,
+    val isActive: Boolean = true,
+    val qrCode: String? = null
 )

@@ -1,70 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+android:layout_width="match_parent"
+android:layout_height="wrap_content"
+android:orientation="vertical"
+xmlns:tools="http://schemas.android.com/tools"
+android:padding="16dp">
+<TextView
+    android:id="@+id/tvBatchName"
+    android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    xmlns:tools="http://schemas.android.com/tools"
-    app:cardCornerRadius="8dp"
-    app:cardElevation="4dp"
-    android:layout_margin="8dp">
+    android:textSize="18sp"
+    android:textStyle="bold"
+    tools:text="Batch Name" />
+<TextView
+    android:id="@+id/tvProductType"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:textSize="16sp"
+    tools:text="Product Type" />
+<TextView
+    android:id="@+id/currentStageName"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:textSize="14sp"
+    tools:text="Current stage" />
+<TextView
+    android:id="@+id/tvBatchStartDate"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:textSize="14sp"
+    tools:text="Start date: 02.09.2025" />
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="16dp">
-
-        <!-- Product Icon -->
-        <ImageView
-            android:id="@+id/ivProductIcon"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            android:src="@drawable/ic_product_placeholder" />
-
-        <!-- Name -->
-        <TextView
-            android:id="@+id/tvName"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toEndOf="@id/ivProductIcon"
-            app:layout_constraintEnd_toStartOf="@id/progressLoss"
-            android:layout_marginStart="8dp"
-            tools:text="Batch Name" />
-
-        <!-- Type -->
-        <TextView
-            android:id="@+id/tvType"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@id/tvName"
-            app:layout_constraintStart_toEndOf="@id/ivProductIcon"
-            app:layout_constraintEnd_toStartOf="@id/progressLoss"
-            android:layout_marginStart="8dp"
-            tools:text="Product Type" />
-
-        <!-- Progress -->
-        <ProgressBar
-            android:id="@+id/progressLoss"
-            style="?android:attr/progressBarStyleHorizontal"
-            android:layout_width="80dp"
-            android:layout_height="wrap_content"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:max="100"
-            tools:progress="50" />
-
-        <!-- Progress Percent -->
-        <TextView
-            android:id="@+id/tvProgressPercent"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@id/progressLoss"
-            app:layout_constraintEnd_toEndOf="parent"
-            tools:text="50%" />
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
-</androidx.cardview.widget.CardView>
+<TextView
+    android:id="@+id/tvProgress"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:textSize="14sp"
+    tools:text="50%" />
+</LinearLayout>

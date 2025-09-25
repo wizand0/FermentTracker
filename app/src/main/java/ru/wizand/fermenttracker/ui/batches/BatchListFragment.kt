@@ -1,16 +1,17 @@
 package ru.wizand.fermenttracker.ui.batches
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import ru.wizand.fermenttracker.R
 import ru.wizand.fermenttracker.databinding.FragmentBatchListBinding
 import ru.wizand.fermenttracker.ui.adapters.BatchAdapter
 import ru.wizand.fermenttracker.vm.BatchListViewModel
@@ -21,7 +22,11 @@ class BatchListFragment : Fragment() {
     private val binding get() = _binding!!
     private val viewModel: BatchListViewModel by activityViewModels()
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
         _binding = FragmentBatchListBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -30,8 +35,10 @@ class BatchListFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         val adapter = BatchAdapter { batch ->
-            val action = BatchListFragmentDirections.actionBatchListToBatchDetail(batch.id)
-            findNavController().navigate(action)
+            val bundle = Bundle().apply {
+                putString("batchId", batch.id)
+            }
+            findNavController().navigate(R.id.action_batchList_to_batchDetail, bundle)
         }
         binding.rvBatches.layoutManager = LinearLayoutManager(requireContext())
         binding.rvBatches.adapter = adapter
@@ -40,8 +47,15 @@ class BatchListFragment : Fragment() {
             adapter.submitList(batches)
         }
 
-        val itemTouchHelper = ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT) {
-            override fun onMove(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder): Boolean = false
+        val itemTouchHelper = ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(
+            0,
+            ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT
+        ) {
+            override fun onMove(
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder,
+                target: RecyclerView.ViewHolder
+            ): Boolean = false
 
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
                 val position = viewHolder.adapterPosition

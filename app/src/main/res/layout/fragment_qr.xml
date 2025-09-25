@@ -1,26 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
-    android:padding="16dp"
-    android:gravity="center"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
 
-    <ImageView
-        android:id="@+id/ivQr"
-        android:layout_width="300dp"
-        android:layout_height="300dp"
-        android:contentDescription="@string/qr_image"/>
-
-    <Button
-        android:id="@+id/btnShare"
+    <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/share"/>
+        android:text="QR Scanner"
+        android:textSize="24sp"
+        android:textAlignment="center"
+        android:layout_marginBottom="32dp" />
 
     <Button
-        android:id="@+id/btnSave"
+        android:id="@+id/btnScan"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/save"/>
+        android:text="Сканировать QR-код" />
+
 </LinearLayout>

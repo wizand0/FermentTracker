@@ -26,4 +26,14 @@
     <string name="product_pickles">Pickles</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string-array name="fermentation_types">
+        <item>Dry-cured meat</item>
+        <item>Dry-cured sausage</item>
+        <item>Beer</item>
+        <item>Wine</item>
+        <item>Kvass</item>
+        <item>Kimchi</item>
+        <item>Sauerkraut</item>
+        <item>Other</item>
+    </string-array>
 </resources>

@@ -1,44 +1,56 @@
 package ru.wizand.fermenttracker.data.repository
 
-import androidx.lifecycle.LiveData
 import ru.wizand.fermenttracker.data.db.dao.BatchDao
 import ru.wizand.fermenttracker.data.db.entities.Batch
+import ru.wizand.fermenttracker.data.db.entities.BatchLog
 import ru.wizand.fermenttracker.data.db.entities.Photo
 import ru.wizand.fermenttracker.data.db.entities.Stage
 
-class BatchRepository(private val dao: BatchDao) {
-    val allBatches: LiveData<List<Batch>> = dao.getAllBatches()
+class BatchRepository(private val batchDao: BatchDao) {
+
+    val allBatches = batchDao.getAllBatches()
 
     suspend fun addBatch(batch: Batch) {
-        android.util.Log.d("BatchRepository", "Inserting batch: $batch")
-        dao.insertBatch(batch)
+        batchDao.insertBatch(batch)
     }
 
+    suspend fun updateBatch(batch: Batch) {
+        batchDao.updateBatch(batch)
+    }
+
+    suspend fun deleteBatch(batchId: String) {
+        batchDao.deleteBatch(batchId)
+    }
+
+    fun getBatchById(batchId: String) = batchDao.getBatchById(batchId)
+
     suspend fun addStage(stage: Stage) {
-        android.util.Log.d("BatchRepository", "Inserting stage: $stage")
-        dao.insertStage(stage)
+        batchDao.insertStage(stage)
     }
 
     suspend fun updateStage(stage: Stage) {
-        android.util.Log.d("BatchRepository", "Updating stage: $stage")
-        dao.updateStage(stage)
+        batchDao.updateStage(stage)
     }
+
+    suspend fun deleteStage(stageId: String) {
+        batchDao.deleteStage(stageId)
+    }
+
+    fun getStages(batchId: String) = batchDao.getStagesForBatch(batchId)
 
     suspend fun addPhoto(photo: Photo) {
-        android.util.Log.d("BatchRepository", "Inserting photo: $photo")
-        dao.insertPhoto(photo)
+        batchDao.insertPhoto(photo)
     }
 
-    suspend fun updatePhoto(photo: Photo) {
-        android.util.Log.d("BatchRepository", "Updating photo: $photo")
-        dao.updatePhoto(photo)
+    fun getPhotos(batchId: String) = batchDao.getPhotosForBatch(batchId)
+
+    suspend fun addLog(log: BatchLog) {
+        batchDao.insertLog(log)
     }
 
-    suspend fun deleteBatch(batch: Batch) = dao.deleteBatch(batch)
+    fun getLogs(batchId: String) = batchDao.getLogsForBatch(batchId)
 
-    fun getBatchById(id: String): LiveData<Batch?> = dao.getBatchById(id)
-
-    fun getStages(batchId: String): LiveData<List<Stage>> = dao.getStagesForBatch(batchId)
-
-    fun getPhotos(stageId: String): LiveData<List<Photo>> = dao.getPhotosForStage(stageId)
+    suspend fun findBatchByQrCode(qrCode: String): Batch? {
+        return batchDao.findBatchByQrCode(qrCode)
+    }
 }

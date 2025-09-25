@@ -2,23 +2,24 @@ package ru.wizand.fermenttracker.data.db.entities
 
 import androidx.room.Entity
 import androidx.room.ForeignKey
-import androidx.room.ForeignKey.Companion.CASCADE
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import kotlinx.parcelize.Parcelize
 import java.util.UUID
 
+@Parcelize
 @Entity(
     tableName = "stages",
-    foreignKeys = [ForeignKey(entity = Batch::class, parentColumns = ["id"], childColumns = ["batchId"], onDelete = CASCADE)],
+    foreignKeys = [ForeignKey(entity = Batch::class, parentColumns = ["id"], childColumns = ["batchId"], onDelete = ForeignKey.CASCADE)],
     indices = [Index("batchId")]
 )
 data class Stage(
     @PrimaryKey val id: String = UUID.randomUUID().toString(),
-    val batchId: String?,
+    val batchId: String? = null,
     val name: String,
-    val durationHours: Long, // длительность в часах
+    val durationHours: Long,
     val startTime: Long? = null,
     val endTime: Long? = null,
     val currentWeightGr: Double? = null,
     val orderIndex: Int = 0
-)
+) : android.os.Parcelable

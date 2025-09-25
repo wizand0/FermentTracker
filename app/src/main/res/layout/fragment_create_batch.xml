@@ -1,70 +1,58 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="16dp">
+    android:fitsSystemWindows="true"
+    android:paddingTop="?attr/actionBarSize"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".ui.batches.CreateBatchFragment">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:padding="16dp">
 
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/tilName"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="@string/label_batch_name"
-            app:boxCornerRadiusTopStart="8dp"
-            app:boxCornerRadiusTopEnd="8dp">
+    <EditText
+        android:id="@+id/etName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Batch Name" />
 
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/etName"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="text" />
-        </com.google.android.material.textfield.TextInputLayout>
+    <Spinner
+        android:id="@+id/spinnerType"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/label_product_type"
-            android:layout_marginTop="12dp"/>
+    <EditText
+        android:id="@+id/etNotes"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Notes"
+        android:layout_marginTop="16dp" />
 
-        <Spinner
-            android:id="@+id/spinnerType"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"/>
+    <EditText
+        android:id="@+id/etQrCode"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="QR Code (optional)"
+        android:layout_marginTop="16dp" />
 
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/tilStartWeight"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="@string/label_start_weight"
-            android:layout_marginTop="12dp">
+    <Button
+        android:id="@+id/btnLoadTemplate"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Load Template"
+        android:layout_marginTop="16dp" />
 
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/etStartWeight"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="numberDecimal"/>
-        </com.google.android.material.textfield.TextInputLayout>
+    <Button
+        android:id="@+id/btnCreateBatch"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Create Batch"
+        android:layout_marginTop="16dp" />
 
-        <!-- Кнопки/шаблоны этапов -->
-        <Button
-            android:id="@+id/btnTemplateStages"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/button_load_template"
-            android:layout_marginTop="12dp"/>
-
-        <Button
-            android:id="@+id/btnSave"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/save"
-            android:layout_marginTop="20dp"/>
     </LinearLayout>
 </ScrollView>

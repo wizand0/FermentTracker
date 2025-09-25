@@ -7,37 +7,49 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import ru.wizand.fermenttracker.data.db.entities.Batch
 import ru.wizand.fermenttracker.databinding.ItemBatchBinding
+import ru.wizand.fermenttracker.R
+import java.text.SimpleDateFormat
+import java.util.Locale
+import java.util.Date
 
-class BatchAdapter(
-    private val onClick: (Batch) -> Unit
-) : ListAdapter<Batch, BatchAdapter.VH>(DIFF) {
+class BatchAdapter(private val onItemClick: (Batch) -> Unit) :
+    ListAdapter<Batch, BatchAdapter.BatchViewHolder>(BatchDiffCallback()) {
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VH {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BatchViewHolder {
         val binding = ItemBatchBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return VH(binding)
+        return BatchViewHolder(binding)
     }
 
-    override fun onBindViewHolder(holder: VH, position: Int) = holder.bind(getItem(position))
+    override fun onBindViewHolder(holder: BatchViewHolder, position: Int) {
+        val batch = getItem(position)
+        holder.bind(batch)
+    }
 
-    inner class VH(private val b: ItemBatchBinding) : RecyclerView.ViewHolder(b.root) {
+    inner class BatchViewHolder(private val binding: ItemBatchBinding) :
+        RecyclerView.ViewHolder(binding.root) {
+
         fun bind(batch: Batch) {
-            b.tvName.text = batch.name
-            b.tvType.text = batch.productType
-            b.progressLoss.progress = 50 // Replace with actual progress logic
-            b.tvProgressPercent.text = "50%"
-            b.root.setOnClickListener { onClick(batch) }
+            binding.tvBatchName.text = batch.name // Changed: use binding directly
+            binding.tvProductType.text = batch.type // Assuming binding has tvProductType
+            binding.currentStageName.text = batch.currentStage // Assuming binding has currentStageName
+            binding.tvBatchStartDate.text = formatDate(batch.startDate) // Assuming binding has tvBatchStartDate
+
+            binding.root.setOnClickListener { onItemClick(batch) }
+        }
+
+        private fun formatDate(timestamp: Long): String {
+            val sdf = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
+            return sdf.format(Date(timestamp))
         }
     }
 
-    companion object {
-        private val DIFF = object : DiffUtil.ItemCallback<Batch>() {
-            override fun areItemsTheSame(oldItem: Batch, newItem: Batch) = oldItem.id == newItem.id
-            override fun areContentsTheSame(oldItem: Batch, newItem: Batch) = oldItem == newItem
+    class BatchDiffCallback : DiffUtil.ItemCallback<Batch>() {
+        override fun areItemsTheSame(oldItem: Batch, newItem: Batch): Boolean {
+            return oldItem.id == newItem.id
         }
-    }
 
-    // Updated to only set the swipe listener without returning ItemTouchHelper.Callback
-    fun setOnItemSwipeListener(onSwipe: (Batch) -> Unit) {
-        // This function now only stores the swipe action; ItemTouchHelper setup moves to Fragment
+        override fun areContentsTheSame(oldItem: Batch, newItem: Batch): Boolean {
+            return oldItem == newItem
+        }
     }
 }
