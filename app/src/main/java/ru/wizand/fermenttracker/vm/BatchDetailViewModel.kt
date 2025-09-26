@@ -15,7 +15,10 @@ import ru.wizand.fermenttracker.data.db.entities.Stage
 import ru.wizand.fermenttracker.data.repository.BatchRepository
 
 class BatchDetailViewModel(application: Application, private val batchId: String) : AndroidViewModel(application) {
-    private val repository = BatchRepository(AppDatabase.getInstance(application).batchDao())
+    private val repository = BatchRepository(
+        AppDatabase.getInstance(application).batchDao(),
+        application.applicationContext
+    )
     val batch: LiveData<Batch?> = repository.getBatchById(batchId)
     val stages: LiveData<List<Stage>> = repository.getStages(batchId)
     val photos: LiveData<List<Photo>> = repository.getPhotos(batchId)

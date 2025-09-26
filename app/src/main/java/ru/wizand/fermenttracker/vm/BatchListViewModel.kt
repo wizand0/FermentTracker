@@ -28,7 +28,19 @@ class BatchListViewModel(application: Application) : AndroidViewModel(applicatio
 
     fun createBatchWithStages(batch: Batch, stages: List<Stage>) {
         viewModelScope.launch {
-            repository.insertBatchWithStages(batch, stages)
+            try {
+                repository.insertBatchWithStages(batch, stages)
+            } catch (e: Exception) {
+                // fallback: добавляем батч и стадии по отдельности
+                repository.addBatch(batch)
+                stages.forEach { stage ->
+                    try {
+                        repository.addStage(stage)
+                    } catch (stageEx: Exception) {
+                        // можно залогировать или пропустить
+                    }
+                }
+            }
         }
     }
 
@@ -106,5 +118,9 @@ class BatchListViewModel(application: Application) : AndroidViewModel(applicatio
     // Можно добавить Flow/LiveData-методы для stages, если нужно
     fun getStagesForBatchLive(batchId: String): LiveData<List<Stage>> {
         return batchDao.getStagesForBatch(batchId)
+    }
+
+    fun scheduleStageNotification(stage: Stage, batch: Batch) {
+        repository.scheduleStageNotification(stage, batch)
     }
 }

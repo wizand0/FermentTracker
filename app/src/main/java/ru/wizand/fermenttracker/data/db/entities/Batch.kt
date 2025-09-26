@@ -14,5 +14,6 @@ data class Batch(
     val currentStage: String,
     val notes: String,
     val isActive: Boolean = true,
-    val qrCode: String? = null
+    val qrCode: String? = null,
+    val initialWeightGr: Double? = null
 )

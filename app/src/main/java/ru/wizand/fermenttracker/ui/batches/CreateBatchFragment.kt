@@ -87,6 +87,8 @@ class CreateBatchFragment : Fragment() {
 //        }
         binding.btnSave.setOnClickListener {
             val name = binding.etBatchName.text.toString()
+            val initialWeightText = binding.etInitialWeight.text.toString()
+            val initialWeight = initialWeightText.toDoubleOrNull()
             if (name.isEmpty()) {
                 binding.etBatchName.error = "Batch name is required"
                 return@setOnClickListener
@@ -117,16 +119,16 @@ class CreateBatchFragment : Fragment() {
                 startDate = now,
                 currentStage = calculatedStages.firstOrNull()?.name ?: "",
                 notes = binding.etNotes.text.toString(),
-                qrCode = binding.etQrCode.text.toString()
+                qrCode = binding.etQrCode.text.toString(),
+                initialWeightGr = initialWeight
             )
 
             // сохраняем в БД
             viewModel.createBatchWithStages(batch, calculatedStages)
 
             // планируем уведомления
-            val repository = viewModel.getRepository(requireContext())
             calculatedStages.forEach { stage ->
-                repository.scheduleStageNotification(stage, batch)
+                viewModel.scheduleStageNotification(stage, batch)
             }
 
             findNavController().popBackStack()
