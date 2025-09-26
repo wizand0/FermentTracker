@@ -29,9 +29,6 @@ FermentTracker is an Android application designed to help users manage and track
 |-----------------------------|----------------------------|
 | ![](images/screenshot3.png) | ![](images/screenshot7.png) |
 
-|  Server Settings (PIN Lock)  |  Server Configuration Options |
-|--------------------------------|---------------------------------|
-| ![](images/screenshot6.png)    | ![](images/screenshot4.png)     |
 
 *(Note: Replace these URLs with actual screenshot links hosted on GitHub or another service.)*
 
