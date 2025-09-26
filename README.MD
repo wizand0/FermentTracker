@@ -15,11 +15,6 @@ FermentTracker is an Android application designed to help users manage and track
 - **Template Editing**: Add and edit preparation templates for recurring processes.
 
 ### Screenshots
-![Batch List](https://example.com/screenshots/batch_list.png)  
-![Batch Detail](https://example.com/screenshots/batch_detail.png)  
-![QR Code](https://example.com/screenshots/qr_code.png)  
-
-## 📸 Screenshots
 
 |  Main screen (swipe)     |  Detailed info (page1)    |  Detailed info (page2)    | Create new product        |
 |--------------------------|---------------------------|---------------------------|---------------------------|
