@@ -18,6 +18,21 @@ FermentTracker is an Android application designed to help users manage and track
 ![Batch List](https://example.com/screenshots/batch_list.png)  
 ![Batch Detail](https://example.com/screenshots/batch_detail.png)  
 ![QR Code](https://example.com/screenshots/qr_code.png)  
+
+## 📸 Screenshots
+
+|  Main screen (swipe)     |  Detailed info (page1)    |
+|----------------------------|-----------------------------|
+| ![](images/screenshot1.png) | ![](images/screenshot3.png) |
+
+|  Detailed info (page2)    |  Create new product      |
+|-----------------------------|----------------------------|
+| ![](images/screenshot3.png) | ![](images/screenshot7.png) |
+
+|  Server Settings (PIN Lock)  |  Server Configuration Options |
+|--------------------------------|---------------------------------|
+| ![](images/screenshot6.png)    | ![](images/screenshot4.png)     |
+
 *(Note: Replace these URLs with actual screenshot links hosted on GitHub or another service.)*
 
 ### Technology Stack
