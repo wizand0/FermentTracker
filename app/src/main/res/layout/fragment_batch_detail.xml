@@ -46,6 +46,14 @@
             android:textSize="14sp"
             android:layout_marginTop="8dp" />
 
+        <TextView
+            android:id="@+id/tvInitialWeight"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="14sp"
+            android:layout_marginTop="8dp"
+            android:text="Initial Weight: N/A" /> <!-- Added: display initial weight -->
+
         <EditText
             android:id="@+id/etNotes"
             android:layout_width="match_parent"

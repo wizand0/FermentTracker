@@ -51,9 +51,9 @@ class BatchAdapter(private val onItemClick: (Batch) -> Unit) :
 
         private fun computeProgress(batch: Batch): String {
             val now = System.currentTimeMillis()
-            if (batch.type in weightBasedTypes && batch.initialWeightGr != null && batch.currentWeightGr != null && batch.initialWeightGr > 0) { // Added: check initial > 0 to avoid div by zero
-                val lossPercent = ((batch.initialWeightGr - batch.currentWeightGr) / batch.initialWeightGr * 100).toInt()
-                return "$lossPercent% loss"
+            if (batch.type in weightBasedTypes && batch.initialWeightGr != null && batch.currentWeightGr != null && batch.initialWeightGr > 0) {
+                val lossPercent = ((batch.initialWeightGr - batch.currentWeightGr) / batch.initialWeightGr * 100) // Updated: keep as Double for precision
+                return "%.2f%% loss".format(lossPercent) // Updated: format to 2 decimal places, like in Python
             } else if (batch.plannedCompletionDate != null && batch.plannedCompletionDate > batch.startDate) {
                 val totalMs = batch.plannedCompletionDate - batch.startDate
                 val passedMs = now - batch.startDate

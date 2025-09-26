@@ -103,9 +103,15 @@ class BatchDetailFragment : Fragment() {
                 binding.currentStageName.text = it.currentStage
                 binding.tvBatchStartDate.text = formatDate(it.startDate)
 
+                // Added: display initial weight
+                binding.tvInitialWeight.text = it.initialWeightGr?.let { "Initial Weight: $it g" } ?: "Initial Weight: N/A"
+
                 // 🔥 загружаем заметку и QR-код при открытии
                 binding.etNotes.setText(it.notes ?: "")
                 binding.etQrCode.setText(it.qrCode ?: "")
+
+                // Added: update adapter with latest batch weight
+                stageAdapter.updateBatchWeight(it.currentWeightGr)
             }
         }
 
@@ -133,6 +139,9 @@ class BatchDetailFragment : Fragment() {
                 }
                 lastWeight = null
             }
+
+            // Added: refresh adapter after stages update (ensures weight display if active stage changed)
+            stageAdapter.notifyDataSetChanged()
         }
 
         viewModel.photos.observe(viewLifecycleOwner) { photos ->

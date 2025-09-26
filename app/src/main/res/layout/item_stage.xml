@@ -34,16 +34,6 @@
             android:layout_marginTop="8dp"
             tools:text="48 h" />
 
-        <EditText
-            android:id="@+id/etDuration"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:hint="Duration (hours)"
-            app:layout_constraintTop_toBottomOf="@id/tvDuration"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:inputType="number"
-            tools:text="48 h"/>
-
         <!-- Current Weight --> <!-- Removed: now batch-level -->
         <!-- <TextView
             android:id="@+id/tvCurrentWeight"
@@ -55,6 +45,18 @@
             tools:text="Weight: N/A" /> -->
 
         <!-- Planned Start Time -->
+        <EditText
+            android:id="@+id/etDuration"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:hint="Duration (hours)"
+            android:inputType="number"
+            app:layout_constraintBottom_toTopOf="@+id/btnStartStage"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/tvPlannedStartTime"
+            app:layout_constraintTop_toBottomOf="@+id/tvCurrentWeight"
+            tools:text="48 h" />
+
         <TextView
             android:id="@+id/tvPlannedStartTime"
             android:layout_width="wrap_content"
@@ -109,10 +111,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
 
-            app:layout_constraintBottom_toTopOf="@+id/etDuration"
+
+            app:layout_constraintBottom_toBottomOf="@+id/tvStageName"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/tvStageName"
-            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/tvStageName"
             tools:text="Current Weight" />
 
 
