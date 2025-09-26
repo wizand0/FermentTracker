@@ -2,8 +2,7 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:fitsSystemWindows="true">
+    android:layout_height="match_parent">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -11,63 +10,87 @@
         android:orientation="vertical"
         android:padding="16dp">
 
-        <TextView
-            android:id="@+id/tvBatchName"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="18sp"
-            android:textStyle="bold" />
-
-        <TextView
-            android:id="@+id/tvType"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="14sp"
-            android:layout_marginTop="8dp" />
-
-        <TextView
-            android:id="@+id/currentStageName"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="14sp"
-            android:layout_marginTop="8dp" />
-
-        <TextView
-            android:id="@+id/timeLeft"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="14sp"
-            android:layout_marginTop="8dp" />
-
-        <TextView
-            android:id="@+id/tvBatchStartDate"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="14sp"
-            android:layout_marginTop="8dp" />
-
-        <TextView
-            android:id="@+id/tvInitialWeight"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="14sp"
-            android:layout_marginTop="8dp"
-            android:text="Initial Weight: N/A" /> <!-- Added: display initial weight -->
-
-        <EditText
-            android:id="@+id/etNotes"
+        <!-- Карточка информации -->
+        <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Notes"
-            android:layout_marginTop="16dp" />
+            app:cardCornerRadius="12dp"
+            app:cardElevation="4dp"
+            android:layout_marginBottom="16dp">
 
-        <EditText
-            android:id="@+id/etQrCode"
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:id="@+id/tvBatchName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvType"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp" />
+
+                <TextView
+                    android:id="@+id/currentStageName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp" />
+
+                <TextView
+                    android:id="@+id/timeLeft"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp" />
+
+                <TextView
+                    android:id="@+id/tvBatchStartDate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp" />
+
+                <TextView
+                    android:id="@+id/tvInitialWeight"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Initial Weight: N/A" />
+
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Notes -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Notes">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etNotes"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- QR -->
+        <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="QR Code"
-            android:layout_marginTop="16dp" />
+            android:layout_marginTop="12dp">
 
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etQrCode"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- RecyclerView stages -->
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rvStages"
             android:layout_width="match_parent"
@@ -89,72 +112,45 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp" />
 
-        <Button
+        <!-- Buttons -->
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/btnSaveBatch"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Save Batch"
+            style="@style/Widget.Material3.Button.IconButton.Filled"
             android:layout_marginTop="16dp" />
 
-        <LinearLayout
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnAddPhoto"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginTop="8dp">
-
-            <com.google.android.material.floatingactionbutton.FloatingActionButton
-                android:id="@+id/btnAddPhoto"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:contentDescription="Add Photo"
-                app:srcCompat="@android:drawable/ic_menu_camera"
-                android:layout_marginEnd="4dp" />
-
-            <com.google.android.material.floatingactionbutton.FloatingActionButton
-                android:id="@+id/btnAddWeight"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:contentDescription="Add Weight"
-                app:srcCompat="@android:drawable/ic_menu_edit"
-                android:layout_marginStart="4dp" />
-
-        </LinearLayout>
-
-        <!--        <Button-->
-        <!--            android:id="@+id/btnDeleteBatch"-->
-        <!--            android:layout_width="match_parent"-->
-        <!--            android:layout_height="wrap_content"-->
-        <!--            android:text="Delete Batch"-->
-        <!--            android:layout_marginTop="8dp" />-->
-
-        <!-- <Button
-            android:id="@+id/btnNextStage"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Next Stage"
-            android:layout_marginTop="8dp" /> -->
-
-        <!-- <Button
-            android:id="@+id/btnRemoveStage"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Remove Current Stage"
-            android:layout_marginTop="8dp" /> -->
-
-        <Button
-            android:id="@+id/btnAddStage"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Add Stage"
+            android:text="Add Photo"
+            style="@style/Widget.Material3.Button.OutlinedButton"
             android:layout_marginTop="8dp" />
 
-        <Button
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnAddWeight"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Add Weight"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_marginTop="8dp" />
+
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/btnExportPdf"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Export to PDF"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_marginTop="8dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnAddStage"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Add Stage"
+            style="@style/Widget.Material3.Button.OutlinedButton"
             android:layout_marginTop="8dp" />
 
     </LinearLayout>

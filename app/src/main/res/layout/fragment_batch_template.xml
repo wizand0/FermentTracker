@@ -1,71 +1,124 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
     android:paddingTop="?attr/actionBarSize">
 
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
         android:padding="16dp">
 
+        <!-- Заголовок -->
         <TextView
             android:id="@+id/tvTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Select Recipe Template"
-            android:textSize="18sp"
-            android:textStyle="bold" />
+            android:textSize="20sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
+        <!-- Product Type -->
         <Spinner
             android:id="@+id/spinnerProductType"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp" />
+            android:layout_marginTop="16dp"
+            app:layout_constraintTop_toBottomOf="@id/tvTitle"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
 
-        <EditText
-            android:id="@+id/etNewType"
-            android:layout_width="match_parent"
+        <!-- New Type -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/tilNewType"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:hint="New Type (if custom)"
-            android:layout_marginTop="8dp" /> <!-- Added: for custom/new recipe types -->
+            android:layout_marginTop="8dp"
+            app:layout_constraintTop_toBottomOf="@id/spinnerProductType"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
 
-        <EditText
-            android:id="@+id/etIngredients"
-            android:layout_width="match_parent"
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etNewType"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                tools:text="Custom Recipe" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Ingredients -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/tilIngredients"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:hint="Ingredients"
-            android:layout_marginTop="16dp" /> <!-- Added: for recipe ingredients -->
+            android:layout_marginTop="16dp"
+            app:layout_constraintTop_toBottomOf="@id/tilNewType"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
 
-        <EditText
-            android:id="@+id/etNote"
-            android:layout_width="match_parent"
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etIngredients"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                tools:text="Salt, Pepper, Garlic" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Note -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/tilNote"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:hint="Note"
-            android:layout_marginTop="16dp" /> <!-- Added: for recipe note -->
+            android:layout_marginTop="16dp"
+            app:layout_constraintTop_toBottomOf="@id/tilIngredients"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
 
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etNote"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                tools:text="Best kept cool" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Stages -->
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rvStages"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp" />
+            android:layout_marginTop="16dp"
+            app:layout_constraintTop_toBottomOf="@id/tilNote"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
 
-        <Button
+        <!-- Buttons -->
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/btnAddStage"
-            android:layout_width="match_parent"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:text="Add Stage"
-            android:layout_marginTop="16dp" />
+            android:layout_marginTop="16dp"
+            app:layout_constraintTop_toBottomOf="@id/rvStages"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
 
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/btnSaveTemplate"
-            android:layout_width="match_parent"
+            style="@style/Widget.MaterialComponents.Button"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:text="Save Template"
-            android:layout_marginTop="16dp" />
+            android:layout_marginTop="16dp"
+            app:layout_constraintTop_toBottomOf="@id/btnAddStage"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
 
-    </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

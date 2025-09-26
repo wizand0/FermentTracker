@@ -1,40 +1,66 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-android:layout_width="match_parent"
-android:layout_height="wrap_content"
-android:orientation="vertical"
-xmlns:tools="http://schemas.android.com/tools"
-android:padding="16dp">
-<TextView
-    android:id="@+id/tvBatchName"
-    android:layout_width="wrap_content"
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:textSize="18sp"
-    android:textStyle="bold"
-    tools:text="Batch Name" />
-<TextView
-    android:id="@+id/tvProductType"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:textSize="16sp"
-    tools:text="Product Type" />
-<TextView
-    android:id="@+id/currentStageName"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:textSize="14sp"
-    tools:text="Current stage" />
-<TextView
-    android:id="@+id/tvBatchStartDate"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:textSize="14sp"
-    tools:text="Start date: 02.09.2025" />
+    android:layout_margin="8dp"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="6dp">
 
-<TextView
-    android:id="@+id/tvProgress"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:textSize="14sp"
-    tools:text="50%" />
-</LinearLayout>
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp">
+
+        <TextView
+            android:id="@+id/tvBatchName"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toStartOf="@id/tvProgress"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="Batch Name" />
+
+        <TextView
+            android:id="@+id/tvProgress"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintBaseline_toBaselineOf="@id/tvBatchName"
+            app:layout_constraintEnd_toEndOf="parent"
+            tools:text="50%" />
+
+        <TextView
+            android:id="@+id/tvProductType"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvBatchName"
+            tools:text="Product Type" />
+
+        <TextView
+            android:id="@+id/currentStageName"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvProductType"
+            tools:text="Current stage" />
+
+        <TextView
+            android:id="@+id/tvBatchStartDate"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/currentStageName"
+            tools:text="Start date: 02.09.2025" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</com.google.android.material.card.MaterialCardView>

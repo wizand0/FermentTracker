@@ -40,6 +40,7 @@ class StageAdapter(
 
         fun bind(stage: Stage) {
             binding.tvStageName.text = stage.name
+//            binding.tvDuration.text = "${stage.durationHours} h"
             binding.tvDuration.text = "${stage.durationHours} h"
 
             // убираем старый TextWatcher, если он был
@@ -79,8 +80,33 @@ class StageAdapter(
             btnStartStage.isVisible = (stage.startTime == null)
             btnCompleteStage.isVisible = (stage.startTime != null && stage.endTime == null)
 
-            btnStartStage.setOnClickListener { onStartClicked(stage) }
-            btnCompleteStage.setOnClickListener { onCompleteClicked(stage) }
+//            btnStartStage.setOnClickListener { onStartClicked(stage) }
+//            btnCompleteStage.setOnClickListener { onCompleteClicked(stage) }
+
+            btnStartStage.setOnClickListener {
+                val context = binding.root.context
+                android.app.AlertDialog.Builder(context)
+                    .setTitle("Start stage")
+                    .setMessage("Are you sure you want to start this stage?")
+                    .setPositiveButton("Yes") { _, _ ->
+                        onStartClicked(stage)
+                    }
+                    .setNegativeButton("Cancel", null)
+                    .show()
+            }
+
+            btnCompleteStage.setOnClickListener {
+                val context = binding.root.context
+                android.app.AlertDialog.Builder(context)
+                    .setTitle("Complete stage")
+                    .setMessage("Are you sure you want to complete this stage?")
+                    .setPositiveButton("Yes") { _, _ ->
+                        onCompleteClicked(stage)
+                    }
+                    .setNegativeButton("Cancel", null)
+                    .show()
+            }
+
         }
 
         private fun formatDate(timestamp: Long): String {
