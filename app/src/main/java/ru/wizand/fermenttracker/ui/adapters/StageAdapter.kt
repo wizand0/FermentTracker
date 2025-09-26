@@ -1,14 +1,24 @@
 package ru.wizand.fermenttracker.ui.adapters
 
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import ru.wizand.fermenttracker.data.db.entities.Stage
 import ru.wizand.fermenttracker.databinding.ItemStageBinding
+import java.text.SimpleDateFormat
+import java.util.Locale
+import java.util.concurrent.TimeUnit
 
-class StageAdapter : ListAdapter<Stage, StageAdapter.StageViewHolder>(StageDiffCallback()) {
+class StageAdapter(
+    private val onStartClicked: (Stage) -> Unit = {},
+    private val onCompleteClicked: (Stage) -> Unit = {},
+    private val onDurationChanged: (Stage) -> Unit = {}
+) : ListAdapter<Stage, StageAdapter.StageViewHolder>(StageDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): StageViewHolder {
         val binding = ItemStageBinding.inflate(LayoutInflater.from(parent.context), parent, false)
@@ -20,27 +30,75 @@ class StageAdapter : ListAdapter<Stage, StageAdapter.StageViewHolder>(StageDiffC
     }
 
     inner class StageViewHolder(private val binding: ItemStageBinding) : RecyclerView.ViewHolder(binding.root) {
+
         fun bind(stage: Stage) {
             binding.tvStageName.text = stage.name
             binding.tvDuration.text = "${stage.durationHours} h"
-            binding.tvCurrentWeight.text = stage.currentWeightGr?.toString() ?: "N/A"
-            binding.tvStartTime.text = stage.startTime?.let { "Start: ${formatDate(it)}" } ?: "Not started"
-            binding.tvEndTime.text = stage.endTime?.let { "End: ${formatDate(it)}" } ?: "Ongoing"
-            binding.tvTimeLeft.text = "Time Left: ${calculateTimeLeft(stage)}"
+
+            // убираем старый TextWatcher, если он был
+            (binding.etDuration.tag as? TextWatcher)?.let {
+                binding.etDuration.removeTextChangedListener(it)
+            }
+
+            binding.etDuration.setText(stage.durationHours.toString())
+
+            // создаём новый TextWatcher и сохраняем его в tag
+            val watcher = object : TextWatcher {
+                override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+                override fun afterTextChanged(s: Editable?) {
+                    val newDuration = s.toString().toLongOrNull()
+                    if (newDuration != null && newDuration != stage.durationHours) {
+                        val updatedStage = stage.copy(durationHours = newDuration)
+                        onDurationChanged(updatedStage)
+                    }
+                }
+            }
+            binding.etDuration.addTextChangedListener(watcher)
+            binding.etDuration.tag = watcher
+
+            // остальная инфа
+            binding.tvCurrentWeight.text = stage.currentWeightGr?.let { "Weight: $it g" } ?: "Weight: N/A"
+            binding.tvPlannedStartTime.text = stage.plannedStartTime?.let { "Planned Start: ${formatDate(it)}" } ?: "Planned Start: N/A"
+            binding.tvPlannedEndTime.text = stage.plannedEndTime?.let { "Planned End: ${formatDate(it)}" } ?: "Planned End: N/A"
+            binding.tvStartTime.text = stage.startTime?.let { "Start: ${formatDate(it)}" } ?: "Start: Not started"
+            binding.tvEndTime.text = stage.endTime?.let { "End: ${formatDate(it)}" } ?: "End: Ongoing"
+
+            binding.tvTimeLeft.text = "Time Left: ${computeTimeLeftText(stage)}"
+
+            val btnStartStage = binding.btnStartStage
+            val btnCompleteStage = binding.btnCompleteStage
+            btnStartStage.isVisible = (stage.startTime == null)
+            btnCompleteStage.isVisible = (stage.startTime != null && stage.endTime == null)
+
+            btnStartStage.setOnClickListener { onStartClicked(stage) }
+            btnCompleteStage.setOnClickListener { onCompleteClicked(stage) }
         }
 
         private fun formatDate(timestamp: Long): String {
-            return java.text.SimpleDateFormat("yyyy-MM-dd HH:mm", java.util.Locale.getDefault()).format(java.util.Date(timestamp))
+            return SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault()).format(java.util.Date(timestamp))
         }
 
-        private fun calculateTimeLeft(stage: Stage): String {
-            val start = stage.startTime ?: return "N/A"
-            val endPlanned = start + java.util.concurrent.TimeUnit.HOURS.toMillis(stage.durationHours)
-            val leftMs = endPlanned - System.currentTimeMillis()
-            return if (leftMs > 0) {
-                val hours = java.util.concurrent.TimeUnit.MILLISECONDS.toHours(leftMs)
-                "$hours h"
-            } else "Overdue"
+        private fun computeTimeLeftText(stage: Stage): String {
+            val now = System.currentTimeMillis()
+            val expectedEnd = when {
+                stage.endTime != null -> stage.endTime
+                stage.startTime != null -> stage.startTime + TimeUnit.HOURS.toMillis(stage.durationHours)
+                stage.plannedEndTime != null -> stage.plannedEndTime
+                else -> null
+            }
+            return if (expectedEnd == null) {
+                "N/A"
+            } else {
+                val diff = expectedEnd - now
+                if (diff <= 0) "Overdue" else formatDuration(diff)
+            }
+        }
+
+        private fun formatDuration(millis: Long): String {
+            val hours = TimeUnit.MILLISECONDS.toHours(millis)
+            val minutes = TimeUnit.MILLISECONDS.toMinutes(millis) - TimeUnit.HOURS.toMinutes(hours)
+            return if (hours > 0) "${hours}h ${minutes}m" else "${minutes}m"
         }
     }
 

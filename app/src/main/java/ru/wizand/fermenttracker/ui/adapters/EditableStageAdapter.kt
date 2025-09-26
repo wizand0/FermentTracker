@@ -9,6 +9,8 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import ru.wizand.fermenttracker.data.db.entities.Stage
 import ru.wizand.fermenttracker.databinding.ItemStageBinding
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 class EditableStageAdapter(
     private val onAddStage: () -> Unit,
@@ -23,9 +25,13 @@ class EditableStageAdapter(
     override fun onBindViewHolder(holder: VH, position: Int) = holder.bind(getItem(position), position)
 
     inner class VH(private val b: ItemStageBinding) : RecyclerView.ViewHolder(b.root) {
+        private val sdf = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault())
+
         fun bind(stage: Stage, pos: Int) {
             b.tvStageName.text = stage.name
             b.etDuration.setText(stage.durationHours.toString())
+            b.tvPlannedStartTime.text = stage.plannedStartTime?.let { "Planned Start: ${sdf.format(it)}" } ?: "Planned Start: N/A"
+            b.tvPlannedEndTime.text = stage.plannedEndTime?.let { "Planned End: ${sdf.format(it)}" } ?: "Planned End: N/A"
 
             b.etDuration.addTextChangedListener(object : TextWatcher {
                 override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
@@ -37,7 +43,7 @@ class EditableStageAdapter(
                 }
             })
 
-//            b.btnRemoveStage.setOnClickListener { onRemoveStage(pos) }
+            b.btnRemoveStage.setOnClickListener { onRemoveStage(pos) }
         }
     }
 

@@ -6,7 +6,17 @@ import ru.wizand.fermenttracker.data.db.entities.BatchLog
 import ru.wizand.fermenttracker.data.db.entities.Photo
 import ru.wizand.fermenttracker.data.db.entities.Stage
 
-class BatchRepository(private val batchDao: BatchDao) {
+import android.content.Context
+import androidx.work.Data
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
+import java.util.concurrent.TimeUnit
+import ru.wizand.fermenttracker.workers.StageNotificationWorker
+
+class BatchRepository(
+    private val batchDao: BatchDao,
+    private val appContext: Context
+) {
 
     val allBatches = batchDao.getAllBatches()
 
@@ -52,5 +62,26 @@ class BatchRepository(private val batchDao: BatchDao) {
 
     suspend fun findBatchByQrCode(qrCode: String): Batch? {
         return batchDao.findBatchByQrCode(qrCode)
+    }
+    fun scheduleStageNotification(stage: Stage, batch: Batch) {
+        val delay = stage.plannedEndTime?.let { it - System.currentTimeMillis() } ?: return
+        if (delay <= 0) return
+
+        val data = Data.Builder()
+            .putString("stageName", stage.name)
+            .putString("batchName", batch.name)
+            .putInt("notificationId", stage.id.hashCode())
+            .build()
+
+        val workRequest = OneTimeWorkRequestBuilder<StageNotificationWorker>()
+            .setInitialDelay(delay, TimeUnit.MILLISECONDS)
+            .setInputData(data)
+            .build()
+
+        WorkManager.getInstance(appContext).enqueue(workRequest)
+    }
+
+    suspend fun insertBatchWithStages(batch: Batch, stages: List<Stage>) {
+        batchDao.insertBatchWithStages(batch, stages)
     }
 }

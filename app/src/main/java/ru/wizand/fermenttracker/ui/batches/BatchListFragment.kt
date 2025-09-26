@@ -1,10 +1,14 @@
 package ru.wizand.fermenttracker.ui.batches
 
+import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
@@ -51,6 +55,9 @@ class BatchListFragment : Fragment() {
             0,
             ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT
         ) {
+            private val deleteIcon = ContextCompat.getDrawable(requireContext(), android.R.drawable.ic_menu_delete)
+            private val background = ColorDrawable(Color.RED)
+
             override fun onMove(
                 recyclerView: RecyclerView,
                 viewHolder: RecyclerView.ViewHolder,
@@ -64,6 +71,42 @@ class BatchListFragment : Fragment() {
                     viewModel.deleteBatch(batch)
                     Toast.makeText(context, "Batch ${batch.name} deleted", Toast.LENGTH_SHORT).show()
                 }
+            }
+
+            override fun onChildDraw(
+                c: Canvas,
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder,
+                dX: Float,
+                dY: Float,
+                actionState: Int,
+                isCurrentlyActive: Boolean
+            ) {
+                super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
+                val itemView = viewHolder.itemView
+                val icon = deleteIcon ?: return
+                val background = background
+
+                val iconMargin = (itemView.height - icon.intrinsicHeight) / 2
+                val iconTop = itemView.top + iconMargin
+                val iconBottom = iconTop + icon.intrinsicHeight
+
+                if (dX > 0) { // Swiping to the right
+                    val iconLeft = itemView.left + iconMargin
+                    val iconRight = iconLeft + icon.intrinsicWidth
+                    icon.setBounds(iconLeft, iconTop, iconRight, iconBottom)
+                    background.setBounds(itemView.left, itemView.top, itemView.left + dX.toInt(), itemView.bottom)
+                } else if (dX < 0) { // Swiping to the left
+                    val iconRight = itemView.right - iconMargin
+                    val iconLeft = iconRight - icon.intrinsicWidth
+                    icon.setBounds(iconLeft, iconTop, iconRight, iconBottom)
+                    background.setBounds(itemView.right + dX.toInt(), itemView.top, itemView.right, itemView.bottom)
+                } else {
+                    background.setBounds(0, 0, 0, 0)
+                }
+
+                background.draw(c)
+                icon.draw(c)
             }
         })
         itemTouchHelper.attachToRecyclerView(binding.rvBatches)

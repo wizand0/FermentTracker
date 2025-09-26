@@ -31,15 +31,18 @@
             android:layout_height="wrap_content"
             app:layout_constraintTop_toBottomOf="@id/tvStageName"
             app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginTop="8dp"
             tools:text="48 h" />
 
         <EditText
             android:id="@+id/etDuration"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@id/tvStageName"
+            android:hint="Duration (hours)"
+            app:layout_constraintTop_toBottomOf="@id/tvDuration"
             app:layout_constraintEnd_toEndOf="parent"
-            tools:text="48 h" />
+            android:inputType="number"
+            tools:text="48 h"/>
 
         <!-- Current Weight -->
         <TextView
@@ -48,17 +51,38 @@
             android:layout_height="wrap_content"
             app:layout_constraintTop_toBottomOf="@id/tvDuration"
             app:layout_constraintStart_toStartOf="parent"
-            tools:text="1.5 kg" />
+            android:layout_marginTop="8dp"
+            tools:text="Weight: N/A" />
+
+        <!-- Planned Start Time -->
+        <TextView
+            android:id="@+id/tvPlannedStartTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/tvCurrentWeight"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginTop="8dp"
+            tools:text="Planned Start: 2025-09-24 10:00" />
+
+        <!-- Planned End Time -->
+        <TextView
+            android:id="@+id/tvPlannedEndTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/tvPlannedStartTime"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginTop="4dp"
+            tools:text="Planned End: 2025-09-26 10:00" />
 
         <!-- Start Time -->
         <TextView
             android:id="@+id/tvStartTime"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@id/tvCurrentWeight"
+            app:layout_constraintTop_toBottomOf="@id/tvPlannedEndTime"
             app:layout_constraintStart_toStartOf="parent"
             android:layout_marginTop="8dp"
-            tools:text="Start: 2025-09-24 10:00" />
+            tools:text="Start: Not started" />
 
         <!-- End Time -->
         <TextView
@@ -77,8 +101,38 @@
             android:layout_height="wrap_content"
             app:layout_constraintTop_toBottomOf="@id/tvEndTime"
             app:layout_constraintStart_toStartOf="parent"
-            android:layout_marginTop="4dp"
+            android:layout_marginTop="8dp"
             tools:text="Time Left: 24 h" />
+
+        <!-- Remove Stage Button (for EditableStageAdapter) -->
+        <Button
+            android:id="@+id/btnRemoveStage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Remove"
+            app:layout_constraintTop_toBottomOf="@id/tvTimeLeft"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="8dp"
+            android:visibility="gone" />
+
+
+        <Button
+            android:id="@+id/btnStartStage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Start"
+            app:layout_constraintBottom_toTopOf="@+id/btnCompleteStage"
+            app:layout_constraintEnd_toEndOf="@+id/btnCompleteStage"
+            app:layout_constraintStart_toStartOf="@+id/btnCompleteStage" />
+
+        <Button
+            android:id="@+id/btnCompleteStage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Complete"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/tvTimeLeft" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.cardview.widget.CardView>

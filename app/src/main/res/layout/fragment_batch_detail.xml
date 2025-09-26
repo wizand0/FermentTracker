@@ -2,7 +2,8 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -87,6 +88,32 @@
             android:text="Save Batch"
             android:layout_marginTop="16dp" />
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="8dp">
+
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/btnAddPhoto"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:contentDescription="Add Photo"
+                app:srcCompat="@android:drawable/ic_menu_camera"
+                android:layout_marginEnd="4dp" />
+
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/btnAddWeight"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:contentDescription="Add Weight"
+                app:srcCompat="@android:drawable/ic_menu_edit"
+                android:layout_marginStart="4dp" />
+
+        </LinearLayout>
+
 <!--        <Button-->
 <!--            android:id="@+id/btnDeleteBatch"-->
 <!--            android:layout_width="match_parent"-->
@@ -94,40 +121,26 @@
 <!--            android:text="Delete Batch"-->
 <!--            android:layout_marginTop="8dp" />-->
 
-        <Button
-            android:id="@+id/btnAddWeight"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Add Weight"
-            android:layout_marginTop="8dp" />
-
-        <Button
-            android:id="@+id/btnAddPhoto"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Add Photo"
-            android:layout_marginTop="8dp" />
-
-        <Button
+        <!-- <Button
             android:id="@+id/btnNextStage"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Next Stage"
-            android:layout_marginTop="8dp" />
+            android:layout_marginTop="8dp" /> -->
 
-        <Button
+        <!-- <Button
             android:id="@+id/btnRemoveStage"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Remove Current Stage"
-            android:layout_marginTop="8dp" />
+            android:layout_marginTop="8dp" /> -->
 
-<!--        <Button-->
-<!--            android:id="@+id/btnAddStage"-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:text="Add Stage"-->
-<!--            android:layout_marginTop="8dp" />-->
+        <Button
+            android:id="@+id/btnAddStage"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Add Stage"
+            android:layout_marginTop="8dp" />
 
         <Button
             android:id="@+id/btnExportPdf"

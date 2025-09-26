@@ -6,7 +6,9 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Transaction
 import androidx.room.Update
+import kotlinx.coroutines.flow.Flow
 import ru.wizand.fermenttracker.data.db.entities.Batch
 import ru.wizand.fermenttracker.data.db.entities.BatchLog
 import ru.wizand.fermenttracker.data.db.entities.Photo
@@ -17,6 +19,12 @@ interface BatchDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertBatch(batch: Batch)
+
+    @Transaction
+    suspend fun insertBatchWithStages(batch: Batch, stages: List<Stage>) {
+        insertBatch(batch)
+        stages.forEach { insertStage(it) }
+    }
 
     @Update
     suspend fun updateBatch(batch: Batch)
@@ -56,4 +64,19 @@ interface BatchDao {
 
     @Query("SELECT * FROM batch_logs WHERE batchId = :batchId ORDER BY timestamp DESC")
     fun getLogsForBatch(batchId: String): LiveData<List<BatchLog>>
+
+    @Query("SELECT * FROM stages WHERE batchId = :batchId ORDER BY orderIndex")
+    fun getStagesForBatchFlow(batchId: String): Flow<List<Stage>>
+
+    @Query("SELECT * FROM stages WHERE batchId = :batchId AND startTime IS NOT NULL AND endTime IS NULL LIMIT 1")
+    suspend fun getActiveStage(batchId: String): Stage?
+
+    @Query("UPDATE stages SET startTime = :startTime, plannedEndTime = :plannedEnd WHERE id = :stageId")
+    suspend fun startStage(stageId: String, startTime: Long, plannedEnd: Long)
+
+    @Query("UPDATE stages SET endTime = :endTime WHERE id = :stageId")
+    suspend fun completeStage(stageId: String, endTime: Long)
+
+    @Query("SELECT * FROM stages WHERE batchId = :batchId AND orderIndex = :orderIndex LIMIT 1")
+    suspend fun getStageByOrder(batchId: String, orderIndex: Int): Stage?
 }
