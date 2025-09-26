@@ -11,9 +11,13 @@ import ru.wizand.fermenttracker.R
 import java.text.SimpleDateFormat
 import java.util.Locale
 import java.util.Date
+import kotlin.math.max
+import kotlin.math.min
 
 class BatchAdapter(private val onItemClick: (Batch) -> Unit) :
     ListAdapter<Batch, BatchAdapter.BatchViewHolder>(BatchDiffCallback()) {
+
+    private val weightBasedTypes = listOf("Dry-cured meat", "Dry-cured sausage") // Added: hardcoded weight-based types
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BatchViewHolder {
         val binding = ItemBatchBinding.inflate(LayoutInflater.from(parent.context), parent, false)
@@ -34,12 +38,29 @@ class BatchAdapter(private val onItemClick: (Batch) -> Unit) :
             binding.currentStageName.text = batch.currentStage // Assuming binding has currentStageName
             binding.tvBatchStartDate.text = formatDate(batch.startDate) // Assuming binding has tvBatchStartDate
 
+            // Added: compute and set progress
+            binding.tvProgress.text = computeProgress(batch)
+
             binding.root.setOnClickListener { onItemClick(batch) }
         }
 
         private fun formatDate(timestamp: Long): String {
             val sdf = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
             return sdf.format(Date(timestamp))
+        }
+
+        private fun computeProgress(batch: Batch): String {
+            val now = System.currentTimeMillis()
+            if (batch.type in weightBasedTypes && batch.initialWeightGr != null && batch.currentWeightGr != null && batch.initialWeightGr > 0) { // Added: check initial > 0 to avoid div by zero
+                val lossPercent = ((batch.initialWeightGr - batch.currentWeightGr) / batch.initialWeightGr * 100).toInt()
+                return "$lossPercent% loss"
+            } else if (batch.plannedCompletionDate != null && batch.plannedCompletionDate > batch.startDate) {
+                val totalMs = batch.plannedCompletionDate - batch.startDate
+                val passedMs = now - batch.startDate
+                val percent = min(100, max(0, (passedMs.toDouble() / totalMs * 100).toInt()))
+                return "$percent%"
+            }
+            return "N/A"
         }
     }
 

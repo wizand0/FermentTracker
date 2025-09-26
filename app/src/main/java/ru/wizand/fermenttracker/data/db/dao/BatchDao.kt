@@ -13,6 +13,8 @@ import ru.wizand.fermenttracker.data.db.entities.Batch
 import ru.wizand.fermenttracker.data.db.entities.BatchLog
 import ru.wizand.fermenttracker.data.db.entities.Photo
 import ru.wizand.fermenttracker.data.db.entities.Stage
+import ru.wizand.fermenttracker.data.db.entities.Recipe // Added
+import ru.wizand.fermenttracker.data.db.entities.StageTemplate // Added
 
 @Dao
 interface BatchDao {
@@ -79,4 +81,32 @@ interface BatchDao {
 
     @Query("SELECT * FROM stages WHERE batchId = :batchId AND orderIndex = :orderIndex LIMIT 1")
     suspend fun getStageByOrder(batchId: String, orderIndex: Int): Stage?
+
+    // Added: Recipe and StageTemplate methods
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertRecipe(recipe: Recipe)
+
+    @Query("SELECT * FROM recipes")
+    suspend fun getAllRecipes(): List<Recipe>
+
+    @Query("SELECT type FROM recipes")
+    suspend fun getAllRecipeTypes(): List<String>
+
+    @Update
+    suspend fun updateRecipe(recipe: Recipe)
+
+    @Query("DELETE FROM recipes WHERE type = :type")
+    suspend fun deleteRecipe(type: String)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertStageTemplate(template: StageTemplate)
+
+    @Query("SELECT * FROM stage_templates WHERE recipeType = :recipeType ORDER BY orderIndex ASC")
+    suspend fun getStageTemplatesForType(recipeType: String): List<StageTemplate>
+
+    @Update
+    suspend fun updateStageTemplate(template: StageTemplate)
+
+    @Query("DELETE FROM stage_templates WHERE id = :id")
+    suspend fun deleteStageTemplate(id: String)
 }

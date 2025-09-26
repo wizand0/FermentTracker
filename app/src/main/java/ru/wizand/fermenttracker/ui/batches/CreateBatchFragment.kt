@@ -18,6 +18,10 @@ import ru.wizand.fermenttracker.ui.adapters.EditableStageAdapter
 import ru.wizand.fermenttracker.vm.BatchListViewModel
 import java.util.UUID
 import java.util.concurrent.TimeUnit
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class CreateBatchFragment : Fragment() {
     private var _binding: FragmentCreateBatchBinding? = null
@@ -43,21 +47,38 @@ class CreateBatchFragment : Fragment() {
     }
 
     private fun setupSpinner() {
-        val types = resources.getStringArray(R.array.fermentation_types)
-        val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, types)
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        binding.spinnerProductType.adapter = adapter
-        binding.spinnerProductType.setOnItemSelectedListener(object : android.widget.AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: android.widget.AdapterView<*>, view: View?, position: Int, id: Long) {
-                val selectedType = types[position]
-                stages = RecipeTemplates.getTemplateStages(requireContext())[selectedType]
-                    ?.mapIndexed { index, stage ->
-                        stage.copy(orderIndex = index)
-                    }?.toMutableList() ?: mutableListOf()
+        // Changed: load from DB instead of array
+        CoroutineScope(Dispatchers.IO).launch {
+            val types = viewModel.repository.getAllRecipeTypes()
+            withContext(Dispatchers.Main) {
+                val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, types)
+                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                binding.spinnerProductType.adapter = adapter
+                binding.spinnerProductType.setOnItemSelectedListener(object : android.widget.AdapterView.OnItemSelectedListener {
+                    override fun onItemSelected(parent: android.widget.AdapterView<*>, view: View?, position: Int, id: Long) {
+                        val selectedType = types[position]
+                        loadStagesForType(selectedType)
+                    }
+                    override fun onNothingSelected(parent: android.widget.AdapterView<*>) {}
+                })
+            }
+        }
+    }
+
+    private fun loadStagesForType(type: String) {
+        CoroutineScope(Dispatchers.IO).launch {
+            val templates = viewModel.repository.getStageTemplatesForType(type)
+            stages = templates.mapIndexed { index, template ->
+                Stage(
+                    name = template.name,
+                    durationHours = template.durationHours,
+                    orderIndex = index
+                )
+            }.toMutableList()
+            withContext(Dispatchers.Main) {
                 stageAdapter.submitList(stages)
             }
-            override fun onNothingSelected(parent: android.widget.AdapterView<*>) {}
-        })
+        }
     }
 
     private fun setupRecyclerView() {
@@ -112,6 +133,8 @@ class CreateBatchFragment : Fragment() {
                 )
             }
 
+            val totalDurationMs = calculatedStages.sumOf { TimeUnit.HOURS.toMillis(it.durationHours) } // Added: compute total for plannedCompletionDate
+
             val batch = Batch(
                 id = batchId,
                 name = binding.etBatchName.text.toString(),
@@ -120,7 +143,8 @@ class CreateBatchFragment : Fragment() {
                 currentStage = calculatedStages.firstOrNull()?.name ?: "",
                 notes = binding.etNotes.text.toString(),
                 qrCode = binding.etQrCode.text.toString(),
-                initialWeightGr = initialWeight
+                initialWeightGr = initialWeight,
+                plannedCompletionDate = now + totalDurationMs // Added
             )
 
             // сохраняем в БД

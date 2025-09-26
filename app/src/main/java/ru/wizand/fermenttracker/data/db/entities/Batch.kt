@@ -15,5 +15,7 @@ data class Batch(
     val notes: String,
     val isActive: Boolean = true,
     val qrCode: String? = null,
-    val initialWeightGr: Double? = null
+    val initialWeightGr: Double? = null,
+    val currentWeightGr: Double? = null, // Added: latest measured weight for the batch
+    val plannedCompletionDate: Long? = null // Added: estimated completion date for time-based progress (start + sum of stage durations)
 )

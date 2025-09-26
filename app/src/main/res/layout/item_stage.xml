@@ -44,22 +44,22 @@
             android:inputType="number"
             tools:text="48 h"/>
 
-        <!-- Current Weight -->
-        <TextView
+        <!-- Current Weight --> <!-- Removed: now batch-level -->
+        <!-- <TextView
             android:id="@+id/tvCurrentWeight"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:layout_constraintTop_toBottomOf="@id/tvDuration"
             app:layout_constraintStart_toStartOf="parent"
             android:layout_marginTop="8dp"
-            tools:text="Weight: N/A" />
+            tools:text="Weight: N/A" /> -->
 
         <!-- Planned Start Time -->
         <TextView
             android:id="@+id/tvPlannedStartTime"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@id/tvCurrentWeight"
+            app:layout_constraintTop_toBottomOf="@id/tvDuration"
             app:layout_constraintStart_toStartOf="parent"
             android:layout_marginTop="8dp"
             tools:text="Planned Start: 2025-09-24 10:00" />
@@ -103,6 +103,19 @@
             app:layout_constraintStart_toStartOf="parent"
             android:layout_marginTop="8dp"
             tools:text="Time Left: 24 h" />
+
+        <TextView
+            android:id="@+id/tvCurrentWeight"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            app:layout_constraintBottom_toTopOf="@+id/etDuration"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/tvStageName"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="Current Weight" />
+
+
 
         <!-- Remove Stage Button (for EditableStageAdapter) -->
         <Button

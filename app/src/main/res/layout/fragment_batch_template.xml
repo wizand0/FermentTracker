@@ -26,6 +26,27 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp" />
 
+        <EditText
+            android:id="@+id/etNewType"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="New Type (if custom)"
+            android:layout_marginTop="8dp" /> <!-- Added: for custom/new recipe types -->
+
+        <EditText
+            android:id="@+id/etIngredients"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Ingredients"
+            android:layout_marginTop="16dp" /> <!-- Added: for recipe ingredients -->
+
+        <EditText
+            android:id="@+id/etNote"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Note"
+            android:layout_marginTop="16dp" /> <!-- Added: for recipe note -->
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rvStages"
             android:layout_width="match_parent"

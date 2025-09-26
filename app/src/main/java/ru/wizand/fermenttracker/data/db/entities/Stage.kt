@@ -22,6 +22,5 @@ data class Stage(
     val endTime: Long? = null,
     val plannedStartTime: Long? = null,
     val plannedEndTime: Long? = null,
-    val currentWeightGr: Double? = null,
     val orderIndex: Int = 0
 ) : android.os.Parcelable

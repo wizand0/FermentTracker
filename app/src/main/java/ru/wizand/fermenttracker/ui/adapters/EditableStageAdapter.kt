@@ -29,19 +29,30 @@ class EditableStageAdapter(
 
         fun bind(stage: Stage, pos: Int) {
             b.tvStageName.text = stage.name
-            b.etDuration.setText(stage.durationHours.toString())
             b.tvPlannedStartTime.text = stage.plannedStartTime?.let { "Planned Start: ${sdf.format(it)}" } ?: "Planned Start: N/A"
             b.tvPlannedEndTime.text = stage.plannedEndTime?.let { "Planned End: ${sdf.format(it)}" } ?: "Planned End: N/A"
 
-            b.etDuration.addTextChangedListener(object : TextWatcher {
+            // Added: remove old watcher before setText to prevent triggers during binding
+            (b.etDuration.tag as? TextWatcher)?.let {
+                b.etDuration.removeTextChangedListener(it)
+            }
+
+            b.etDuration.setText(stage.durationHours.toString())
+
+            // Added: create and add new watcher after setText, with change check
+            val watcher = object : TextWatcher {
                 override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
                 override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
                 override fun afterTextChanged(s: Editable?) {
                     val newDuration = s.toString().toLongOrNull() ?: 0L
-                    val updatedStage = stage.copy(durationHours = newDuration)
-                    submitList(currentList.toMutableList().apply { set(pos, updatedStage) })
+                    if (newDuration != stage.durationHours) { // Added: only submit if actually changed
+                        val updatedStage = stage.copy(durationHours = newDuration)
+                        submitList(currentList.toMutableList().apply { set(pos, updatedStage) })
+                    }
                 }
-            })
+            }
+            b.etDuration.addTextChangedListener(watcher)
+            b.etDuration.tag = watcher // Store for future removal
 
             b.btnRemoveStage.setOnClickListener { onRemoveStage(pos) }
         }

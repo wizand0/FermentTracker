@@ -82,7 +82,10 @@ class BatchDetailFragment : Fragment() {
         stageAdapter = StageAdapter(
             onStartClicked = { stage -> startStageManual(stage) },
             onCompleteClicked = { stage -> completeStageAndMaybeStartNext(stage) },
-            onDurationChanged = { updatedStage -> viewModel.updateStage(updatedStage) } // сохраняем новое время
+            onDurationChanged = { updatedStage ->
+                viewModel.updateStage(updatedStage)
+                updateBatchPlannedCompletion() // Added: recalculate plannedCompletionDate on duration change
+            }
         )
         binding.rvStages.adapter = stageAdapter
         binding.rvStages.layoutManager = LinearLayoutManager(requireContext())
@@ -116,7 +119,7 @@ class BatchDetailFragment : Fragment() {
             if (activeStage != null) {
                 val timeLeftMs = activeStage.startTime!! + TimeUnit.HOURS.toMillis(activeStage.durationHours) - System.currentTimeMillis()
                 binding.timeLeft.text = formatTimeLeft(timeLeftMs)
-                lastWeight = activeStage.currentWeightGr
+                lastWeight = viewModel.batch.value?.currentWeightGr // Changed: use batch.currentWeightGr
                 // обновим отображение текущего этапа в заголовке
                 binding.currentStageName.text = activeStage.name
             } else {
@@ -172,6 +175,7 @@ class BatchDetailFragment : Fragment() {
                 plannedEndTime = System.currentTimeMillis() + TimeUnit.HOURS.toMillis(24)
             )
             viewModel.addStage(newStage)
+            updateBatchPlannedCompletion() // Added: update planned completion after adding stage
         }
         binding.btnAddPhoto.setOnClickListener {
             val currentStage = viewModel.stages.value?.find { it.endTime == null }
@@ -217,10 +221,10 @@ class BatchDetailFragment : Fragment() {
                     Toast.makeText(context, "Invalid weight", Toast.LENGTH_SHORT).show()
                     return@setPositiveButton
                 }
-                val currentStage = viewModel.stages.value?.find { it.endTime == null }
-                currentStage?.let {
-                    val updated = it.copy(currentWeightGr = weight)
-                    viewModel.updateStage(updated)
+                // Changed: update batch.currentWeightGr instead of stage
+                viewModel.batch.value?.let { batch ->
+                    val updatedBatch = batch.copy(currentWeightGr = weight)
+                    viewModel.updateBatch(updatedBatch)
                 }
                 val log = BatchLog(
                     id = UUID.randomUUID().toString(),
@@ -329,6 +333,17 @@ class BatchDetailFragment : Fragment() {
             }
             Toast.makeText(requireContext(), "Stage completed", Toast.LENGTH_SHORT).show()
         }
+        updateBatchPlannedCompletion() // Added: update after stage changes
+    }
+
+    // Added: helper to recalculate and update batch.plannedCompletionDate based on stages
+    private fun updateBatchPlannedCompletion() {
+        val stages = viewModel.stages.value ?: return
+        val totalDurationMs = stages.sumOf { TimeUnit.HOURS.toMillis(it.durationHours) }
+        viewModel.batch.value?.let { batch ->
+            val updated = batch.copy(plannedCompletionDate = batch.startDate + totalDurationMs)
+            viewModel.updateBatch(updated)
+        }
     }
 
     private fun exportToPdf() {
@@ -356,7 +371,7 @@ class BatchDetailFragment : Fragment() {
                 table.addCell(stage.durationHours.toString())
                 table.addCell(stage.plannedStartTime?.let { formatDate(it) } ?: "N/A")
                 table.addCell(stage.plannedEndTime?.let { formatDate(it) } ?: "N/A")
-                table.addCell(stage.currentWeightGr?.toString() ?: "N/A")
+                table.addCell("N/A") // Changed: weight is batch-level, not per stage
             }
 
             document.add(table)

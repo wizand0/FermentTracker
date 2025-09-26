@@ -15,7 +15,7 @@ import ru.wizand.fermenttracker.data.repository.BatchRepository
 import java.util.concurrent.TimeUnit
 
 class BatchListViewModel(application: Application) : AndroidViewModel(application) {
-    private val repository: BatchRepository
+    val repository: BatchRepository // Changed: made public for access in fragments
     private val batchDao = AppDatabase.getInstance(application).batchDao()
     val batches: LiveData<List<Batch>>
 

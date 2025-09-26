@@ -58,7 +58,7 @@ class StageAdapter(
             binding.etDuration.tag = watcher
 
             // остальная инфа
-            binding.tvCurrentWeight.text = stage.currentWeightGr?.let { "Weight: $it g" } ?: "Weight: N/A"
+            binding.tvCurrentWeight.text = "Weight: N/A" // Changed: removed stage.currentWeightGr reference (now batch-level)
             binding.tvPlannedStartTime.text = stage.plannedStartTime?.let { "Planned Start: ${formatDate(it)}" } ?: "Planned Start: N/A"
             binding.tvPlannedEndTime.text = stage.plannedEndTime?.let { "Planned End: ${formatDate(it)}" } ?: "Planned End: N/A"
             binding.tvStartTime.text = stage.startTime?.let { "Start: ${formatDate(it)}" } ?: "Start: Not started"
