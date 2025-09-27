@@ -40,6 +40,10 @@ interface BatchDao {
     @Query("SELECT * FROM batches WHERE id = :batchId")
     fun getBatchById(batchId: String): LiveData<Batch?>
 
+    // Added: synchronous single-shot fetch (useful from repository / suspend functions)
+    @Query("SELECT * FROM batches WHERE id = :batchId LIMIT 1")
+    suspend fun getBatchByIdOnce(batchId: String): Batch?
+
     @Query("SELECT * FROM batches WHERE qrCode = :qrCode LIMIT 1")
     suspend fun findBatchByQrCode(qrCode: String): Batch?
 
@@ -67,8 +71,12 @@ interface BatchDao {
     @Query("SELECT * FROM batch_logs WHERE batchId = :batchId ORDER BY timestamp DESC")
     fun getLogsForBatch(batchId: String): LiveData<List<BatchLog>>
 
+    // Added: get last non-null weight from logs
+    @Query("SELECT weightGr FROM batch_logs WHERE batchId = :batchId AND weightGr IS NOT NULL ORDER BY timestamp DESC LIMIT 1")
+    suspend fun getLastLogWeight(batchId: String): Double?
+
     @Query("SELECT * FROM stages WHERE batchId = :batchId ORDER BY orderIndex")
-    fun getStagesForBatchFlow(batchId: String): Flow<List<Stage>>
+    fun getStagesForBatchFlow(batchId: String): kotlinx.coroutines.flow.Flow<List<Stage>>
 
     @Query("SELECT * FROM stages WHERE batchId = :batchId AND startTime IS NOT NULL AND endTime IS NULL LIMIT 1")
     suspend fun getActiveStage(batchId: String): Stage?

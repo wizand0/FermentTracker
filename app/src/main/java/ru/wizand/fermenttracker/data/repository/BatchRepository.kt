@@ -34,7 +34,11 @@ class BatchRepository(
         batchDao.deleteBatch(batchId)
     }
 
+    // returns LiveData (existing)
     fun getBatchById(batchId: String) = batchDao.getBatchById(batchId)
+
+    // Added: synchronous suspend fetch (single-shot)
+    suspend fun getBatchByIdOnce(batchId: String): Batch? = batchDao.getBatchByIdOnce(batchId)
 
     suspend fun addStage(stage: Stage) {
         batchDao.insertStage(stage)
@@ -61,6 +65,9 @@ class BatchRepository(
     }
 
     fun getLogs(batchId: String) = batchDao.getLogsForBatch(batchId)
+
+    // Added: last log weight
+    suspend fun getLastLogWeight(batchId: String): Double? = batchDao.getLastLogWeight(batchId)
 
     suspend fun findBatchByQrCode(qrCode: String): Batch? {
         return batchDao.findBatchByQrCode(qrCode)

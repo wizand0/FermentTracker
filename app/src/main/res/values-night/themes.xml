@@ -2,7 +2,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <!-- Основная тема приложения (Material3, поддержка DayNight) -->
-    <style name="Theme.FermentTracker" parent="Theme.Material3.DayNight.NoActionBar">
+    <style name="Theme.FermentTracker" parent="Theme.Material3.DayNight">
         <!-- Применяем цветовые токены (определены в colors.xml / values-night/colors.xml) -->
         <item name="colorPrimary">@color/md_theme_primary</item>
         <item name="colorOnPrimary">@color/md_theme_onPrimary</item>

@@ -1,5 +1,6 @@
 package ru.wizand.fermenttracker.ui.adapters
 
+import android.app.AlertDialog
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.LayoutInflater
@@ -20,11 +21,20 @@ class StageAdapter(
     private val onDurationChanged: (Stage) -> Unit = {}
 ) : ListAdapter<Stage, StageAdapter.StageViewHolder>(StageDiffCallback()) {
 
-    var batchCurrentWeight: Double? = null // Added: hold batch-level current weight for display in active stage
+    // Хранит id активного этапа (тот, который сейчас выполняется). Устанавливается извне (фрагмент/VM).
+    var activeStageId: String? = null
+        private set
 
-    fun updateBatchWeight(weight: Double?) { // Added: method to update weight and refresh UI
+    fun setActiveStage(id: String?) {
+        activeStageId = id
+        notifyDataSetChanged()
+    }
+
+    var batchCurrentWeight: Double? = null // держим текущий вес батча для отображения в активном этапе
+
+    fun updateBatchWeight(weight: Double?) { // метод для обновления веса и обновления UI
         batchCurrentWeight = weight
-        notifyDataSetChanged() // Refresh all items (simple, since list small; no animations needed)
+        notifyDataSetChanged()
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): StageViewHolder {
@@ -40,7 +50,6 @@ class StageAdapter(
 
         fun bind(stage: Stage) {
             binding.tvStageName.text = stage.name
-//            binding.tvDuration.text = "${stage.durationHours} h"
             binding.tvDuration.text = "${stage.durationHours} h"
 
             // убираем старый TextWatcher, если он был
@@ -65,9 +74,18 @@ class StageAdapter(
             binding.etDuration.addTextChangedListener(watcher)
             binding.etDuration.tag = watcher
 
-            // остальная инфа
-            val isActive = stage.startTime != null && stage.endTime == null // Added: check if this is the active stage
-            binding.tvCurrentWeight.text = if (isActive) batchCurrentWeight?.let { "Weight: $it g" } ?: "Weight: N/A" else "N/A" // Updated: show batch weight only if active
+            // Определяем состояние "выполняется" по activeStageId (приоритет) либо по полям startTime/endTime
+            val isThisActive = activeStageId != null && activeStageId == stage.id
+            val inferredActive = (stage.startTime != null && stage.endTime == null)
+            val isActive = isThisActive || inferredActive
+
+            // Показываем вес только для активного этапа (если известен)
+            binding.tvCurrentWeight.text = if (isActive) {
+                batchCurrentWeight?.let { "Weight: $it g" } ?: "Weight: N/A"
+            } else {
+                "N/A"
+            }
+
             binding.tvPlannedStartTime.text = stage.plannedStartTime?.let { "Planned Start: ${formatDate(it)}" } ?: "Planned Start: N/A"
             binding.tvPlannedEndTime.text = stage.plannedEndTime?.let { "Planned End: ${formatDate(it)}" } ?: "Planned End: N/A"
             binding.tvStartTime.text = stage.startTime?.let { "Start: ${formatDate(it)}" } ?: "Start: Not started"
@@ -77,15 +95,16 @@ class StageAdapter(
 
             val btnStartStage = binding.btnStartStage
             val btnCompleteStage = binding.btnCompleteStage
-            btnStartStage.isVisible = (stage.startTime == null)
-            btnCompleteStage.isVisible = (stage.startTime != null && stage.endTime == null)
 
-//            btnStartStage.setOnClickListener { onStartClicked(stage) }
-//            btnCompleteStage.setOnClickListener { onCompleteClicked(stage) }
+            // Если есть активный этап (activeStageId != null), то Start доступен только если нет активного,
+            // а Complete доступен только у активного этапа
+            val anyRunning = activeStageId != null
+            btnStartStage.isVisible = !anyRunning && stage.startTime == null
+            btnCompleteStage.isVisible = isActive && stage.endTime == null
 
             btnStartStage.setOnClickListener {
                 val context = binding.root.context
-                android.app.AlertDialog.Builder(context)
+                AlertDialog.Builder(context)
                     .setTitle("Start stage")
                     .setMessage("Are you sure you want to start this stage?")
                     .setPositiveButton("Yes") { _, _ ->
@@ -97,7 +116,7 @@ class StageAdapter(
 
             btnCompleteStage.setOnClickListener {
                 val context = binding.root.context
-                android.app.AlertDialog.Builder(context)
+                AlertDialog.Builder(context)
                     .setTitle("Complete stage")
                     .setMessage("Are you sure you want to complete this stage?")
                     .setPositiveButton("Yes") { _, _ ->
@@ -106,7 +125,6 @@ class StageAdapter(
                     .setNegativeButton("Cancel", null)
                     .show()
             }
-
         }
 
         private fun formatDate(timestamp: Long): String {

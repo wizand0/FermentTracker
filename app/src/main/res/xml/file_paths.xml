@@ -1,5 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <paths xmlns:android="http://schemas.android.com/apk/res/android">
-    <cache-path name="images" path="images/"/>
-    <external-path name="external_files" path="."/>
+
+    <!-- internal filesDir (Context.getFilesDir()) -->
+    <files-path name="internal_files" path="." />
+
+    <!-- external files dir (Context.getExternalFilesDir()) -->
+    <external-files-path name="external_files" path="." />
+
+    <!-- cache dir (Context.getCacheDir()) -->
+    <cache-path name="cache_images" path="images/" />
+
 </paths>
