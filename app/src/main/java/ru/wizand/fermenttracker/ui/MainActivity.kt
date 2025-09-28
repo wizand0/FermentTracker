@@ -12,6 +12,9 @@ import android.view.MenuItem
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.navigation.findNavController
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.CoroutineScope
@@ -71,9 +74,30 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        WindowCompat.setDecorFitsSystemWindows(window, false)
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        setSupportActionBar(binding.toolbar)  // Изменено: binding.toolbar вместо findViewById
+
+        // Handle insets for FABs (avoid nav bar overlap)
+        ViewCompat.setOnApplyWindowInsetsListener(binding.fabAdd) { v, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.setPadding(0, 0, systemBars.right, systemBars.bottom)
+            insets
+        }
+        ViewCompat.setOnApplyWindowInsetsListener(binding.fabScanQr) { v, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.setPadding(0, 0, systemBars.right, systemBars.bottom + 64)  // Extra for stacking
+            insets
+        }
+
+        // Handle insets for content (NavHost)
+        ViewCompat.setOnApplyWindowInsetsListener(binding.navHostFragment) { v, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+            insets
+        }
 
         // seed DB ако нужно
         seedRecipesIfNeeded()
@@ -98,6 +122,10 @@ class MainActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
+            R.id.menu_edit_recipes -> {
+                startActivity(Intent(this, RecipeEditorActivity::class.java))
+                true
+            }
             R.id.menu_export_db -> {
                 // Запрос имени файла, default "ferment_backup.db"
                 createDocumentLauncher.launch("ferment_tracker_backup_${System.currentTimeMillis()}.db")
@@ -159,7 +187,8 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
             } catch (e: Exception) {
-                // ignore seed errors
+                android.util.Log.e("MainActivity", "Error seeding recipes: ${e.message}", e)
+                // Опционально: Snackbar на UI, но не обязательно для init
             }
         }
     }

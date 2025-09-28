@@ -16,5 +16,5 @@ data class StageTemplate(
     val recipeType: String,
     val name: String,
     val durationHours: Long,
-    val orderIndex: Int
+    var orderIndex: Int
 )
