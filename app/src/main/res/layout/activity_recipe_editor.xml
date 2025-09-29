@@ -1,13 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="16dp">
+    tools:context=".ui.RecipeEditorActivity">
 
     <Button
         android:id="@+id/btnAddNewRecipe"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Add New Recipe" />
 
@@ -15,56 +17,20 @@
         android:id="@+id/rvRecipes"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1" />
-
-    <!-- Editor section (initially GONE) -->
-    <EditText
-        android:id="@+id/etRecipeType"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Recipe Type"
-        android:visibility="gone" />
-
-    <EditText
-        android:id="@+id/etIngredients"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Ingredients"
-        android:visibility="gone" />
-
-    <EditText
-        android:id="@+id/etNote"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Note"
-        android:visibility="gone" />
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvStages"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
         android:layout_weight="1"
-        android:visibility="gone" />
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
 
-    <LinearLayout
+    <Button
+        android:id="@+id/btnDeleteSelectedRecipes"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:visibility="gone">
+        android:text="Delete Selected"
+        android:visibility="gone" />
 
-        <Button
-            android:id="@+id/btnSaveRecipe"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Save" />
-
-        <Button
-            android:id="@+id/btnCancelEdit"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Cancel" />
-    </LinearLayout>
+    <FrameLayout
+        android:id="@+id/fragment_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone" />
 
 </LinearLayout>

@@ -82,19 +82,12 @@ class CreateBatchFragment : Fragment() {
     }
 
     private fun setupRecyclerView() {
-        stageAdapter = EditableStageAdapter(
-            onAddStage = {
-                stages.add(Stage(
-                    id = UUID.randomUUID().toString(),
-                    name = "New Stage",
-                    durationHours = 24,
-                    orderIndex = stages.size
-                ))
-                stageAdapter.submitList(stages.toList())
-            },
+        stageAdapter = EditableStageAdapter( // Изменено: передаем onRemoveStage
             onRemoveStage = { position ->
                 stages.removeAt(position)
-                stages.forEachIndexed { index, stage -> stage.copy(orderIndex = index) }
+                stages.forEachIndexed { index, stage ->
+                    stage.copy(orderIndex = index) // Обновляем orderIndex (но stage immutable, так что создаем копию)
+                }
                 stageAdapter.submitList(stages.toList())
             }
         )
@@ -103,9 +96,15 @@ class CreateBatchFragment : Fragment() {
     }
 
     private fun setupButtons() {
-//        binding.btnAddStage.setOnClickListener {
-//            stageAdapter.onAddStage()
-//        }
+        binding.btnAddStage.setOnClickListener {
+            stages.add(Stage(
+                id = UUID.randomUUID().toString(),
+                name = "New Stage",
+                durationHours = 24,
+                orderIndex = stages.size
+            ))
+            stageAdapter.submitList(stages.toList())
+        }
         binding.btnSave.setOnClickListener {
             val name = binding.etBatchName.text.toString()
             val initialWeightText = binding.etInitialWeight.text.toString()

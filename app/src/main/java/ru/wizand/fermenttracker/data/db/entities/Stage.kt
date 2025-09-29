@@ -1,5 +1,6 @@
 package ru.wizand.fermenttracker.data.db.entities
 
+import android.os.Parcelable
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
@@ -10,7 +11,14 @@ import java.util.UUID
 @Parcelize
 @Entity(
     tableName = "stages",
-    foreignKeys = [ForeignKey(entity = Batch::class, parentColumns = ["id"], childColumns = ["batchId"], onDelete = ForeignKey.CASCADE)],
+    foreignKeys = [
+        ForeignKey(
+            entity = Batch::class,
+            parentColumns = ["id"],
+            childColumns = ["batchId"],
+            onDelete = ForeignKey.CASCADE
+        )
+    ],
     indices = [Index("batchId")]
 )
 data class Stage(
@@ -23,4 +31,11 @@ data class Stage(
     val plannedStartTime: Long? = null,
     val plannedEndTime: Long? = null,
     val orderIndex: Int = 0
-) : android.os.Parcelable
+) : Parcelable {
+    val status: String
+        get() = when {
+            startTime == null -> "Not started"
+            endTime == null -> "Ongoing"
+            else -> "Completed"
+        }
+}

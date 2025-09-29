@@ -1,4 +1,3 @@
-// Новый файл: EditableStageTemplateAdapter.kt в ui.adapters
 package ru.wizand.fermenttracker.ui.adapters
 
 import android.text.Editable
@@ -9,12 +8,11 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import ru.wizand.fermenttracker.data.db.entities.StageTemplate
-import ru.wizand.fermenttracker.databinding.ItemEditableStageBinding  // Предполагая, что binding для item_editable_stage.xml
+import ru.wizand.fermenttracker.databinding.ItemEditableStageBinding
 import java.text.SimpleDateFormat
 import java.util.Locale
 
 class EditableStageTemplateAdapter(
-    private val onAddStage: () -> Unit,
     private val onRemoveStage: (position: Int) -> Unit
 ) : ListAdapter<StageTemplate, EditableStageTemplateAdapter.VH>(DIFF) {
 
@@ -39,7 +37,9 @@ class EditableStageTemplateAdapter(
                     val newName = s.toString()
                     if (newName != template.name) {
                         val updated = template.copy(name = newName)
-                        submitList(currentList.toMutableList().apply { set(pos, updated) })
+                        val mutableList = currentList.toMutableList()
+                        mutableList[pos] = updated
+                        submitList(mutableList)  // Альтернатива: notifyItemChanged(pos) если StageTemplate mutable, но submitList ок если список мал
                     }
                 }
             }
@@ -56,15 +56,14 @@ class EditableStageTemplateAdapter(
                     val newDuration = s.toString().toLongOrNull() ?: 0L
                     if (newDuration != template.durationHours) {
                         val updated = template.copy(durationHours = newDuration)
-                        submitList(currentList.toMutableList().apply { set(pos, updated) })
+                        val mutableList = currentList.toMutableList()
+                        mutableList[pos] = updated
+                        submitList(mutableList)
                     }
                 }
             }
             b.etDuration.addTextChangedListener(durationWatcher)
             b.etDuration.tag = durationWatcher
-
-            // Другие поля, если нужны (planned times не в StageTemplate, так что игнор или удалить)
-            // b.tvPlannedStartTime.text = ... (удалить если не нужно)
 
             b.btnRemoveStage.setOnClickListener { onRemoveStage(pos) }
         }

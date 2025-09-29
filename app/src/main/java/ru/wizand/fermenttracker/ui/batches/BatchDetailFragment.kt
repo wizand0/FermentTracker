@@ -161,7 +161,7 @@ class BatchDetailFragment : Fragment() {
                     binding.timeLeft.text = "N/A"
                 }
             }
-            stageAdapter.notifyDataSetChanged()
+//            stageAdapter.notifyDataSetChanged()
         }
 
         viewModel.photos.observe(viewLifecycleOwner) { photos ->

@@ -26,9 +26,12 @@ import ru.wizand.fermenttracker.databinding.ActivityMainBinding
 import ru.wizand.fermenttracker.data.db.RecipeTemplates
 import ru.wizand.fermenttracker.data.db.entities.Recipe
 import ru.wizand.fermenttracker.data.db.entities.StageTemplate
+import ru.wizand.fermenttracker.data.repository.BatchRepository
 import ru.wizand.fermenttracker.utils.FileUtils
 import java.io.File
 import java.util.UUID
+import android.content.Context
+import androidx.lifecycle.lifecycleScope
 
 class MainActivity : AppCompatActivity() {
 
@@ -79,6 +82,8 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         setSupportActionBar(binding.toolbar)  // Изменено: binding.toolbar вместо findViewById
+
+        initializeTemplates()
 
         // Handle insets for FABs (avoid nav bar overlap)
         ViewCompat.setOnApplyWindowInsetsListener(binding.fabAdd) { v, insets ->
@@ -254,6 +259,34 @@ class MainActivity : AppCompatActivity() {
                 runOnUiThread {
                     Snackbar.make(binding.root, "Ошибка при restore: ${e.message ?: e.toString()}", Snackbar.LENGTH_LONG).show()
                 }
+            }
+        }
+    }
+
+    private fun initializeTemplates() {
+        val prefs = getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+        val isFirstRun = prefs.getBoolean("first_run", true)
+        if (isFirstRun) {
+            val repository = BatchRepository(AppDatabase.getInstance(this).batchDao(), this)
+            lifecycleScope.launch(Dispatchers.IO) {
+                val templates = RecipeTemplates.getTemplateStages(this@MainActivity)
+                templates.forEach { (type, stages) ->
+                    // Вставляем Recipe (ingredients и note по умолчанию пустые)
+                    val recipe = Recipe(type = type, ingredients = "", note = "")
+                    repository.insertRecipe(recipe)
+
+                    // Вставляем StageTemplate для каждого этапа
+                    stages.forEachIndexed { index, stage ->
+                        val template = StageTemplate(
+                            recipeType = type,
+                            name = stage.name,
+                            durationHours = stage.durationHours,
+                            orderIndex = index
+                        )
+                        repository.insertStageTemplate(template)
+                    }
+                }
+                prefs.edit().putBoolean("first_run", false).apply()
             }
         }
     }

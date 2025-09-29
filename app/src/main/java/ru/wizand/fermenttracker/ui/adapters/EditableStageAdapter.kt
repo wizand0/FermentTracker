@@ -1,73 +1,49 @@
 package ru.wizand.fermenttracker.ui.adapters
 
-import android.text.Editable
-import android.text.TextWatcher
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import ru.wizand.fermenttracker.data.db.entities.Stage
-//import ru.wizand.fermenttracker.databinding.ItemStageBinding
-import ru.wizand.fermenttracker.databinding.ItemEditableStageBinding
+import ru.wizand.fermenttracker.databinding.ItemStageBinding
 import java.text.SimpleDateFormat
 import java.util.Locale
 
 class EditableStageAdapter(
-    private val onAddStage: () -> Unit,
     private val onRemoveStage: (position: Int) -> Unit
 ) : ListAdapter<Stage, EditableStageAdapter.VH>(DIFF) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VH {
-        val binding = ItemEditableStageBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        val binding = ItemStageBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return VH(binding)
     }
 
-    override fun onBindViewHolder(holder: VH, position: Int) = holder.bind(getItem(position), position)
+    override fun onBindViewHolder(holder: VH, position: Int) =
+        holder.bind(getItem(position), position)
 
-    inner class VH(private val b: ItemEditableStageBinding) : RecyclerView.ViewHolder(b.root) {
+    inner class VH(private val b: ItemStageBinding) : RecyclerView.ViewHolder(b.root) {
         private val sdf = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault())
 
         fun bind(stage: Stage, pos: Int) {
-            b// Обработка имени этапа (EditText)
-            (b.etStageName.tag as? TextWatcher)?.let {
-                b.etStageName.removeTextChangedListener(it)
-            }
-            b.etStageName.setText(stage.name)
+            b.tvStageName.text = stage.name
+            b.tvDuration.text = "${stage.durationHours} h"
 
-            val nameWatcher = object : TextWatcher {
-                override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-                override fun afterTextChanged(s: Editable?) {
-                    val newName = s.toString()
-                    if (newName != stage.name) {
-                        val updatedStage = stage.copy(name = newName)
-                        submitList(currentList.toMutableList().apply { set(pos, updatedStage) })
-                    }
+            when (stage.status) {
+                "Not started" -> {
+                    b.btnStartStage.visibility = View.VISIBLE
+                    b.btnCompleteStage.visibility = View.GONE
+                }
+                "Ongoing" -> {
+                    b.btnStartStage.visibility = View.GONE
+                    b.btnCompleteStage.visibility = View.VISIBLE
+                }
+                "Completed" -> {
+                    b.btnStartStage.visibility = View.GONE
+                    b.btnCompleteStage.visibility = View.GONE
                 }
             }
-            b.etStageName.addTextChangedListener(nameWatcher)
-            b.etStageName.tag = nameWatcher
-
-            // Обработка duration (уже есть, но с проверкой на изменение)
-            (b.etDuration.tag as? TextWatcher)?.let {
-                b.etDuration.removeTextChangedListener(it)
-            }
-            b.etDuration.setText(stage.durationHours.toString())
-
-            val durationWatcher = object : TextWatcher {
-                override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-                override fun afterTextChanged(s: Editable?) {
-                    val newDuration = s.toString().toLongOrNull() ?: 0L
-                    if (newDuration != stage.durationHours) {
-                        val updatedStage = stage.copy(durationHours = newDuration)
-                        submitList(currentList.toMutableList().apply { set(pos, updatedStage) })
-                    }
-                }
-            }
-            b.etDuration.addTextChangedListener(durationWatcher)
-            b.etDuration.tag = durationWatcher
 
             b.btnRemoveStage.setOnClickListener { onRemoveStage(pos) }
         }
