@@ -18,17 +18,23 @@
     <string name="qr_image">QR image</string>
     <string name="share">Share</string>
     <string name="title_qr">QR-сканер</string>
-    <string name="product_cured_meat">Cured meat</string>
-    <string name="product_cured_sausage">Cured sausage</string>
-    <string name="product_cheese">Cheese</string>
-    <string name="product_sauerkraut">Sauerkraut</string>
-    <string name="product_kombucha">Kombucha</string>
-    <string name="product_pickles">Pickles</string>
-    <!-- TODO: Remove or change this placeholder text -->
+    <string name="product_cured_meat">Сыровяленое мясо</string>
+    <string name="product_cured_sausage">Сыровяленая колбаса</string>
+    <string name="product_cheese">Домашний сыр</string>
+    <string name="product_sauerkraut">Квашеная капуста</string>
+    <string name="product_kombucha">Комбуча</string>
+    <string name="product_pickles">Солёные огурцы</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="scan_qr">Scan QR</string>
+    <string name="recipe_details_title">Recipe for %s</string>
+    <string name="ingredients_title">Ingredients:</string>
+    <string name="note_title">Instructions/Note:</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
+
     <string-array name="fermentation_types">
-        <item>Dry-cured meat</item>
+        <item>Dry-cured meat (basic)</item>
+        <item>Dry-cured meat (spicy)</item>
         <item>Dry-cured sausage</item>
         <item>Beer</item>
         <item>Wine</item>

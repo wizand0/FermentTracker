@@ -13,9 +13,13 @@ import ru.wizand.fermenttracker.databinding.ActivityRecipeEditorBinding
 import ru.wizand.fermenttracker.ui.adapters.RecipeListAdapter
 import ru.wizand.fermenttracker.vm.BatchListViewModel
 import androidx.activity.viewModels
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import ru.wizand.fermenttracker.data.db.entities.Recipe
 import ru.wizand.fermenttracker.ui.batches.BatchTemplateFragment
 import ru.wizand.fermenttracker.R
+import androidx.activity.OnBackPressedCallback
+
 
 class RecipeEditorActivity : AppCompatActivity() {
 
@@ -28,6 +32,34 @@ class RecipeEditorActivity : AppCompatActivity() {
         binding = ActivityRecipeEditorBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        // Добавить обработку system insets
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+            insets
+        }
+
+        // Современная обработка кнопки "Назад"
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                if (supportFragmentManager.backStackEntryCount > 0) {
+                    // Если есть фрагменты в стеке - убираем их
+                    supportFragmentManager.popBackStack()
+                    // Восстанавливаем вид списка
+                    binding.rvRecipes.visibility = View.VISIBLE
+                    binding.btnAddNewRecipe.visibility = View.VISIBLE
+                    binding.btnDeleteSelectedRecipes.visibility = if (adapter.getSelectedItems().isNotEmpty()) View.VISIBLE else View.GONE
+                    binding.fragmentContainer.visibility = View.GONE
+
+                    // Обновляем список рецептов
+                    loadRecipes()
+                } else {
+                    // Если стек фрагментов пуст - закрываем активность
+                    finish()
+                }
+            }
+        })
+
         adapter = RecipeListAdapter(
             { selectionCount ->
                 binding.btnDeleteSelectedRecipes.visibility =
@@ -38,6 +70,7 @@ class RecipeEditorActivity : AppCompatActivity() {
             }
         )
 
+        // Остальной код остается без изменений...
         binding.rvRecipes.layoutManager = LinearLayoutManager(this)
         binding.rvRecipes.adapter = adapter
 
@@ -91,14 +124,4 @@ class RecipeEditorActivity : AppCompatActivity() {
             .commit()
     }
 
-    override fun onBackPressed() {
-        super.onBackPressed()
-        if (supportFragmentManager.backStackEntryCount == 0) {
-            // Восстанавливаем вид списка
-            binding.rvRecipes.visibility = View.VISIBLE
-            binding.btnAddNewRecipe.visibility = View.VISIBLE
-            binding.btnDeleteSelectedRecipes.visibility = if (adapter.getSelectedItems().isNotEmpty()) View.VISIBLE else View.GONE
-            binding.fragmentContainer.visibility = View.GONE
-        }
-    }
 }

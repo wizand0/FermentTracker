@@ -1,143 +1,183 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<!-- Новый корневой элемент: FrameLayout -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true"
-    android:paddingTop="?attr/actionBarSize">
+    android:background="@color/semi_transparent_light_bg">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <!-- ScrollView теперь внутри FrameLayout -->
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="16dp">
+        android:layout_height="match_parent"
+        android:fitsSystemWindows="true"
+        android:paddingTop="?attr/actionBarSize">
 
-        <!-- Заголовок -->
-        <TextView
-            android:id="@+id/tvTitle"
-            android:layout_width="wrap_content"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Create Batch"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:padding="16dp">
 
-        <!-- Batch Name -->
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/tilBatchName"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:hint="Batch Name"
-            android:layout_marginTop="16dp"
-            app:layout_constraintTop_toBottomOf="@id/tvTitle"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/etBatchName"
-                android:layout_width="match_parent"
+            <!-- Остальные элементы остаются без изменений -->
+            <TextView
+                android:id="@+id/tvTitle"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                tools:text="Batch #1" />
-        </com.google.android.material.textfield.TextInputLayout>
+                android:text="Create Batch"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
-        <!-- Product Type -->
-        <Spinner
-            android:id="@+id/spinnerProductType"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            app:layout_constraintTop_toBottomOf="@id/tilBatchName"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
-
-        <!-- Initial Weight -->
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/tilInitialWeight"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:hint="Initial Weight (grams)"
-            android:layout_marginTop="16dp"
-            app:layout_constraintTop_toBottomOf="@id/spinnerProductType"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/etInitialWeight"
-                android:layout_width="match_parent"
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tilBatchName"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:inputType="numberDecimal"
-                tools:text="1500" />
-        </com.google.android.material.textfield.TextInputLayout>
+                android:hint="Batch Name"
+                android:layout_marginTop="16dp"
+                app:layout_constraintTop_toBottomOf="@id/tvTitle"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent">
 
-        <!-- Notes -->
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/tilNotes"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:hint="Notes"
-            android:layout_marginTop="16dp"
-            app:layout_constraintTop_toBottomOf="@id/tilInitialWeight"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etBatchName"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    tools:text="Batch #1" />
+            </com.google.android.material.textfield.TextInputLayout>
 
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/etNotes"
-                android:layout_width="match_parent"
+            <Spinner
+                android:id="@+id/spinnerProductType"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                tools:text="Keep in fridge" />
-        </com.google.android.material.textfield.TextInputLayout>
+                android:layout_marginTop="16dp"
+                app:layout_constraintTop_toBottomOf="@id/tilBatchName"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" />
 
-        <!-- QR Code -->
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/tilQrCode"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:hint="QR Code"
-            android:layout_marginTop="16dp"
-            app:layout_constraintTop_toBottomOf="@id/tilNotes"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent">
 
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/etQrCode"
-                android:layout_width="match_parent"
+            <!-- Ingredients Display -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tilIngredientsDisplay"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                tools:text="12345-ABCDE" />
-        </com.google.android.material.textfield.TextInputLayout>
+                android:hint="Ingredients"
+                android:layout_marginTop="8dp"
+                app:layout_constraintTop_toBottomOf="@id/spinnerProductType"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent">
 
-        <!-- Stages List -->
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rvStages"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            app:layout_constraintTop_toBottomOf="@id/tilQrCode"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etIngredientsDisplay"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:enabled="false"
+                    android:inputType="textMultiLine|textNoSuggestions" /> <!-- Для многострочного текста -->
+            </com.google.android.material.textfield.TextInputLayout>
 
-        <!-- Buttons -->
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnAddStage"
-            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:text="Add Stage"
-            android:layout_marginTop="16dp"
-            app:layout_constraintTop_toBottomOf="@id/rvStages"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
+            <!-- Note Display -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tilNoteDisplay"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:hint="Note"
+                android:layout_marginTop="8dp"
+                app:layout_constraintTop_toBottomOf="@id/tilIngredientsDisplay"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent">
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnSave"
-            style="@style/Widget.MaterialComponents.Button"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:text="Save"
-            android:layout_marginTop="16dp"
-            app:layout_constraintTop_toBottomOf="@id/btnAddStage"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etNoteDisplay"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:enabled="false"
+                    android:inputType="textMultiLine|textNoSuggestions" />
+            </com.google.android.material.textfield.TextInputLayout>
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
-</ScrollView>
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tilInitialWeight"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:hint="Initial Weight (grams)"
+                android:layout_marginTop="16dp"
+                app:layout_constraintTop_toBottomOf="@id/tilNoteDisplay"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etInitialWeight"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="numberDecimal"
+                    tools:text="1500" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tilNotes"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:hint="Notes"
+                android:layout_marginTop="16dp"
+                app:layout_constraintTop_toBottomOf="@id/tilInitialWeight"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etNotes"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    tools:text="Keep in fridge" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tilQrCode"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:hint="QR Code"
+                android:layout_marginTop="16dp"
+                app:layout_constraintTop_toBottomOf="@id/tilNotes"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etQrCode"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    tools:text="12345-ABCDE" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvStages"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                app:layout_constraintTop_toBottomOf="@id/tilQrCode"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnAddStage"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="Add Stage"
+                android:layout_marginTop="16dp"
+                app:layout_constraintTop_toBottomOf="@id/rvStages"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnSave"
+                style="@style/Widget.MaterialComponents.Button"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="Save"
+                android:layout_marginTop="16dp"
+                app:layout_constraintTop_toBottomOf="@id/btnAddStage"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
+</FrameLayout>

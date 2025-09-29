@@ -9,6 +9,17 @@
     android:fitsSystemWindows="true"
     tools:context=".ui.MainActivity">
 
+    <!-- ImageView для фона -->
+    <ImageView
+        android:id="@+id/background_image_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        android:src="@drawable/background"
+        android:clickable="false"
+        android:focusable="false"
+        android:contentDescription="Background" />
+
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appBarLayout"
         android:layout_width="match_parent"

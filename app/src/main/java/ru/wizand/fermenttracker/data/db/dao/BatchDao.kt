@@ -40,6 +40,10 @@ interface BatchDao {
     @Query("SELECT * FROM batches WHERE id = :batchId")
     fun getBatchById(batchId: String): LiveData<Batch?>
 
+    // Added: Get recipe by its type
+    @Query("SELECT * FROM recipes WHERE type = :type LIMIT 1")
+    suspend fun getRecipeByType(type: String): Recipe? // Return null if not found
+
     // Added: synchronous single-shot fetch (useful from repository / suspend functions)
     @Query("SELECT * FROM batches WHERE id = :batchId LIMIT 1")
     suspend fun getBatchByIdOnce(batchId: String): Batch?

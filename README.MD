@@ -47,8 +47,8 @@ FermentTracker is an Android application designed to help users manage and track
 5. Build and run the app on an emulator or physical device with Android 5.0 (API 21) or higher.
 
 ### Current Version
-- Version: 1.8
-- Release Date: September 28, 2025
+- Version: 1.11
+- Release Date: September 29, 2025
 - Notes: Initial release with core fermentation tracking features. Future updates will include data persistence improvements and additional export options.
 
 ### Contributing
@@ -123,8 +123,8 @@ git clone https://github.com/yourusername/FermentTracker.git
 
 ### Текущая версия
 
-- Версия: 1.8
-- Дата выпуска: 28 сентября 2025 года
+- Версия: 1.11
+- Дата выпуска: 29 сентября 2025 года
 Примечания: Начальный релиз с основными функциями отслеживания ферментации. Будущие обновления включат улучшения хранения данных и дополнительные опции экспорта.
 
 ### Участие в разработке

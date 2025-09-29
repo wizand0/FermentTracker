@@ -135,7 +135,7 @@ class StageAdapter(
             val now = System.currentTimeMillis()
             val expectedEnd = when {
                 stage.endTime != null -> stage.endTime
-                stage.startTime != null -> stage.startTime + TimeUnit.HOURS.toMillis(stage.durationHours)
+                stage.startTime != null -> stage.startTime!! + TimeUnit.HOURS.toMillis(stage.durationHours)
                 stage.plannedEndTime != null -> stage.plannedEndTime
                 else -> null
             }

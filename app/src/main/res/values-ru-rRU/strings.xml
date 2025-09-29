@@ -27,14 +27,22 @@
     <string name="product_pickles">Солёные огурцы</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="scan_qr">Scan QR</string>
+
+    <string name="recipe_details_title">Recipe for %s</string>
+    <string name="ingredients_title">Ingredients:</string>
+    <string name="note_title">Instructions/Note:</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
+
     <string-array name="fermentation_types">
-        <item>Сыровяленое мясо</item>
-        <item>Сыровяленая колбаса</item>
-        <item>Пиво</item>
-        <item>Вино</item>
-        <item>Квас</item>
-        <item>Кимчи</item>
-        <item>Квашеная капуста</item>
-        <item>Другое</item>
+        <item>Dry-cured meat (basic)</item>
+        <item>Dry-cured meat (spicy)</item>
+        <item>Dry-cured sausage</item>
+        <item>Beer</item>
+        <item>Wine</item>
+        <item>Kvass</item>
+        <item>Kimchi</item>
+        <item>Sauerkraut</item>
+        <item>Other</item>
     </string-array>
 </resources>

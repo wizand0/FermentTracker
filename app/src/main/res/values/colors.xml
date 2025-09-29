@@ -34,4 +34,6 @@
     <color name="ct_accent">#FFB86B</color>
     <color name="ct_gray_100">#F5F6F7</color>
     <color name="ct_gray_900">#121212</color>
+
+    <color name="semi_transparent_light_bg">#CCFFFFFF</color>
 </resources>

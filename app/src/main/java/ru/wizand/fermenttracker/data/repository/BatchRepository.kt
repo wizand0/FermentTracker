@@ -107,6 +107,9 @@ class BatchRepository(
         return batchDao.getAllRecipeTypes()
     }
 
+    // Added: Get recipe by its type
+    suspend fun getRecipeByType(type: String): Recipe? = batchDao.getRecipeByType(type)
+
     suspend fun updateRecipe(recipe: Recipe) {
         batchDao.updateRecipe(recipe)
     }
@@ -119,8 +122,16 @@ class BatchRepository(
         batchDao.insertStageTemplate(template)
     }
 
+//    suspend fun getStageTemplatesForType(recipeType: String): List<StageTemplate> {
+//        return batchDao.getStageTemplatesForType(recipeType)
+//    }
+
     suspend fun getStageTemplatesForType(recipeType: String): List<StageTemplate> {
-        return batchDao.getStageTemplatesForType(recipeType)
+        val templates = batchDao.getStageTemplatesForType(recipeType)
+            .groupBy { it.name + it.durationHours }  // Группируем по уникальному ключу
+            .map { it.value.sortedBy { t -> t.orderIndex }.first() }  // Берём первого в группе с min orderIndex
+            .sortedBy { it.orderIndex }  // Сортируем по orderIndex
+        return templates
     }
 
     suspend fun updateStageTemplate(template: StageTemplate) {

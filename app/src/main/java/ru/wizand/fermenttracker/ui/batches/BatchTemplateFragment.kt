@@ -4,24 +4,22 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.recyclerview.widget.LinearLayoutManager
-import ru.wizand.fermenttracker.R
-import ru.wizand.fermenttracker.data.db.RecipeTemplates
-import ru.wizand.fermenttracker.databinding.FragmentBatchTemplateBinding
-import androidx.navigation.fragment.findNavController
-import ru.wizand.fermenttracker.ui.adapters.EditableStageTemplateAdapter  // Изменено: импортируем правильный адаптер для StageTemplate
-import ru.wizand.fermenttracker.vm.BatchListViewModel
 import androidx.fragment.app.activityViewModels
-import ru.wizand.fermenttracker.data.db.entities.Recipe
-import ru.wizand.fermenttracker.data.db.entities.StageTemplate
-import java.util.UUID
+import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import ru.wizand.fermenttracker.R
+import ru.wizand.fermenttracker.data.db.entities.Recipe
+import ru.wizand.fermenttracker.data.db.entities.StageTemplate
+import ru.wizand.fermenttracker.databinding.FragmentBatchTemplateBinding
+import ru.wizand.fermenttracker.ui.adapters.EditableStageTemplateAdapter
+import ru.wizand.fermenttracker.vm.BatchListViewModel
+import java.util.UUID
 
 class BatchTemplateFragment : Fragment() {
     private var _binding: FragmentBatchTemplateBinding? = null
@@ -112,12 +110,23 @@ override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 
     private fun loadStagesForType(type: String) {
         CoroutineScope(Dispatchers.IO).launch {
-            val templates = viewModel.repository.getStageTemplatesForType(type).distinct()
-            val recipe = viewModel.repository.getAllRecipes().find { it.type == type }
-            withContext(Dispatchers.Main) {
-                stageAdapter.submitList(templates)
-                binding.etIngredients.setText(recipe?.ingredients ?: "")
-                binding.etNote.setText(recipe?.note ?: "")
+            try {
+                val templates = viewModel.repository.getStageTemplatesForType(type).distinct()
+                val recipe = viewModel.repository.getAllRecipes().find { it.type == type }
+                withContext(Dispatchers.Main) {
+                    if (isAdded && !isDetached) { // Проверяем, что фрагмент еще активен
+                        stageAdapter.submitList(templates)
+                        binding.etIngredients.setText(recipe?.ingredients ?: "")
+                        binding.etNote.setText(recipe?.note ?: "")
+                    }
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    if (isAdded && !isDetached) {
+                        // Показать ошибку пользователю
+                        Toast.makeText(requireContext(), "Error loading stages: ${e.message}", Toast.LENGTH_SHORT).show()
+                    }
+                }
             }
         }
     }
@@ -127,13 +136,14 @@ override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         stageAdapter = EditableStageTemplateAdapter(
             onRemoveStage = { position ->
                 val current = stageAdapter.currentList.toMutableList()
-                if (position < 0 || position >= current.size) return@EditableStageTemplateAdapter
-                current.removeAt(position)
-                // Обновляем orderIndex
-                current.forEachIndexed { index, template ->
-                    template.orderIndex = index
+                if (position >= 0 && position < current.size) {
+                    current.removeAt(position)
+                    // Обновляем orderIndex для всех оставшихся этапов
+                    current.forEachIndexed { index, template ->
+                        template.orderIndex = index
+                    }
+                    stageAdapter.submitList(current)
                 }
-                stageAdapter.submitList(current)
             }
         )
         binding.rvStages.layoutManager = LinearLayoutManager(requireContext())
@@ -185,12 +195,33 @@ override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
                 template.copy(recipeType = type)
             }
             CoroutineScope(Dispatchers.IO).launch {
+                // Удаляем старые шаблоны для этого типа
+                val oldTemplates = viewModel.repository.getStageTemplatesForType(type)
+                oldTemplates.forEach { viewModel.repository.deleteStageTemplate(it.id) }
+
+                // Вставляем новые
                 viewModel.repository.insertRecipe(recipe)
                 templates.forEach { viewModel.repository.insertStageTemplate(it) }
             }
-            findNavController().popBackStack()
+//            findNavController().popBackStack()
+            goBack()
         }
 
+    }
+
+    private fun goBack() {
+        try {
+            // Пытаемся найти NavController безопасно
+            val navController = findNavController()
+            if (navController.currentDestination?.id == R.id.batchTemplateFragment) {
+                navController.popBackStack()
+            } else {
+                requireActivity().onBackPressedDispatcher.onBackPressed()
+            }
+        } catch (e: IllegalStateException) {
+            // NavController не найден - мы в RecipeEditorActivity
+            requireActivity().onBackPressedDispatcher.onBackPressed()
+        }
     }
 
     override fun onDestroyView() {

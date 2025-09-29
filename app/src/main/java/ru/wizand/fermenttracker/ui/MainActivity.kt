@@ -24,12 +24,10 @@ import ru.wizand.fermenttracker.R
 import ru.wizand.fermenttracker.data.db.AppDatabase
 import ru.wizand.fermenttracker.databinding.ActivityMainBinding
 import ru.wizand.fermenttracker.data.db.RecipeTemplates
-import ru.wizand.fermenttracker.data.db.entities.Recipe
 import ru.wizand.fermenttracker.data.db.entities.StageTemplate
 import ru.wizand.fermenttracker.data.repository.BatchRepository
 import ru.wizand.fermenttracker.utils.FileUtils
 import java.io.File
-import java.util.UUID
 import android.content.Context
 import androidx.lifecycle.lifecycleScope
 
@@ -37,7 +35,6 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
 
-    // launcher для множественных разрешений (camera & notification для Android13+ и storage legacy)
     private val multiplePermissionsLauncher = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
     ) { result ->
@@ -57,23 +54,15 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    // SAF: CreateDocument launcher (экспорт базы)
-    private val createDocumentLauncher = registerForActivityResult(ActivityResultContracts.CreateDocument("application/octet-stream")) { uri ->
-        if (uri != null) {
-            performBackup(uri)
-        } else {
-            // пользователь отменил
+    private val createDocumentLauncher =
+        registerForActivityResult(ActivityResultContracts.CreateDocument("application/octet-stream")) { uri ->
+            if (uri != null) performBackup(uri)
         }
-    }
 
-    // SAF: OpenDocument launcher (импорт базы)
-    private val openDocumentLauncher = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
-        if (uri != null) {
-            performRestore(uri)
-        } else {
-            // отмена
+    private val openDocumentLauncher =
+        registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
+            if (uri != null) performRestore(uri)
         }
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -81,11 +70,10 @@ class MainActivity : AppCompatActivity() {
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        setSupportActionBar(binding.toolbar)  // Изменено: binding.toolbar вместо findViewById
+        setSupportActionBar(binding.toolbar)
 
         initializeTemplates()
 
-        // Handle insets for FABs (avoid nav bar overlap)
         ViewCompat.setOnApplyWindowInsetsListener(binding.fabAdd) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(0, 0, systemBars.right, systemBars.bottom)
@@ -93,19 +81,15 @@ class MainActivity : AppCompatActivity() {
         }
         ViewCompat.setOnApplyWindowInsetsListener(binding.fabScanQr) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(0, 0, systemBars.right, systemBars.bottom + 64)  // Extra for stacking
+            v.setPadding(0, 0, systemBars.right, systemBars.bottom + 64)
             insets
         }
 
-        // Handle insets for content (NavHost)
         ViewCompat.setOnApplyWindowInsetsListener(binding.navHostFragment) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
-
-        // seed DB ако нужно
-        seedRecipesIfNeeded()
 
         ensureCriticalPermissions()
 
@@ -132,12 +116,10 @@ class MainActivity : AppCompatActivity() {
                 true
             }
             R.id.menu_export_db -> {
-                // Запрос имени файла, default "ferment_backup.db"
                 createDocumentLauncher.launch("ferment_tracker_backup_${System.currentTimeMillis()}.db")
                 true
             }
             R.id.menu_import_db -> {
-                // Разрешаем выбрать любой файл
                 openDocumentLauncher.launch(arrayOf("*/*"))
                 true
             }
@@ -147,17 +129,14 @@ class MainActivity : AppCompatActivity() {
 
     private fun ensureCriticalPermissions() {
         val perms = mutableListOf<String>()
-
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
             perms.add(Manifest.permission.CAMERA)
         }
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
                 perms.add(Manifest.permission.POST_NOTIFICATIONS)
             }
         }
-
         if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.P) {
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
                 perms.add(Manifest.permission.WRITE_EXTERNAL_STORAGE)
@@ -166,45 +145,12 @@ class MainActivity : AppCompatActivity() {
                 perms.add(Manifest.permission.READ_EXTERNAL_STORAGE)
             }
         }
-
         if (perms.isNotEmpty()) multiplePermissionsLauncher.launch(perms.toTypedArray())
     }
 
-    private fun seedRecipesIfNeeded() {
-        CoroutineScope(Dispatchers.IO).launch {
-            val dao = AppDatabase.getInstance(applicationContext).batchDao()
-            try {
-                val list = dao.getAllRecipes()
-                if (list.isEmpty()) {
-                    val templates = RecipeTemplates.getTemplateStages(applicationContext)
-                    templates.forEach { (type, stageList) ->
-                        val recipe = Recipe(type = type, ingredients = "", note = "")
-                        dao.insertRecipe(recipe)
-                        stageList.forEachIndexed { index, stage ->
-                            val template = StageTemplate(
-                                recipeType = type,
-                                name = stage.name,
-                                durationHours = stage.durationHours,
-                                orderIndex = index
-                            )
-                            dao.insertStageTemplate(template)
-                        }
-                    }
-                }
-            } catch (e: Exception) {
-                android.util.Log.e("MainActivity", "Error seeding recipes: ${e.message}", e)
-                // Опционально: Snackbar на UI, но не обязательно для init
-            }
-        }
-    }
-
-    /**
-     * Выполняет backup БД -> выбранный URI (SAF). Работает в IO-потоке.
-     */
     private fun performBackup(targetUri: Uri) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                // path to DB file
                 val dbFile = getDatabasePath("ferment_tracker_db")
                 if (!dbFile.exists()) {
                     runOnUiThread {
@@ -212,42 +158,28 @@ class MainActivity : AppCompatActivity() {
                     }
                     return@launch
                 }
-
                 FileUtils.copyFileToUri(dbFile, targetUri, this@MainActivity)
-
                 runOnUiThread {
                     Snackbar.make(binding.root, "Резервная копия создана", Snackbar.LENGTH_LONG).show()
                 }
             } catch (e: Exception) {
                 runOnUiThread {
-                    Snackbar.make(binding.root, "Ошибка при backup: ${e.message ?: e.toString()}", Snackbar.LENGTH_LONG).show()
+                    Snackbar.make(binding.root, "Ошибка при backup: ${e.message}", Snackbar.LENGTH_LONG).show()
                 }
             }
         }
     }
 
-    /**
-     * Выполняет restore из выбранного URI -> файл БД приложения.
-     * Закрывает текущую инстанцию DB перед заменой файла.
-     */
     private fun performRestore(sourceUri: Uri) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                // close Room instance to allow overwrite
                 AppDatabase.closeInstance()
-
                 val dbFile = getDatabasePath("ferment_tracker_db")
-                // ensure parent exists
                 dbFile.parentFile?.mkdirs()
-
-                // copy selected file into DB location
                 FileUtils.copyUriToFile(sourceUri, dbFile, this@MainActivity)
-
-                // recreate DB instance (getInstance will re-open DB)
                 AppDatabase.getInstance(applicationContext)
-
                 runOnUiThread {
-                    Snackbar.make(binding.root, "База успешно восстановлена. Перезапустите приложение для полной корректности.", Snackbar.LENGTH_LONG)
+                    Snackbar.make(binding.root, "База успешно восстановлена. Перезапустите приложение.", Snackbar.LENGTH_LONG)
                         .setAction("Перезапустить") {
                             val intent = packageManager.getLaunchIntentForPackage(packageName)
                             intent?.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
@@ -257,7 +189,7 @@ class MainActivity : AppCompatActivity() {
                 }
             } catch (e: Exception) {
                 runOnUiThread {
-                    Snackbar.make(binding.root, "Ошибка при restore: ${e.message ?: e.toString()}", Snackbar.LENGTH_LONG).show()
+                    Snackbar.make(binding.root, "Ошибка при restore: ${e.message}", Snackbar.LENGTH_LONG).show()
                 }
             }
         }
@@ -270,17 +202,14 @@ class MainActivity : AppCompatActivity() {
             val repository = BatchRepository(AppDatabase.getInstance(this).batchDao(), this)
             lifecycleScope.launch(Dispatchers.IO) {
                 val templates = RecipeTemplates.getTemplateStages(this@MainActivity)
-                templates.forEach { (type, stages) ->
-                    // Вставляем Recipe (ingredients и note по умолчанию пустые)
-                    val recipe = Recipe(type = type, ingredients = "", note = "")
+                templates.forEach { (type, pair) ->
+                    val recipe = pair.second
                     repository.insertRecipe(recipe)
-
-                    // Вставляем StageTemplate для каждого этапа
-                    stages.forEachIndexed { index, stage ->
+                    pair.first.forEachIndexed { index, stage ->
                         val template = StageTemplate(
                             recipeType = type,
                             name = stage.name,
-                            durationHours = stage.durationHours,
+                            durationHours = stage.durationHours.toLong(),
                             orderIndex = index
                         )
                         repository.insertStageTemplate(template)

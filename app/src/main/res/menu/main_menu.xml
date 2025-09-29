@@ -12,13 +12,15 @@
             android:id="@+id/menu_export_db"
             android:title="Export DB"
             android:icon="@android:drawable/ic_menu_save"
-            android:orderInCategory="2"
-            app:showAsAction="ifRoom" />
+            android:orderInCategory="2" />
+<!--            app:showAsAction="ifRoom"-->
+            />
         <item
             android:id="@+id/menu_import_db"
             android:title="Import DB"
             android:icon="@android:drawable/ic_menu_upload"
-            android:orderInCategory="3"
-            app:showAsAction="ifRoom" />
+            android:orderInCategory="3" />
+<!--            app:showAsAction="ifRoom" -->
+
     </group>
 </menu>
