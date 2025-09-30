@@ -1,6 +1,7 @@
 package ru.wizand.fermenttracker.ui
 
 import android.Manifest
+import android.content.ComponentCallbacks2
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
@@ -17,7 +18,6 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.navigation.findNavController
 import com.google.android.material.snackbar.Snackbar
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import ru.wizand.fermenttracker.R
@@ -29,7 +29,13 @@ import ru.wizand.fermenttracker.data.repository.BatchRepository
 import ru.wizand.fermenttracker.utils.FileUtils
 import java.io.File
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.lifecycleScope
+import ru.wizand.fermenttracker.utils.BatteryOptimizationHelper
+import ru.wizand.fermenttracker.utils.ImageUtils
+import ru.wizand.fermenttracker.utils.NotificationHelper
+import java.io.FileNotFoundException
+import java.io.IOException
 
 class MainActivity : AppCompatActivity() {
 
@@ -66,6 +72,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        NotificationHelper.createChannel(this)
         WindowCompat.setDecorFitsSystemWindows(window, false)
 
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -73,6 +80,12 @@ class MainActivity : AppCompatActivity() {
         setSupportActionBar(binding.toolbar)
 
         initializeTemplates()
+
+        // Обработка открытия батча из уведомления
+        handleNotificationIntent(intent)
+
+        checkBatteryOptimization()
+
 
         ViewCompat.setOnApplyWindowInsetsListener(binding.fabAdd) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
@@ -149,49 +162,255 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun performBackup(targetUri: Uri) {
-        CoroutineScope(Dispatchers.IO).launch {
+        lifecycleScope.launch(Dispatchers.IO) {
             try {
                 val dbFile = getDatabasePath("ferment_tracker_db")
-                if (!dbFile.exists()) {
-                    runOnUiThread {
-                        Snackbar.make(binding.root, "Файл базы не найден", Snackbar.LENGTH_LONG).show()
+
+                // Проверяем существование и доступность файла БД
+                when {
+                    !dbFile.exists() -> {
+                        showError("База данных не найдена")
+                        return@launch
                     }
+                    !dbFile.canRead() -> {
+                        showError("Нет доступа на чтение базы данных")
+                        return@launch
+                    }
+                    dbFile.length() == 0L -> {
+                        showError("Файл базы данных пуст")
+                        return@launch
+                    }
+                }
+
+                // Проверяем свободное место (нужно минимум столько же, сколько занимает БД + 10% запас)
+                val requiredSpace = (dbFile.length() * 1.1).toLong()
+                val availableSpace = dbFile.parentFile?.usableSpace ?: 0L
+                if (availableSpace < requiredSpace) {
+                    showError("Недостаточно свободного места (требуется ${requiredSpace / 1024 / 1024} МБ)")
                     return@launch
                 }
+
+                // Закрываем БД перед копированием для консистентности
+                AppDatabase.closeInstance()
+
+                // Выполняем копирование
                 FileUtils.copyFileToUri(dbFile, targetUri, this@MainActivity)
-                runOnUiThread {
-                    Snackbar.make(binding.root, "Резервная копия создана", Snackbar.LENGTH_LONG).show()
-                }
+
+                // Переоткрываем БД
+                AppDatabase.getInstance(applicationContext)
+
+                showSuccess("Резервная копия создана (${dbFile.length() / 1024} КБ)")
+
+            } catch (e: FileNotFoundException) {
+                showError("Файл не найден: ${e.message}")
+            } catch (e: SecurityException) {
+                showError("Нет прав доступа к файлу")
+            } catch (e: IOException) {
+                showError("Ошибка ввода-вывода: ${e.message}")
             } catch (e: Exception) {
-                runOnUiThread {
-                    Snackbar.make(binding.root, "Ошибка при backup: ${e.message}", Snackbar.LENGTH_LONG).show()
+                showError("Неизвестная ошибка при создании резервной копии: ${e.message}")
+            } finally {
+                // Гарантируем, что БД будет переоткрыта
+                try {
+                    AppDatabase.getInstance(applicationContext)
+                } catch (e: Exception) {
+                    showError("Критическая ошибка: не удалось переоткрыть базу данных")
                 }
             }
         }
     }
 
     private fun performRestore(sourceUri: Uri) {
-        CoroutineScope(Dispatchers.IO).launch {
+        lifecycleScope.launch(Dispatchers.IO) {
+            var backupFile: File? = null
             try {
-                AppDatabase.closeInstance()
+                // Проверяем размер исходного файла
+                val fileSize = contentResolver.openFileDescriptor(sourceUri, "r")?.use { fd ->
+                    fd.statSize
+                } ?: 0L
+
+                when {
+                    fileSize == 0L -> {
+                        showError("Файл резервной копии пуст или недоступен")
+                        return@launch
+                    }
+                    fileSize < 4096 -> { // SQLite database минимум ~4KB
+                        showError("Файл резервной копии слишком мал (${fileSize} байт). Возможно, файл поврежден")
+                        return@launch
+                    }
+                }
+
                 val dbFile = getDatabasePath("ferment_tracker_db")
+
+                // Проверяем свободное место
+                val requiredSpace = (fileSize * 1.5).toLong() // дополнительное место для временной копии
+                val availableSpace = dbFile.parentFile?.usableSpace ?: 0L
+                if (availableSpace < requiredSpace) {
+                    showError("Недостаточно свободного места (требуется ${requiredSpace / 1024 / 1024} МБ)")
+                    return@launch
+                }
+
+                // Создаем резервную копию текущей БД
+                backupFile = File(dbFile.parentFile, "ferment_tracker_db.backup")
+                if (dbFile.exists()) {
+                    try {
+                        dbFile.copyTo(backupFile, overwrite = true)
+                    } catch (e: Exception) {
+                        showError("Не удалось создать резервную копию текущей БД: ${e.message}")
+                        return@launch
+                    }
+                }
+
+                // Закрываем текущую БД
+                AppDatabase.closeInstance()
+
+                // Создаем директорию если нужно
                 dbFile.parentFile?.mkdirs()
+
+                // Копируем новую БД
                 FileUtils.copyUriToFile(sourceUri, dbFile, this@MainActivity)
+
+                // Проверяем целостность восстановленной БД
+                val verificationResult = verifyDatabase()
+
+                if (!verificationResult.isValid) {
+                    // Восстанавливаем старую БД
+                    if (backupFile?.exists() == true) {
+                        backupFile.copyTo(dbFile, overwrite = true)
+                    }
+                    AppDatabase.getInstance(applicationContext)
+                    showError("Восстановление не удалось: ${verificationResult.errorMessage}\nСтарая база данных восстановлена")
+                    return@launch
+                }
+
+                // Удаляем временную резервную копию
+                backupFile?.delete()
+
+                // Переоткрываем БД
                 AppDatabase.getInstance(applicationContext)
-                runOnUiThread {
-                    Snackbar.make(binding.root, "База успешно восстановлена. Перезапустите приложение.", Snackbar.LENGTH_LONG)
-                        .setAction("Перезапустить") {
-                            val intent = packageManager.getLaunchIntentForPackage(packageName)
-                            intent?.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-                            startActivity(intent)
-                            finish()
-                        }.show()
-                }
+
+                showRestoreSuccess(verificationResult.batchCount)
+
+            } catch (e: FileNotFoundException) {
+                restoreBackup(backupFile, getDatabasePath("ferment_tracker_db"))
+                showError("Файл не найден: ${e.message}")
+            } catch (e: SecurityException) {
+                restoreBackup(backupFile, getDatabasePath("ferment_tracker_db"))
+                showError("Нет прав доступа к файлу")
+            } catch (e: IOException) {
+                restoreBackup(backupFile, getDatabasePath("ferment_tracker_db"))
+                showError("Ошибка ввода-вывода: ${e.message}")
             } catch (e: Exception) {
-                runOnUiThread {
-                    Snackbar.make(binding.root, "Ошибка при restore: ${e.message}", Snackbar.LENGTH_LONG).show()
+                restoreBackup(backupFile, getDatabasePath("ferment_tracker_db"))
+                showError("Неизвестная ошибка при восстановлении: ${e.message}")
+            } finally {
+                // Гарантируем, что БД будет переоткрыта
+                try {
+                    AppDatabase.getInstance(applicationContext)
+                } catch (e: Exception) {
+                    showError("Критическая ошибка: не удалось переоткрыть базу данных")
                 }
+                // Очищаем временный файл
+                backupFile?.delete()
             }
+        }
+    }
+
+    /**
+     * Восстанавливает резервную копию БД в случае ошибки
+     */
+    private fun restoreBackup(backupFile: File?, targetFile: File) {
+        try {
+            if (backupFile?.exists() == true) {
+                AppDatabase.closeInstance()
+                backupFile.copyTo(targetFile, overwrite = true)
+                AppDatabase.getInstance(applicationContext)
+            }
+        } catch (e: Exception) {
+            // Логируем, но не показываем пользователю, чтобы не перегружать информацией
+            e.printStackTrace()
+        }
+    }
+
+    /**
+     * Результат проверки целостности базы данных
+     */
+    private data class DatabaseVerificationResult(
+        val isValid: Boolean,
+        val errorMessage: String? = null,
+        val batchCount: Int = 0
+    )
+
+    /**
+     * Проверяет целостность базы данных после восстановления
+     */
+    private fun verifyDatabase(): DatabaseVerificationResult {
+        return try {
+            val db = AppDatabase.getInstance(applicationContext)
+
+            // Проверяем, что БД открывается и доступна
+            val dao = db.batchDao()
+
+            // Проверяем, что можем выполнять запросы
+            val batchCount = dao.getBatchCount()
+
+            // Проверяем наличие базовых таблиц
+            val recipeCount = dao.getRecipeCount()
+
+            // БД валидна, если она открывается и можно выполнять запросы
+            // (даже если данных нет - это может быть новая пустая БД)
+            DatabaseVerificationResult(
+                isValid = true,
+                batchCount = batchCount
+            )
+        } catch (e: android.database.sqlite.SQLiteDatabaseCorruptException) {
+            DatabaseVerificationResult(
+                isValid = false,
+                errorMessage = "База данных повреждена"
+            )
+        } catch (e: android.database.sqlite.SQLiteException) {
+            DatabaseVerificationResult(
+                isValid = false,
+                errorMessage = "Ошибка SQLite: ${e.message}"
+            )
+        } catch (e: Exception) {
+            DatabaseVerificationResult(
+                isValid = false,
+                errorMessage = "Не удалось открыть базу данных: ${e.message}"
+            )
+        }
+    }
+
+    private fun showError(message: String) {
+        runOnUiThread {
+            Snackbar.make(binding.root, message, Snackbar.LENGTH_LONG).show()
+        }
+    }
+
+    private fun showSuccess(message: String) {
+        runOnUiThread {
+            Snackbar.make(binding.root, message, Snackbar.LENGTH_LONG).show()
+        }
+    }
+
+    private fun showRestoreSuccess(batchCount: Int) {
+        runOnUiThread {
+            val message = if (batchCount > 0) {
+                "База восстановлена ($batchCount партий)"
+            } else {
+                "База восстановлена (данные отсутствуют)"
+            }
+
+            Snackbar.make(
+                binding.root,
+                message,
+                Snackbar.LENGTH_INDEFINITE
+            ).setAction("Перезапустить") {
+                val intent = packageManager.getLaunchIntentForPackage(packageName)
+                intent?.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
+                startActivity(intent)
+                finish()
+            }.show()
         }
     }
 
@@ -217,6 +436,68 @@ class MainActivity : AppCompatActivity() {
                 }
                 prefs.edit().putBoolean("first_run", false).apply()
             }
+        }
+    }
+
+    override fun onTrimMemory(level: Int) {
+        super.onTrimMemory(level)
+        if (level >= ComponentCallbacks2.TRIM_MEMORY_MODERATE) {
+            ImageUtils.clearCache()
+        }
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        // Убедитесь, что intent не nullable
+        setIntent(intent)  // если нужно обновить intent
+        handleNotificationIntent(intent)
+    }
+
+//    override fun onNewIntent(intent: Intent?) {
+//        super.onNewIntent(intent)
+//        intent?.let { handleNotificationIntent(it) }
+//    }
+
+    private fun handleNotificationIntent(intent: Intent) {
+        intent.getStringExtra("batchId")?.let { batchId ->
+            try {
+                val navController = findNavController(R.id.nav_host_fragment)
+
+                // Проверяем текущий destination
+                val currentDestination = navController.currentDestination?.id
+
+                // Если мы не на BatchListFragment, сначала переходим туда
+                if (currentDestination != R.id.batchListFragment) {
+                    navController.navigate(R.id.batchListFragment)
+                }
+
+                // Используем правильное имя, сгенерированное SafeArgs
+                val action = ru.wizand.fermenttracker.ui.batches.BatchListFragmentDirections
+                    .actionBatchListToBatchDetail(batchId)  // ← Исправлено имя
+                navController.navigate(action)
+
+                Log.d("MainActivity", "Navigated to batch: $batchId from notification")
+            } catch (e: Exception) {
+                Log.e("MainActivity", "Navigation error: ${e.message}", e)
+                Snackbar.make(
+                    binding.root,
+                    "Ошибка навигации к партии",
+                    Snackbar.LENGTH_SHORT
+                ).show()
+            }
+        }
+    }
+
+    private fun checkBatteryOptimization() {
+        if (!BatteryOptimizationHelper.isIgnoringBatteryOptimizations(this)) {
+            androidx.appcompat.app.AlertDialog.Builder(this)
+                .setTitle("Оптимизация батареи")
+                .setMessage("Для надежной работы уведомлений рекомендуется отключить оптимизацию батареи для этого приложения.")
+                .setPositiveButton("Настроить") { _, _ ->
+                    BatteryOptimizationHelper.requestIgnoreBatteryOptimizations(this)
+                }
+                .setNegativeButton("Позже", null)
+                .show()
         }
     }
 }

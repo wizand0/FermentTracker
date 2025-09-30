@@ -1,72 +1,63 @@
 package ru.wizand.fermenttracker.vm
 
 import android.app.Application
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import ru.wizand.fermenttracker.data.db.AppDatabase
-import ru.wizand.fermenttracker.data.db.entities.Batch
-import ru.wizand.fermenttracker.data.db.entities.BatchLog
-import ru.wizand.fermenttracker.data.db.entities.Photo
-import ru.wizand.fermenttracker.data.db.entities.Stage
+import ru.wizand.fermenttracker.data.db.entities.*
 import ru.wizand.fermenttracker.data.repository.BatchRepository
 
-class BatchDetailViewModel(application: Application, private val batchId: String) : AndroidViewModel(application) {
-    private val repository = BatchRepository(
-        AppDatabase.getInstance(application).batchDao(),
-        application.applicationContext
-    )
-    val batch: LiveData<Batch?> = repository.getBatchById(batchId)
-    val stages: LiveData<List<Stage>> = repository.getStages(batchId)
-    val photos: LiveData<List<Photo>> = repository.getPhotos(batchId)
-    val logs: LiveData<List<BatchLog>> = repository.getLogs(batchId)
+class BatchDetailViewModel(
+    application: Application,
+    private val batchId: String
+) : AndroidViewModel(application) {
 
-    fun updateBatch(batch: Batch) {
-        viewModelScope.launch {
-            repository.updateBatch(batch)
-        }
+    private val repository: BatchRepository
+
+    val batch: LiveData<Batch?>
+    val stages: LiveData<List<Stage>>
+    val photos: LiveData<List<Photo>>
+    val logs: LiveData<List<BatchLog>>
+
+    init {
+        val batchDao = AppDatabase.getInstance(application).batchDao()
+        repository = BatchRepository(batchDao, application)
+        batch = repository.getBatchById(batchId)
+        stages = repository.getStages(batchId)
+        photos = repository.getPhotos(batchId)
+        logs = repository.getLogs(batchId)
     }
 
-    fun deleteBatch() {
-        viewModelScope.launch {
-            repository.deleteBatch(batchId)
-        }
+    fun updateBatch(batch: Batch) = viewModelScope.launch(Dispatchers.IO) {
+        repository.updateBatch(batch)
     }
 
-    fun addStage(stage: Stage) {
-        viewModelScope.launch {
-            repository.addStage(stage.copy(batchId = batchId))
-        }
+    fun addStage(stage: Stage) = viewModelScope.launch(Dispatchers.IO) {
+        repository.addStage(stage)
     }
 
-    fun updateStage(stage: Stage) {
-        viewModelScope.launch {
-            repository.updateStage(stage)
-        }
+    fun updateStage(stage: Stage) = viewModelScope.launch(Dispatchers.IO) {
+        repository.updateStage(stage)
     }
 
-    fun deleteStage(stageId: String) {
-        viewModelScope.launch {
-            repository.deleteStage(stageId)
-        }
+    fun addPhoto(photo: Photo) = viewModelScope.launch(Dispatchers.IO) {
+        repository.addPhoto(photo)
     }
 
-    fun addPhoto(photo: Photo) {
-        viewModelScope.launch {
-            repository.addPhoto(photo)
-        }
+    fun addLog(log: BatchLog) = viewModelScope.launch(Dispatchers.IO) {
+        repository.addLog(log)
     }
 
-    fun addLog(log: BatchLog) {
-        viewModelScope.launch {
-            repository.addLog(log)
-        }
+    // Добавьте этот метод:
+    fun scheduleStageNotification(stage: Stage, batch: Batch) {
+        repository.scheduleStageNotification(stage, batch)
     }
 
-    class Factory(private val application: Application, private val batchId: String) : ViewModelProvider.Factory {
+    class Factory(
+        private val application: Application,
+        private val batchId: String
+    ) : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             if (modelClass.isAssignableFrom(BatchDetailViewModel::class.java)) {
                 @Suppress("UNCHECKED_CAST")

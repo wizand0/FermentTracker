@@ -1,15 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
-    <!-- Notifications (runtime permission exists on Android 13+; declared here for compatibility) -->
-    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" /> <!-- Camera permission -->
-    <uses-permission android:name="android.permission.CAMERA" /> <!-- For older Android versions (<=28) include storage perms; using maxSdkVersion to limit scope -->
+
+    <!-- Notifications (runtime permission exists on Android 13+) -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
+    <!-- Camera permission -->
+    <uses-permission android:name="android.permission.CAMERA" />
+
+    <!-- For older Android versions (<=28) -->
     <uses-permission
         android:name="android.permission.READ_EXTERNAL_STORAGE"
         android:maxSdkVersion="28" />
     <uses-permission
         android:name="android.permission.WRITE_EXTERNAL_STORAGE"
         android:maxSdkVersion="28" />
+
+    <!-- Note: REQUEST_IGNORE_BATTERY_OPTIMIZATIONS можно запросить, но это может
+         привести к отклонению приложения в Google Play. Лучше направить пользователя
+         в настройки вручную, если нужна надежная работа фоновых задач -->
 
     <uses-feature
         android:name="android.hardware.camera"
@@ -25,18 +34,20 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.FermentTracker"
         tools:targetApi="31">
+
         <activity
             android:name=".ui.RecipeEditorActivity"
             android:exported="false" />
+
         <activity
             android:name=".ui.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity> <!-- IMPORTANT: authority must not contain spaces -->
+        </activity>
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.fileprovider"

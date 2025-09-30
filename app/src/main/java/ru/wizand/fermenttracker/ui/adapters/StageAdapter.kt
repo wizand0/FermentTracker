@@ -52,14 +52,18 @@ class StageAdapter(
             binding.tvStageName.text = stage.name
             binding.tvDuration.text = "${stage.durationHours} h"
 
-            // убираем старый TextWatcher, если он был
-            (binding.etDuration.tag as? TextWatcher)?.let {
-                binding.etDuration.removeTextChangedListener(it)
+            // ========== Для duration ==========
+            // Удаляем ВСЕ старые watchers из etDuration
+            while (binding.etDuration.tag != null) {
+                (binding.etDuration.tag as? TextWatcher)?.let {
+                    binding.etDuration.removeTextChangedListener(it)
+                }
+                binding.etDuration.tag = null
             }
 
             binding.etDuration.setText(stage.durationHours.toString())
 
-            // создаём новый TextWatcher и сохраняем его в tag
+            // Создаём новый TextWatcher и сохраняем его в tag
             val watcher = object : TextWatcher {
                 override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
                 override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
@@ -71,8 +75,8 @@ class StageAdapter(
                     }
                 }
             }
-            binding.etDuration.addTextChangedListener(watcher)
             binding.etDuration.tag = watcher
+            binding.etDuration.addTextChangedListener(watcher)
 
             // Определяем состояние "выполняется" по activeStageId (приоритет) либо по полям startTime/endTime
             val isThisActive = activeStageId != null && activeStageId == stage.id

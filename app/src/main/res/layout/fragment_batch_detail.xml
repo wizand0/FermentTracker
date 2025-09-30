@@ -160,6 +160,13 @@
                 style="@style/Widget.Material3.Button.OutlinedButton"
                 android:layout_marginTop="8dp" />
 
+            <Button
+                android:id="@+id/btnTestNotification"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="🔔 Test Notification (10s)"
+                android:backgroundTint="@android:color/holo_orange_dark" />
+
         </LinearLayout>
     </ScrollView>
 </FrameLayout>

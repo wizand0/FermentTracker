@@ -26,11 +26,19 @@ class EditableStageTemplateAdapter(
     inner class VH(private val b: ItemEditableStageBinding) : RecyclerView.ViewHolder(b.root) {
         private val sdf = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault())
 
-
         fun bind(template: StageTemplate, pos: Int) {
-            // Для имени
-            (b.etStageName.tag as? TextWatcher)?.let { b.etStageName.removeTextChangedListener(it) }
+            // ========== Для имени ==========
+            // Удаляем ВСЕ старые watchers из etStageName
+            while (b.etStageName.tag != null) {
+                (b.etStageName.tag as? TextWatcher)?.let {
+                    b.etStageName.removeTextChangedListener(it)
+                }
+                b.etStageName.tag = null
+            }
+
             b.etStageName.setText(template.name)
+
+            // Создаем новый watcher для имени
             val nameWatcher = object : TextWatcher {
                 override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
                 override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
@@ -46,12 +54,21 @@ class EditableStageTemplateAdapter(
                     }
                 }
             }
-            b.etStageName.addTextChangedListener(nameWatcher)
             b.etStageName.tag = nameWatcher
+            b.etStageName.addTextChangedListener(nameWatcher)
 
-            // Для duration
-            (b.etDuration.tag as? TextWatcher)?.let { b.etDuration.removeTextChangedListener(it) }
+            // ========== Для duration ==========
+            // Удаляем ВСЕ старые watchers из etDuration
+            while (b.etDuration.tag != null) {
+                (b.etDuration.tag as? TextWatcher)?.let {
+                    b.etDuration.removeTextChangedListener(it)
+                }
+                b.etDuration.tag = null
+            }
+
             b.etDuration.setText(template.durationHours.toString())
+
+            // Создаем новый watcher для duration
             val durationWatcher = object : TextWatcher {
                 override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
                 override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
@@ -67,16 +84,16 @@ class EditableStageTemplateAdapter(
                     }
                 }
             }
-            b.etDuration.addTextChangedListener(durationWatcher)
             b.etDuration.tag = durationWatcher
+            b.etDuration.addTextChangedListener(durationWatcher)
 
+            // Кнопка удаления стадии
             b.btnRemoveStage.setOnClickListener {
                 if (pos < currentList.size) {
                     onRemoveStage(pos)
                 }
             }
         }
-
     }
 
     companion object {

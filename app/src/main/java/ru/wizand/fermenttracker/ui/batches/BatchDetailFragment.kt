@@ -33,6 +33,7 @@ import ru.wizand.fermenttracker.data.db.entities.Stage
 import ru.wizand.fermenttracker.databinding.FragmentBatchDetailBinding
 import ru.wizand.fermenttracker.ui.adapters.LogsAdapter
 import ru.wizand.fermenttracker.ui.adapters.StageAdapter
+import ru.wizand.fermenttracker.utils.NotificationHelper
 import ru.wizand.fermenttracker.vm.BatchDetailViewModel
 import ru.wizand.fermenttracker.vm.BatchListViewModel
 import java.io.File
@@ -188,6 +189,10 @@ class BatchDetailFragment : Fragment() {
             Toast.makeText(context, "Batch saved", Toast.LENGTH_SHORT).show()
         }
 
+        binding.btnTestNotification.setOnClickListener {
+            testNotificationIn10Seconds()
+        }
+
         binding.btnAddStage.setOnClickListener {
             val newStage = Stage(
                 id = UUID.randomUUID().toString(),
@@ -276,6 +281,7 @@ class BatchDetailFragment : Fragment() {
     }
 
     // Start stage locally (update detail VM) and notify global VM
+    // Start stage locally (update detail VM) and notify global VM
     private fun startStageManual(stage: Stage) {
         val now = System.currentTimeMillis()
         val updated = stage.copy(startTime = now, plannedEndTime = now + TimeUnit.HOURS.toMillis(stage.durationHours))
@@ -284,18 +290,26 @@ class BatchDetailFragment : Fragment() {
         viewModel.batch.value?.let { batch ->
             val updatedBatch = batch.copy(currentStage = stage.name)
             viewModel.updateBatch(updatedBatch)
+
+            // Планируем уведомление для этого этапа
+            viewModel.scheduleStageNotification(updated, batch)
+            android.util.Log.d("BatchDetailFragment", "Notification scheduled for stage: ${stage.name}")
         }
 
         // notify global vm to set active stage
         batchListViewModel.startStageManual(args.batchId, stage.id, stage.durationHours, autoStopPrevious = false)
-        Toast.makeText(requireContext(), "Stage start requested", Toast.LENGTH_SHORT).show()
+        Toast.makeText(requireContext(), "Stage started & notification scheduled", Toast.LENGTH_SHORT).show()
     }
 
+    // Complete stage locally and via global VM (may auto-start next)
     // Complete stage locally and via global VM (may auto-start next)
     private fun completeStageAndMaybeStartNext(stage: Stage) {
         val now = System.currentTimeMillis()
         val finished = stage.copy(endTime = now)
         viewModel.updateStage(finished)
+
+        // Отменяем уведомление для завершенного этапа
+        NotificationHelper.cancelNotification(requireContext(), stage.id.hashCode())
 
         // local next start for immediate UI responsiveness
         val stages = viewModel.stages.value ?: emptyList()
@@ -306,10 +320,14 @@ class BatchDetailFragment : Fragment() {
             viewModel.batch.value?.let { batch ->
                 val updatedBatch = batch.copy(currentStage = next.name)
                 viewModel.updateBatch(updatedBatch)
+
+                // Планируем уведомление для следующего этапа
+                viewModel.scheduleStageNotification(started, batch)
+                android.util.Log.d("BatchDetailFragment", "Notification scheduled for next stage: ${next.name}")
             }
             // notify global vm to switch active
             batchListViewModel.completeStageAndMaybeStartNext(args.batchId, stage.id, stage.orderIndex, autoStartNext = true)
-            Toast.makeText(requireContext(), "Stage completed — next started", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), "Stage completed — next started & notification scheduled", Toast.LENGTH_SHORT).show()
         } else {
             viewModel.batch.value?.let { batch ->
                 val updatedBatch = batch.copy(currentStage = "")
@@ -400,5 +418,40 @@ class BatchDetailFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    private fun testNotificationIn10Seconds() {
+        val batch = viewModel.batch.value
+        val currentStage = viewModel.stages.value?.find { it.startTime != null && it.endTime == null }
+
+        if (batch == null || currentStage == null) {
+            Toast.makeText(requireContext(), "Нет активного этапа для теста", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val testData = androidx.work.Data.Builder()
+            .putString("stageName", currentStage.name)
+            .putString("batchName", batch.name)
+            .putString("batchId", batch.id)
+            .putInt("notificationId", currentStage.id.hashCode())
+            .build()
+
+        val testWorkRequest = androidx.work.OneTimeWorkRequestBuilder<ru.wizand.fermenttracker.workers.StageNotificationWorker>()
+            .setInitialDelay(10, java.util.concurrent.TimeUnit.SECONDS)
+            .setInputData(testData)
+            .addTag("test_notification")
+            .build()
+
+        androidx.work.WorkManager.getInstance(requireContext()).enqueue(testWorkRequest)
+
+        android.util.Log.d("BatchDetailFragment", "Test notification scheduled for 10 seconds, workRequestId: ${testWorkRequest.id}")
+        Toast.makeText(requireContext(), "Тестовое уведомление запланировано через 10 секунд", Toast.LENGTH_LONG).show()
+
+        // Можно добавить отслеживание статуса
+        androidx.work.WorkManager.getInstance(requireContext())
+            .getWorkInfoByIdLiveData(testWorkRequest.id)
+            .observe(viewLifecycleOwner) { workInfo ->
+                android.util.Log.d("BatchDetailFragment", "Test work status: ${workInfo?.state}")
+            }
     }
 }

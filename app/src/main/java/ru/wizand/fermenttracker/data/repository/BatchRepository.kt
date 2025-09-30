@@ -9,6 +9,7 @@ import ru.wizand.fermenttracker.data.db.entities.Recipe // Added
 import ru.wizand.fermenttracker.data.db.entities.StageTemplate // Added
 
 import android.content.Context
+import android.util.Log
 import androidx.work.Data
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
@@ -74,20 +75,27 @@ class BatchRepository(
     }
     fun scheduleStageNotification(stage: Stage, batch: Batch) {
         val delay = stage.plannedEndTime?.let { it - System.currentTimeMillis() } ?: return
-        if (delay <= 0) return
+        if (delay <= 0) {
+            Log.d("BatchRepository", "Skipping notification for stage: ${stage.name} - delay is non-positive: $delay")
+            return
+        }
 
         val data = Data.Builder()
             .putString("stageName", stage.name)
             .putString("batchName", batch.name)
+            .putString("batchId", batch.id)  // Добавлен batchId
             .putInt("notificationId", stage.id.hashCode())
             .build()
 
         val workRequest = OneTimeWorkRequestBuilder<StageNotificationWorker>()
             .setInitialDelay(delay, TimeUnit.MILLISECONDS)
             .setInputData(data)
+            .addTag("stage_notification_${stage.id}")  // Добавлен тег для отслеживания
             .build()
 
         WorkManager.getInstance(appContext).enqueue(workRequest)
+
+        Log.d("BatchRepository", "Scheduled notification for stage: ${stage.name}, batchId: ${batch.id}, delay: ${delay}ms (${delay / 1000 / 60} min), workRequestId: ${workRequest.id}")
     }
 
     suspend fun insertBatchWithStages(batch: Batch, stages: List<Stage>) {

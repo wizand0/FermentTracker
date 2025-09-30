@@ -121,4 +121,16 @@ interface BatchDao {
 
     @Query("DELETE FROM stage_templates WHERE id = :id")
     suspend fun deleteStageTemplate(id: String)
+
+    /**
+     * Получить количество партий для проверки целостности БД
+     */
+    @Query("SELECT COUNT(*) FROM batches")
+    fun getBatchCount(): Int
+
+    /**
+     * Получить количество рецептов для проверки целостности БД
+     */
+    @Query("SELECT COUNT(*) FROM recipes")
+    fun getRecipeCount(): Int
 }
