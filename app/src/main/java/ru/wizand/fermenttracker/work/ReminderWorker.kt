@@ -11,7 +11,6 @@ import androidx.work.WorkerParameters
 import ru.wizand.fermenttracker.data.db.AppDatabase
 import kotlin.random.Random
 
-
 class ReminderWorker(
     context: Context,
     params: WorkerParameters
@@ -23,7 +22,10 @@ class ReminderWorker(
             val dao = db.batchDao()
             // Здесь можно выбрать логику: найти стадии с endTime <= now и показать уведомления
             // Для простоты — отправим тестовое уведомление
-            showNotification("CuringTracker", "Reminder: check your batches")
+            showNotification(
+                applicationContext.getString(R.string.reminder_notification_title),
+                applicationContext.getString(R.string.reminder_notification_body)
+            )
             return Result.success()
         } catch (e: Exception) {
             return Result.failure()

@@ -4,9 +4,7 @@ import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
-import android.net.Uri
 import android.os.Bundle
-import android.os.Environment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,25 +13,26 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
-import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.itextpdf.kernel.pdf.PdfDocument
-import com.itextpdf.kernel.pdf.PdfWriter
-import com.itextpdf.layout.Document
-import com.itextpdf.layout.element.Paragraph
-import com.itextpdf.layout.element.Table
-import com.itextpdf.layout.properties.UnitValue
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import ru.wizand.fermenttracker.R
+import ru.wizand.fermenttracker.data.db.entities.Batch
 import ru.wizand.fermenttracker.data.db.entities.BatchLog
 import ru.wizand.fermenttracker.data.db.entities.Photo
 import ru.wizand.fermenttracker.data.db.entities.Stage
 import ru.wizand.fermenttracker.databinding.FragmentBatchDetailBinding
 import ru.wizand.fermenttracker.ui.adapters.LogsAdapter
 import ru.wizand.fermenttracker.ui.adapters.StageAdapter
+import ru.wizand.fermenttracker.utils.LabelGenerator
 import ru.wizand.fermenttracker.utils.NotificationHelper
+import ru.wizand.fermenttracker.utils.PdfExporter
 import ru.wizand.fermenttracker.vm.BatchDetailViewModel
 import ru.wizand.fermenttracker.vm.BatchListViewModel
 import java.io.File
@@ -54,19 +53,21 @@ class BatchDetailFragment : Fragment() {
         BatchDetailViewModel.Factory(requireActivity().application, args.batchId)
     }
 
-    // activity-scoped viewmodel for global state & weight validation
     private val batchListViewModel: BatchListViewModel by activityViewModels()
 
     private lateinit var stageAdapter: StageAdapter
     private lateinit var logsAdapter: LogsAdapter
+    private lateinit var pdfExporter: PdfExporter
+    private lateinit var labelGenerator: LabelGenerator
 
     private var lastPhotoPath: String? = null
     private var lastWeight: Double? = null
 
-    // Activity result contracts
     private val requestCamera = registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
-        if (granted) takePicture.launch(null) else Toast.makeText(context, "Camera denied", Toast.LENGTH_SHORT).show()
+        if (granted) takePicture.launch(null)
+        else Toast.makeText(context, getString(R.string.camera_permission_denied), Toast.LENGTH_SHORT).show()
     }
+
     private val takePicture = registerForActivityResult(ActivityResultContracts.TakePicturePreview()) { bitmap ->
         bitmap?.let { saveAndAddPhoto(it) }
     }
@@ -78,11 +79,14 @@ class BatchDetailFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        pdfExporter = PdfExporter(requireContext())
+        labelGenerator = LabelGenerator(requireContext())
+
         setupViews()
         setupObservers()
         setupButtons()
 
-        // init active stage in BatchListViewModel
         batchListViewModel.refreshActiveStage(args.batchId)
     }
 
@@ -104,22 +108,20 @@ class BatchDetailFragment : Fragment() {
     }
 
     private fun setupObservers() {
-        // Active stage id from batchListViewModel controls adapter buttons visibility
         batchListViewModel.activeStageId.observe(viewLifecycleOwner) { activeId ->
             stageAdapter.setActiveStage(activeId)
         }
 
-        // Observe result of weight saves (validation/errors)
         batchListViewModel.weightSaveResult.observe(viewLifecycleOwner) { result ->
             when (result) {
                 is BatchListViewModel.WeightSaveResult.Success -> {
-                    Toast.makeText(requireContext(), "Вес успешно сохранён", Toast.LENGTH_SHORT).show()
-                    lastWeight = null // refresh from DB via batch observer
+                    Toast.makeText(requireContext(), getString(R.string.weight_saved_successfully), Toast.LENGTH_SHORT).show()
+                    lastWeight = null
                 }
                 is BatchListViewModel.WeightSaveResult.Failure -> {
-                    Toast.makeText(requireContext(), "Ошибка: ${result.reason}", Toast.LENGTH_LONG).show()
+                    Toast.makeText(requireContext(), getString(R.string.error_prefix, result.reason), Toast.LENGTH_LONG).show()
                 }
-                else -> { /* null */ }
+                else -> { }
             }
         }
 
@@ -129,14 +131,13 @@ class BatchDetailFragment : Fragment() {
                 binding.tvType.text = it.type
                 binding.currentStageName.text = it.currentStage
                 binding.tvBatchStartDate.text = formatDate(it.startDate)
-                binding.tvInitialWeight.text = it.initialWeightGr?.let { w -> "Initial Weight: $w g" } ?: "Initial Weight: N/A"
+                binding.tvInitialWeight.text = it.initialWeightGr?.let { w ->
+                    getString(R.string.initial_weight, w)
+                } ?: getString(R.string.initial_weight_na)
                 binding.etNotes.setText(it.notes ?: "")
-                binding.etQrCode.setText(it.qrCode ?: "")
+//                binding.etQrCode.setText(it.qrCode ?: "")
 
-                // update adapter weight display
                 stageAdapter.updateBatchWeight(it.currentWeightGr)
-
-                // Prepare lastWeight from DB snapshot (current or initial)
                 lastWeight = it.currentWeightGr ?: it.initialWeightGr
             }
         }
@@ -145,7 +146,6 @@ class BatchDetailFragment : Fragment() {
             val sorted = stages.sortedBy { it.orderIndex }
             stageAdapter.submitList(sorted)
 
-            // determine active stage for header/time left
             val activeId = batchListViewModel.activeStageId.value
             val activeStage = sorted.find { it.id == activeId } ?: sorted.find { it.startTime != null && it.endTime == null }
 
@@ -156,13 +156,12 @@ class BatchDetailFragment : Fragment() {
             } else {
                 val next = sorted.find { it.startTime == null && it.endTime == null }
                 if (next != null) {
-                    binding.timeLeft.text = "Not started"
+                    binding.timeLeft.text = getString(R.string.not_started)
                     binding.currentStageName.text = next.name
                 } else {
-                    binding.timeLeft.text = "N/A"
+                    binding.timeLeft.text = getString(R.string.na)
                 }
             }
-//            stageAdapter.notifyDataSetChanged()
         }
 
         viewModel.photos.observe(viewLifecycleOwner) { photos ->
@@ -176,35 +175,16 @@ class BatchDetailFragment : Fragment() {
 
     private fun setupButtons() {
         binding.btnExportPdf.setOnClickListener {
-            // we write into app-specific external dir -> no WRITE_EXTERNAL_STORAGE needed
             exportToPdf()
         }
 
         binding.btnSaveBatch.setOnClickListener {
             val updated = viewModel.batch.value?.copy(
                 notes = binding.etNotes.text.toString(),
-                qrCode = binding.etQrCode.text.toString()
+//                qrCode = binding.etQrCode.text.toString()
             )
             updated?.let { viewModel.updateBatch(it) }
-            Toast.makeText(context, "Batch saved", Toast.LENGTH_SHORT).show()
-        }
-
-        binding.btnTestNotification.setOnClickListener {
-            testNotificationIn10Seconds()
-        }
-
-        binding.btnAddStage.setOnClickListener {
-            val newStage = Stage(
-                id = UUID.randomUUID().toString(),
-                batchId = args.batchId,
-                name = "New Stage",
-                durationHours = 24,
-                orderIndex = (viewModel.stages.value?.size ?: 0),
-                plannedStartTime = System.currentTimeMillis(),
-                plannedEndTime = System.currentTimeMillis() + TimeUnit.HOURS.toMillis(24)
-            )
-            viewModel.addStage(newStage)
-            updateBatchPlannedCompletion()
+            Toast.makeText(context, getString(R.string.batch_saved_success), Toast.LENGTH_SHORT).show()
         }
 
         binding.btnAddPhoto.setOnClickListener {
@@ -216,16 +196,19 @@ class BatchDetailFragment : Fragment() {
                     requestCamera.launch(Manifest.permission.CAMERA)
                 }
             } else {
-                Toast.makeText(requireContext(), "Нет активного этапа для добавления фото", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), getString(R.string.no_active_stage_for_photo), Toast.LENGTH_SHORT).show()
             }
         }
 
         binding.btnAddWeight.setOnClickListener {
             showWeightDialog()
         }
+
+        binding.btnPrintLabel.setOnClickListener {
+            generateAndShowLabel()
+        }
     }
 
-    // Dialog to add weight — delegates validation + saving to BatchListViewModel
     private fun showWeightDialog() {
         val initial = viewModel.batch.value?.initialWeightGr
         val input = EditText(requireContext()).apply {
@@ -233,23 +216,21 @@ class BatchDetailFragment : Fragment() {
             setText((lastWeight ?: initial)?.toString() ?: "")
         }
         AlertDialog.Builder(requireContext())
-            .setTitle("Add Weight")
+            .setTitle(getString(R.string.add_weight))
             .setView(input)
-            .setPositiveButton("OK") { _, _ ->
+            .setPositiveButton(getString(R.string.ok)) { _, _ ->
                 val weight = input.text.toString().toDoubleOrNull()
                 if (weight == null) {
-                    Toast.makeText(context, "Invalid weight", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, getString(R.string.invalid_weight), Toast.LENGTH_SHORT).show()
                     return@setPositiveButton
                 }
-                // Call VM — it will validate and save log + update batch current weight
                 batchListViewModel.addWeightChecked(args.batchId, weight, lastPhotoPath)
                 lastWeight = weight
             }
-            .setNegativeButton("Cancel", null)
+            .setNegativeButton(getString(R.string.cancel), null)
             .show()
     }
 
-    // Save photo to internal storage (app external-files dir would also work), add Photo entity and log
     private fun saveAndAddPhoto(bitmap: Bitmap) {
         val file = File(requireContext().filesDir, "photo_${System.currentTimeMillis()}.jpg")
         FileOutputStream(file).use { bitmap.compress(Bitmap.CompressFormat.JPEG, 100, it) }
@@ -277,11 +258,9 @@ class BatchDetailFragment : Fragment() {
         viewModel.addLog(log)
         lastPhotoPath = file.absolutePath
         lastWeight = weightToLog
-        Toast.makeText(context, "Фото добавлено в журнал", Toast.LENGTH_SHORT).show()
+        Toast.makeText(context, getString(R.string.photo_added_to_log_success), Toast.LENGTH_SHORT).show()
     }
 
-    // Start stage locally (update detail VM) and notify global VM
-    // Start stage locally (update detail VM) and notify global VM
     private fun startStageManual(stage: Stage) {
         val now = System.currentTimeMillis()
         val updated = stage.copy(startTime = now, plannedEndTime = now + TimeUnit.HOURS.toMillis(stage.durationHours))
@@ -290,28 +269,20 @@ class BatchDetailFragment : Fragment() {
         viewModel.batch.value?.let { batch ->
             val updatedBatch = batch.copy(currentStage = stage.name)
             viewModel.updateBatch(updatedBatch)
-
-            // Планируем уведомление для этого этапа
             viewModel.scheduleStageNotification(updated, batch)
-            android.util.Log.d("BatchDetailFragment", "Notification scheduled for stage: ${stage.name}")
         }
 
-        // notify global vm to set active stage
         batchListViewModel.startStageManual(args.batchId, stage.id, stage.durationHours, autoStopPrevious = false)
-        Toast.makeText(requireContext(), "Stage started & notification scheduled", Toast.LENGTH_SHORT).show()
+        Toast.makeText(requireContext(), getString(R.string.stage_started_notification_scheduled1), Toast.LENGTH_SHORT).show()
     }
 
-    // Complete stage locally and via global VM (may auto-start next)
-    // Complete stage locally and via global VM (may auto-start next)
     private fun completeStageAndMaybeStartNext(stage: Stage) {
         val now = System.currentTimeMillis()
         val finished = stage.copy(endTime = now)
         viewModel.updateStage(finished)
 
-        // Отменяем уведомление для завершенного этапа
         NotificationHelper.cancelNotification(requireContext(), stage.id.hashCode())
 
-        // local next start for immediate UI responsiveness
         val stages = viewModel.stages.value ?: emptyList()
         val next = stages.find { it.orderIndex == stage.orderIndex + 1 }
         if (next != null) {
@@ -320,26 +291,21 @@ class BatchDetailFragment : Fragment() {
             viewModel.batch.value?.let { batch ->
                 val updatedBatch = batch.copy(currentStage = next.name)
                 viewModel.updateBatch(updatedBatch)
-
-                // Планируем уведомление для следующего этапа
                 viewModel.scheduleStageNotification(started, batch)
-                android.util.Log.d("BatchDetailFragment", "Notification scheduled for next stage: ${next.name}")
             }
-            // notify global vm to switch active
             batchListViewModel.completeStageAndMaybeStartNext(args.batchId, stage.id, stage.orderIndex, autoStartNext = true)
-            Toast.makeText(requireContext(), "Stage completed — next started & notification scheduled", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), getString(R.string.stage_completed_next_started1), Toast.LENGTH_SHORT).show()
         } else {
             viewModel.batch.value?.let { batch ->
                 val updatedBatch = batch.copy(currentStage = "")
                 viewModel.updateBatch(updatedBatch)
             }
             batchListViewModel.completeStageAndMaybeStartNext(args.batchId, stage.id, stage.orderIndex, autoStartNext = false)
-            Toast.makeText(requireContext(), "Stage completed", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), getString(R.string.stage_completed), Toast.LENGTH_SHORT).show()
         }
         updateBatchPlannedCompletion()
     }
 
-    // Recalculate planned completion date based on stages
     private fun updateBatchPlannedCompletion() {
         val stages = viewModel.stages.value ?: return
         val totalMs = stages.sumOf { TimeUnit.HOURS.toMillis(it.durationHours) }
@@ -349,109 +315,134 @@ class BatchDetailFragment : Fragment() {
         }
     }
 
-    // Export to PDF into app-specific external dir and share via FileProvider
     private fun exportToPdf() {
-        val batch = viewModel.batch.value ?: return
-        val stages = viewModel.stages.value ?: return
+        lifecycleScope.launch {
+            try {
+                val batch = viewModel.batch.value
+                val stages = viewModel.stages.value ?: emptyList()
+                val logs = viewModel.logs.value ?: emptyList()
+                val photos = viewModel.photos.value ?: emptyList()
+                val recipe = batch?.let { viewModel.getRecipeForBatch(it.type) }
 
-        // Use app-specific external documents folder (no runtime permission required)
-        val docsDir = requireContext().getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS)
-        if (docsDir == null) {
-            Toast.makeText(requireContext(), "Documents directory not available", Toast.LENGTH_SHORT).show()
-            return
-        }
+                if (batch == null) {
+                    withContext(Dispatchers.Main) {
+                        Toast.makeText(requireContext(), getString(R.string.no_batch_data_error), Toast.LENGTH_SHORT).show()
+                    }
+                    return@launch
+                }
 
-        val file = File(docsDir, "batch_${batch.id}.pdf")
-        try {
-            val writer = PdfWriter(file)
-            val pdf = PdfDocument(writer)
-            val document = Document(pdf)
+                val file = pdfExporter.exportBatchToPdf(batch, stages, logs, photos, recipe)
 
-            document.add(Paragraph("Batch: ${batch.name}"))
-            document.add(Paragraph("Type: ${batch.type}"))
-            document.add(Paragraph("Start Date: ${formatDate(batch.startDate)}"))
-
-            val table = Table(UnitValue.createPercentArray(floatArrayOf(20f, 20f, 20f, 20f, 20f))).useAllAvailableWidth()
-            table.addHeaderCell("Stage")
-            table.addHeaderCell("Duration (h)")
-            table.addHeaderCell("Planned Start")
-            table.addHeaderCell("Planned End")
-            table.addHeaderCell("Weight (g)")
-
-            stages.sortedBy { it.orderIndex }.forEach { stage ->
-                table.addCell(stage.name)
-                table.addCell(stage.durationHours.toString())
-                table.addCell(stage.plannedStartTime?.let { formatDate(it) } ?: "N/A")
-                table.addCell(stage.plannedEndTime?.let { formatDate(it) } ?: "N/A")
-                table.addCell(viewModel.batch.value?.currentWeightGr?.toString() ?: viewModel.batch.value?.initialWeightGr?.toString() ?: "N/A")
+                withContext(Dispatchers.Main) {
+                    if (file != null) {
+//                        pdfExporter.sharePdf(file)
+                        pdfExporter.saveAndSharePdf(file)
+                        Toast.makeText(requireContext(), getString(R.string.pdf_saved_success, file.name), Toast.LENGTH_LONG).show()
+                    } else {
+                        Toast.makeText(requireContext(), getString(R.string.pdf_export_error_message), Toast.LENGTH_LONG).show()
+                    }
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(requireContext(), getString(R.string.pdf_export_error_detailed, e.message), Toast.LENGTH_LONG).show()
+                    android.util.Log.e("BatchDetailFragment", "PDF export error", e)
+                }
             }
-
-            document.add(table)
-            document.close()
-
-            // Share via FileProvider
-            val uri: Uri = FileProvider.getUriForFile(requireContext(), "${requireContext().packageName}.fileprovider", file)
-            val shareIntent = Intent(Intent.ACTION_SEND).apply {
-                type = "application/pdf"
-                putExtra(Intent.EXTRA_STREAM, uri)
-                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-            }
-            startActivity(Intent.createChooser(shareIntent, "Share PDF"))
-
-            Toast.makeText(context, "PDF saved to ${file.absolutePath}", Toast.LENGTH_LONG).show()
-        } catch (e: Exception) {
-            Toast.makeText(context, "Error exporting PDF: ${e.message ?: e.toString()}", Toast.LENGTH_LONG).show()
         }
     }
 
-    // Utility formatting
+    private fun generateAndShowLabel() {
+        val batch = viewModel.batch.value
+        val stages = viewModel.stages.value?.sortedBy { it.orderIndex } ?: emptyList()
+
+        if (batch == null) {
+            Toast.makeText(requireContext(), getString(R.string.no_batch_data), Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val labelBitmap = labelGenerator.generateLabel(batch, stages)
+        showLabelPreviewDialog(labelBitmap, batch)
+    }
+
+    private fun showLabelPreviewDialog(labelBitmap: Bitmap, batch: Batch) {
+        val imageView = android.widget.ImageView(requireContext()).apply {
+            setImageBitmap(labelBitmap)
+            adjustViewBounds = true
+            scaleType = android.widget.ImageView.ScaleType.FIT_CENTER
+            layoutParams = ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            )
+        }
+
+        AlertDialog.Builder(requireContext())
+            .setTitle(getString(R.string.label_preview))
+            .setView(imageView)
+            .setPositiveButton(getString(R.string.save)) { _, _ ->
+                saveLabelToGallery(labelBitmap, batch)
+            }
+            .setNeutralButton(getString(R.string.share)) { _, _ ->
+                shareLabelImage(labelBitmap, batch)
+            }
+            .setNegativeButton(getString(R.string.cancel), null)
+            .show()
+    }
+
+    private fun saveLabelToGallery(bitmap: Bitmap, batch: Batch) {
+        lifecycleScope.launch {
+            try {
+                val result = labelGenerator.saveLabelToGallery(bitmap, batch.name)
+                withContext(Dispatchers.Main) {
+                    if (result) {
+                        Toast.makeText(requireContext(), getString(R.string.label_saved_success), Toast.LENGTH_SHORT).show()
+                    } else {
+                        Toast.makeText(requireContext(), getString(R.string.label_save_failed), Toast.LENGTH_SHORT).show()
+                    }
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(requireContext(), "Error: ${e.message}", Toast.LENGTH_LONG).show()
+                }
+            }
+        }
+    }
+
+    private fun shareLabelImage(bitmap: Bitmap, batch: Batch) {
+        lifecycleScope.launch {
+            try {
+                val uri = labelGenerator.saveLabelToCache(bitmap, batch.name)
+                withContext(Dispatchers.Main) {
+                    if (uri != null) {
+                        val shareIntent = Intent(Intent.ACTION_SEND).apply {
+                            type = "image/png"
+                            putExtra(Intent.EXTRA_STREAM, uri)
+                            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                        }
+                        startActivity(Intent.createChooser(shareIntent, "Share Label"))
+                    } else {
+                        Toast.makeText(requireContext(), getString(R.string.label_share_failed), Toast.LENGTH_SHORT).show()
+                    }
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(requireContext(), "Error: ${e.message}", Toast.LENGTH_LONG).show()
+                }
+            }
+        }
+    }
+
     private fun formatDate(timestamp: Long): String =
         SimpleDateFormat("yyyy-MM-dd HH:mm", java.util.Locale.getDefault()).format(Date(timestamp))
 
     private fun formatTimeLeft(ms: Long): String {
-        if (ms <= 0) return "Overdue"
+        if (ms <= 0) return getString(R.string.overdue)
         val days = TimeUnit.MILLISECONDS.toDays(ms)
         val hours = TimeUnit.MILLISECONDS.toHours(ms) % 24
-        return "$days d, $hours h left"
+        return getString(R.string.time_left_format, days, hours)
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
-    }
-
-    private fun testNotificationIn10Seconds() {
-        val batch = viewModel.batch.value
-        val currentStage = viewModel.stages.value?.find { it.startTime != null && it.endTime == null }
-
-        if (batch == null || currentStage == null) {
-            Toast.makeText(requireContext(), "Нет активного этапа для теста", Toast.LENGTH_SHORT).show()
-            return
-        }
-
-        val testData = androidx.work.Data.Builder()
-            .putString("stageName", currentStage.name)
-            .putString("batchName", batch.name)
-            .putString("batchId", batch.id)
-            .putInt("notificationId", currentStage.id.hashCode())
-            .build()
-
-        val testWorkRequest = androidx.work.OneTimeWorkRequestBuilder<ru.wizand.fermenttracker.workers.StageNotificationWorker>()
-            .setInitialDelay(10, java.util.concurrent.TimeUnit.SECONDS)
-            .setInputData(testData)
-            .addTag("test_notification")
-            .build()
-
-        androidx.work.WorkManager.getInstance(requireContext()).enqueue(testWorkRequest)
-
-        android.util.Log.d("BatchDetailFragment", "Test notification scheduled for 10 seconds, workRequestId: ${testWorkRequest.id}")
-        Toast.makeText(requireContext(), "Тестовое уведомление запланировано через 10 секунд", Toast.LENGTH_LONG).show()
-
-        // Можно добавить отслеживание статуса
-        androidx.work.WorkManager.getInstance(requireContext())
-            .getWorkInfoByIdLiveData(testWorkRequest.id)
-            .observe(viewLifecycleOwner) { workInfo ->
-                android.util.Log.d("BatchDetailFragment", "Test work status: ${workInfo?.state}")
-            }
     }
 }

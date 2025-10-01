@@ -3,6 +3,7 @@ package ru.wizand.fermenttracker.utils
 import android.content.Context
 import android.net.Uri
 import java.io.*
+import ru.wizand.fermenttracker.R
 
 object FileUtils {
 
@@ -16,13 +17,28 @@ object FileUtils {
     fun copyFileToUri(sourceFile: File, targetUri: Uri, context: Context) {
         // Проверки перед началом копирования
         if (!sourceFile.exists()) {
-            throw FileNotFoundException("Исходный файл не существует: ${sourceFile.path}")
+            throw FileNotFoundException(
+                context.getString(
+                    R.string.file_error_source_not_exists,
+                    sourceFile.path
+                )
+            )
         }
         if (!sourceFile.canRead()) {
-            throw SecurityException("Нет доступа на чтение файла: ${sourceFile.path}")
+            throw SecurityException(
+                context.getString(
+                    R.string.file_error_no_read_access,
+                    sourceFile.path
+                )
+            )
         }
         if (sourceFile.length() == 0L) {
-            throw IOException("Исходный файл пуст: ${sourceFile.path}")
+            throw IOException(
+                context.getString(
+                    R.string.file_error_source_empty,
+                    sourceFile.path
+                )
+            )
         }
 
         try {
@@ -33,18 +49,41 @@ object FileUtils {
                     // Проверяем, что скопировано корректное количество байт
                     if (bytesCopied != sourceFile.length()) {
                         throw IOException(
-                            "Копирование неполное: ожидалось ${sourceFile.length()} байт, " +
-                                    "скопировано $bytesCopied байт"
+                            context.getString(
+                                R.string.file_error_copy_incomplete,
+                                sourceFile.length(),
+                                bytesCopied
+                            )
                         )
                     }
-                } ?: throw IOException("Не удалось открыть поток записи для URI: $targetUri")
+                } ?: throw IOException(
+                    context.getString(
+                        R.string.file_error_cannot_open_output_stream,
+                        targetUri.toString()
+                    )
+                )
             }
         } catch (e: FileNotFoundException) {
-            throw FileNotFoundException("Файл недоступен: ${e.message}")
+            throw FileNotFoundException(
+                context.getString(
+                    R.string.file_error_file_unavailable,
+                    e.message
+                )
+            )
         } catch (e: SecurityException) {
-            throw SecurityException("Отказано в доступе: ${e.message}")
+            throw SecurityException(
+                context.getString(
+                    R.string.file_error_access_denied,
+                    e.message
+                )
+            )
         } catch (e: IOException) {
-            throw IOException("Ошибка при копировании файла: ${e.message}")
+            throw IOException(
+                context.getString(
+                    R.string.file_error_copy_failed,
+                    e.message
+                )
+            )
         }
     }
 
@@ -59,7 +98,12 @@ object FileUtils {
         val parentDir = targetFile.parentFile
         if (parentDir != null && !parentDir.exists()) {
             if (!parentDir.mkdirs()) {
-                throw IOException("Не удалось создать директорию: ${parentDir.path}")
+                throw IOException(
+                    context.getString(
+                        R.string.file_error_cannot_create_directory,
+                        parentDir.path
+                    )
+                )
             }
         }
 
@@ -67,7 +111,7 @@ object FileUtils {
             context.contentResolver.openInputStream(sourceUri)?.use { input ->
                 // Проверяем, что поток не пуст
                 if (input.available() == 0) {
-                    throw IOException("Исходный поток пуст")
+                    throw IOException(context.getString(R.string.file_error_source_stream_empty))
                 }
 
                 FileOutputStream(targetFile).use { output ->
@@ -75,20 +119,40 @@ object FileUtils {
 
                     // Проверяем, что что-то скопировано
                     if (bytesCopied == 0L) {
-                        throw IOException("Не скопировано ни одного байта")
+                        throw IOException(context.getString(R.string.file_error_no_bytes_copied))
                     }
                 }
-            } ?: throw FileNotFoundException("Не удалось открыть поток чтения для URI: $sourceUri")
+            } ?: throw FileNotFoundException(
+                context.getString(
+                    R.string.file_error_cannot_open_input_stream,
+                    sourceUri.toString()
+                )
+            )
         } catch (e: FileNotFoundException) {
             // Удаляем частично скопированный файл
             targetFile.delete()
-            throw FileNotFoundException("URI недоступен: ${e.message}")
+            throw FileNotFoundException(
+                context.getString(
+                    R.string.file_error_uri_unavailable,
+                    e.message
+                )
+            )
         } catch (e: SecurityException) {
             targetFile.delete()
-            throw SecurityException("Отказано в доступе к URI: ${e.message}")
+            throw SecurityException(
+                context.getString(
+                    R.string.file_error_access_denied_uri,
+                    e.message
+                )
+            )
         } catch (e: IOException) {
             targetFile.delete()
-            throw IOException("Ошибка при копировании из URI: ${e.message}")
+            throw IOException(
+                context.getString(
+                    R.string.file_error_copy_from_uri_failed,
+                    e.message
+                )
+            )
         }
     }
 
@@ -109,7 +173,11 @@ object FileUtils {
             }
             output.flush()
         } catch (e: IOException) {
-            throw IOException("Ошибка при копировании данных: ${e.message}")
+            // Для этого исключения мы не можем использовать контекст,
+            // так как copyStream не получает его. Но в текущем коде
+            // этот catch не используется в вызовах copyStream,
+            // поэтому ошибка не возникнет в нормальных условиях
+            throw e
         }
 
         return totalBytes

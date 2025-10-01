@@ -13,100 +13,200 @@ object RecipeTemplates {
             // Dry-cured meat (basic)
             types[0] to (
                     listOf(
-                        Stage(name = "Salting", durationHours = 36, orderIndex = 0, batchId = ""),
-                        Stage(name = "Curing and Drying", durationHours = 336, orderIndex = 1, batchId = "")
+                        Stage(
+                            name = context.getString(R.string.stage_salting),
+                            durationHours = 36,
+                            orderIndex = 0,
+                            batchId = ""
+                        ),
+                        Stage(
+                            name = context.getString(R.string.stage_curing_drying),
+                            durationHours = 336,
+                            orderIndex = 1,
+                            batchId = ""
+                        )
                     ) to Recipe(
                         type = types[0],
-                        ingredients = "Мясо свинины/говядины — 1 кг\nСоль — 30 г\nПерец чёрный — 5 г\nЧеснок — 3 зубчика",
-                        note = "Выдерживать мясо в соли 1,5 суток, затем сушить при +4…+8°C 14 дней. **Хранение:** в холодильнике до 2 месяцев, в вакууме — до 6 месяцев."
+                        ingredients = context.getString(R.string.ingredients_cured_meat_basic),
+                        note = context.getString(R.string.note_cured_meat_basic)
                     )
                     ),
 
             // Dry-cured meat (spicy variation)
             types[1] to (
                     listOf(
-                        Stage(name = "Salting with Spices", durationHours = 48, orderIndex = 0, batchId = ""),
-                        Stage(name = "Drying", durationHours = 336, orderIndex = 1, batchId = "")
+                        Stage(
+                            name = context.getString(R.string.stage_salting_spices),
+                            durationHours = 48,
+                            orderIndex = 0,
+                            batchId = ""
+                        ),
+                        Stage(
+                            name = context.getString(R.string.stage_drying),
+                            durationHours = 336,
+                            orderIndex = 1,
+                            batchId = ""
+                        )
                     ) to Recipe(
                         type = types[1],
-                        ingredients = "Свинина — 1 кг\nСоль нитритная — 25 г\nПаприка копчёная — 10 г\nКориандр — 5 г",
-                        note = "Сухой посол с приправами 2 суток, затем сушка 14 дней при +5°C. **Хранение:** в холодильнике до 3 месяцев."
+                        ingredients = context.getString(R.string.ingredients_cured_meat_spicy),
+                        note = context.getString(R.string.note_cured_meat_spicy)
                     )
                     ),
 
             // Dry-cured sausage
             types[2] to (
                     listOf(
-                        Stage(name = "Grinding and Stuffing", durationHours = 18, orderIndex = 0, batchId = ""),
-                        Stage(name = "Fermentation and Drying", durationHours = 144, orderIndex = 1, batchId = "")
+                        Stage(
+                            name = context.getString(R.string.stage_grinding_stuffing),
+                            durationHours = 18,
+                            orderIndex = 0,
+                            batchId = ""
+                        ),
+                        Stage(
+                            name = context.getString(R.string.stage_fermentation_drying),
+                            durationHours = 144,
+                            orderIndex = 1,
+                            batchId = ""
+                        )
                     ) to Recipe(
                         type = types[2],
-                        ingredients = "Свинина — 700 г\nГовядина — 300 г\nСоль нитритная — 25 г\nПерец — 5 г\nЧеснок — 3 зубчика\nОболочка натуральная — 1 м",
-                        note = "Фаршировать, ферментировать 6 дней при +18°C, затем сушить 2–3 недели. **Хранение:** в холодильнике до 2 месяцев."
+                        ingredients = context.getString(R.string.ingredients_cured_sausage),
+                        note = context.getString(R.string.note_cured_sausage)
                     )
                     ),
 
             // Beer
             types[3] to (
                     listOf(
-                        Stage(name = "Brewing Preparation", durationHours = 8, orderIndex = 0, batchId = ""),
-                        Stage(name = "Primary Fermentation", durationHours = 192, orderIndex = 1, batchId = ""),
-                        Stage(name = "Conditioning and Bottling", durationHours = 216, orderIndex = 2, batchId = "")
+                        Stage(
+                            name = context.getString(R.string.stage_brewing_preparation),
+                            durationHours = 8,
+                            orderIndex = 0,
+                            batchId = ""
+                        ),
+                        Stage(
+                            name = context.getString(R.string.stage_primary_fermentation),
+                            durationHours = 192,
+                            orderIndex = 1,
+                            batchId = ""
+                        ),
+                        Stage(
+                            name = context.getString(R.string.stage_conditioning_bottling),
+                            durationHours = 216,
+                            orderIndex = 2,
+                            batchId = ""
+                        )
                     ) to Recipe(
                         type = types[3],
-                        ingredients = "Солод ячменный — 4 кг\nХмель — 50 г\nДрожжи пивные — 1 пакет",
-                        note = "Брожение 8 дней, дображивание 9 дней. **Хранение:** в бутылках при +4°C до 6 месяцев."
+                        ingredients = context.getString(R.string.ingredients_beer),
+                        note = context.getString(R.string.note_beer)
                     )
                     ),
 
             // Wine
             types[4] to (
                     listOf(
-                        Stage(name = "Crushing and Pressing", durationHours = 9, orderIndex = 0, batchId = ""),
-                        Stage(name = "Primary Fermentation", durationHours = 144, orderIndex = 1, batchId = ""),
-                        Stage(name = "Secondary Fermentation and Aging", durationHours = 480, orderIndex = 2, batchId = "")
+                        Stage(
+                            name = context.getString(R.string.stage_crushing_pressing),
+                            durationHours = 9,
+                            orderIndex = 0,
+                            batchId = ""
+                        ),
+                        Stage(
+                            name = context.getString(R.string.stage_primary_fermentation),
+                            durationHours = 144,
+                            orderIndex = 1,
+                            batchId = ""
+                        ),
+                        Stage(
+                            name = context.getString(R.string.stage_secondary_fermentation_aging),
+                            durationHours = 480,
+                            orderIndex = 2,
+                            batchId = ""
+                        )
                     ) to Recipe(
                         type = types[4],
-                        ingredients = "Виноград — 10 кг\nСахар — 2 кг\nДрожжи винные — 1 пакет",
-                        note = "Первичное брожение 6 дней, вторичное 20+ дней. **Хранение:** в бутылках при +12°C до 2 лет."
+                        ingredients = context.getString(R.string.ingredients_wine),
+                        note = context.getString(R.string.note_wine)
                     )
                     ),
 
             // Kvass
             types[5] to (
                     listOf(
-                        Stage(name = "Steeping and Preparation", durationHours = 18, orderIndex = 0, batchId = ""),
-                        Stage(name = "Fermentation", durationHours = 84, orderIndex = 1, batchId = "")
+                        Stage(
+                            name = context.getString(R.string.stage_steeping_preparation),
+                            durationHours = 18,
+                            orderIndex = 0,
+                            batchId = ""
+                        ),
+                        Stage(
+                            name = context.getString(R.string.stage_fermentation),
+                            durationHours = 84,
+                            orderIndex = 1,
+                            batchId = ""
+                        )
                     ) to Recipe(
                         type = types[5],
-                        ingredients = "Ржаной хлеб — 500 г\nСахар — 100 г\nДрожжи сухие — 5 г",
-                        note = "Выдержка хлеба 18 ч, ферментация 3,5 дня. **Хранение:** в холодильнике до 5 дней."
+                        ingredients = context.getString(R.string.ingredients_kvass),
+                        note = context.getString(R.string.note_kvass)
                     )
                     ),
 
             // Kimchi
             types[6] to (
                     listOf(
-                        Stage(name = "Salting", durationHours = 2, orderIndex = 0, batchId = ""),
-                        Stage(name = "Packing with Paste", durationHours = 1, orderIndex = 1, batchId = ""),
-                        Stage(name = "Fermentation", durationHours = 132, orderIndex = 2, batchId = "")
+                        Stage(
+                            name = context.getString(R.string.stage_salting),
+                            durationHours = 2,
+                            orderIndex = 0,
+                            batchId = ""
+                        ),
+                        Stage(
+                            name = context.getString(R.string.stage_packing_paste),
+                            durationHours = 1,
+                            orderIndex = 1,
+                            batchId = ""
+                        ),
+                        Stage(
+                            name = context.getString(R.string.stage_fermentation),
+                            durationHours = 132,
+                            orderIndex = 2,
+                            batchId = ""
+                        )
                     ) to Recipe(
                         type = types[6],
-                        ingredients = "Капуста пекинская — 1 кг\nСоль — 50 г\nПерец чили — 30 г\nЧеснок — 5 зубчиков\nИмбирь — 20 г",
-                        note = "Ферментация 5–6 дней при комнатной температуре. **Хранение:** в холодильнике до 2 месяцев."
+                        ingredients = context.getString(R.string.ingredients_kimchi),
+                        note = context.getString(R.string.note_kimchi)
                     )
                     ),
 
             // Sauerkraut
             types[7] to (
                     listOf(
-                        Stage(name = "Salting and Mixing", durationHours = 2, orderIndex = 0, batchId = ""),
-                        Stage(name = "Fermentation", durationHours = 240, orderIndex = 1, batchId = ""),
-                        Stage(name = "Storage", durationHours = 336, orderIndex = 2, batchId = "")
+                        Stage(
+                            name = context.getString(R.string.stage_salting_mixing),
+                            durationHours = 2,
+                            orderIndex = 0,
+                            batchId = ""
+                        ),
+                        Stage(
+                            name = context.getString(R.string.stage_fermentation),
+                            durationHours = 240,
+                            orderIndex = 1,
+                            batchId = ""
+                        ),
+                        Stage(
+                            name = context.getString(R.string.stage_storage),
+                            durationHours = 336,
+                            orderIndex = 2,
+                            batchId = ""
+                        )
                     ) to Recipe(
                         type = types[7],
-                        ingredients = "Капуста белокочанная — 2 кг\nМорковь — 200 г\nСоль — 40 г",
-                        note = "Ферментация 10 дней при +18°C. **Хранение:** в холодильнике до 6 месяцев."
+                        ingredients = context.getString(R.string.ingredients_sauerkraut),
+                        note = context.getString(R.string.note_sauerkraut)
                     )
                     ),
 

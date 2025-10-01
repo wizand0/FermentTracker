@@ -81,7 +81,7 @@ class BatchTemplateFragment : Fragment() {
                 if (isAdded && !isDetached) {
                     Toast.makeText(
                         requireContext(),
-                        "Error loading stages: ${e.message}",
+                        getString(R.string.error_loading_stages, e.message),
                         Toast.LENGTH_SHORT
                     ).show()
                 }
@@ -113,7 +113,7 @@ class BatchTemplateFragment : Fragment() {
             val newTemplate = StageTemplate(
                 id = UUID.randomUUID().toString(),
                 recipeType = "", // будет перезаписан при сохранении
-                name = "New Stage",
+                name = getString(R.string.new_stage_name),
                 durationHours = 24,
                 orderIndex = current.size
             )
@@ -124,7 +124,7 @@ class BatchTemplateFragment : Fragment() {
         binding.btnSaveTemplate.setOnClickListener {
             val type = binding.etNewType.text.toString()
             if (type.isEmpty()) {
-                Toast.makeText(requireContext(), "Type is required", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), getString(R.string.type_required), Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
@@ -159,7 +159,7 @@ class BatchTemplateFragment : Fragment() {
                     if (isAdded && !isDetached) {
                         Toast.makeText(
                             requireContext(),
-                            "Error saving template: ${e.message}",
+                            getString(R.string.error_saving_template, e.message),
                             Toast.LENGTH_SHORT
                         ).show()
                     }

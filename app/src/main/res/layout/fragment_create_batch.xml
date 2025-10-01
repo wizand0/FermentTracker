@@ -24,7 +24,7 @@
                 android:id="@+id/tvTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Create Batch"
+                android:text="@string/create_batch"
                 android:textSize="20sp"
                 android:textStyle="bold"
                 app:layout_constraintStart_toStartOf="parent"
@@ -34,7 +34,7 @@
                 android:id="@+id/tilBatchName"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:hint="Batch Name"
+                android:hint="@string/batch_name"
                 android:layout_marginTop="16dp"
                 app:layout_constraintTop_toBottomOf="@id/tvTitle"
                 app:layout_constraintStart_toStartOf="parent"
@@ -62,7 +62,7 @@
                 android:id="@+id/tilIngredientsDisplay"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:hint="Ingredients"
+                android:hint="@string/ingredients"
                 android:layout_marginTop="8dp"
                 app:layout_constraintTop_toBottomOf="@id/spinnerProductType"
                 app:layout_constraintStart_toStartOf="parent"
@@ -81,7 +81,7 @@
                 android:id="@+id/tilNoteDisplay"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:hint="Note"
+                android:hint="@string/note"
                 android:layout_marginTop="8dp"
                 app:layout_constraintTop_toBottomOf="@id/tilIngredientsDisplay"
                 app:layout_constraintStart_toStartOf="parent"
@@ -99,7 +99,7 @@
                 android:id="@+id/tilInitialWeight"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:hint="Initial Weight (grams)"
+                android:hint="@string/initial_weight_grams"
                 android:layout_marginTop="16dp"
                 app:layout_constraintTop_toBottomOf="@id/tilNoteDisplay"
                 app:layout_constraintStart_toStartOf="parent"
@@ -117,7 +117,7 @@
                 android:id="@+id/tilNotes"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:hint="Notes"
+                android:hint="@string/note"
                 android:layout_marginTop="16dp"
                 app:layout_constraintTop_toBottomOf="@id/tilInitialWeight"
                 app:layout_constraintStart_toStartOf="parent"
@@ -130,29 +130,29 @@
                     tools:text="Keep in fridge" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/tilQrCode"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:hint="QR Code"
-                android:layout_marginTop="16dp"
-                app:layout_constraintTop_toBottomOf="@id/tilNotes"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent">
+<!--            <com.google.android.material.textfield.TextInputLayout-->
+<!--                android:id="@+id/tilQrCode"-->
+<!--                android:layout_width="0dp"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:hint="QR Code"-->
+<!--                android:layout_marginTop="16dp"-->
+<!--                app:layout_constraintTop_toBottomOf="@id/tilNotes"-->
+<!--                app:layout_constraintStart_toStartOf="parent"-->
+<!--                app:layout_constraintEnd_toEndOf="parent">-->
 
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/etQrCode"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    tools:text="12345-ABCDE" />
-            </com.google.android.material.textfield.TextInputLayout>
+<!--                <com.google.android.material.textfield.TextInputEditText-->
+<!--                    android:id="@+id/etQrCode"-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    tools:text="12345-ABCDE" />-->
+<!--            </com.google.android.material.textfield.TextInputLayout>-->
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rvStages"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                app:layout_constraintTop_toBottomOf="@id/tilQrCode"
+                app:layout_constraintTop_toBottomOf="@id/tilNotes"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent" />
 
@@ -161,7 +161,7 @@
                 style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="Add Stage"
+                android:text="@string/add_stage"
                 android:layout_marginTop="16dp"
                 app:layout_constraintTop_toBottomOf="@id/rvStages"
                 app:layout_constraintStart_toStartOf="parent"
@@ -172,7 +172,7 @@
                 style="@style/Widget.MaterialComponents.Button"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="Save"
+                android:text="@string/save"
                 android:layout_marginTop="16dp"
                 app:layout_constraintTop_toBottomOf="@id/btnAddStage"
                 app:layout_constraintStart_toStartOf="parent"

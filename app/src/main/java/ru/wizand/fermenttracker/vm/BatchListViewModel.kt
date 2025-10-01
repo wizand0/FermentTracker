@@ -15,6 +15,7 @@ import ru.wizand.fermenttracker.data.repository.BatchRepository
 import java.util.concurrent.TimeUnit
 import androidx.lifecycle.MutableLiveData
 import java.util.UUID
+import ru.wizand.fermenttracker.R
 
 class BatchListViewModel(application: Application) : AndroidViewModel(application) {
     val repository: BatchRepository // public
@@ -140,12 +141,20 @@ class BatchListViewModel(application: Application) : AndroidViewModel(applicatio
 
                 val prev = prevWeight
                 if (newWeight > prev) {
-                    _weightSaveResult.postValue(WeightSaveResult.Failure("Вес не может увеличиваться (предыдущий: $prev)"))
+                    val message = getApplication<Application>().getString(
+                        R.string.weight_cannot_increase_error,
+                        prev
+                    )
+                    _weightSaveResult.postValue(WeightSaveResult.Failure(message))
                     return@launch
                 }
                 val diffPercent = (prev - newWeight) / prev
                 if (diffPercent > 0.40) {
-                    _weightSaveResult.postValue(WeightSaveResult.Failure("Вес отличается более чем на 40% от предыдущего (предыдущий: $prev)"))
+                    val message = getApplication<Application>().getString(
+                        R.string.weight_diff_too_large_error,
+                        prev
+                    )
+                    _weightSaveResult.postValue(WeightSaveResult.Failure(message))
                     return@launch
                 }
 
@@ -169,7 +178,11 @@ class BatchListViewModel(application: Application) : AndroidViewModel(applicatio
 
                 _weightSaveResult.postValue(WeightSaveResult.Success)
             } catch (e: Exception) {
-                _weightSaveResult.postValue(WeightSaveResult.Failure("Ошибка при сохранении: ${e.message ?: e.toString()}"))
+                val message = getApplication<Application>().getString(
+                    R.string.weight_save_error,
+                    e.message ?: e.toString()
+                )
+                _weightSaveResult.postValue(WeightSaveResult.Failure(message))
             }
         }
     }

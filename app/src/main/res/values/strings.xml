@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">CuringTracker</string>
+    <string name="app_name">FermentTracker</string>
     <string name="add_batch">Add batch</string>
     <string name="save">Save</string>
     <string name="label_batch_name">Batch name</string>
@@ -7,23 +7,22 @@
     <string name="label_start_weight">Start weight (kg)</string>
     <string name="button_load_template">Load template stages</string>
     <string name="no_batches">No batches yet. Tap + to add.</string>
-    <string name="error_invalid_weight">Please enter valid weight &gt; 0</string>
+    <string name="error_invalid_weight">Please enter valid weight > 0</string>
     <string name="error_name_required">Please enter a name</string>
     <string name="batch_created">Batch created</string>
-    <string name="add_weight">Add weight</string>
     <string name="add_photo">Add photo</string>
     <string name="next_stage">Next</string>
     <string name="title_create_batch">Create batch</string>
     <string name="title_batch_detail">Batch detail</string>
     <string name="qr_image">QR image</string>
     <string name="share">Share</string>
-    <string name="title_qr">QR-сканер</string>
-    <string name="product_cured_meat">Сыровяленое мясо</string>
-    <string name="product_cured_sausage">Сыровяленая колбаса</string>
-    <string name="product_cheese">Домашний сыр</string>
-    <string name="product_sauerkraut">Квашеная капуста</string>
-    <string name="product_kombucha">Комбуча</string>
-    <string name="product_pickles">Солёные огурцы</string>
+    <string name="title_qr">QR Scanner</string>
+    <string name="product_cured_meat">Dry-cured meat</string>
+    <string name="product_cured_sausage">Dry-cured sausage</string>
+    <string name="product_cheese">Homemade cheese</string>
+    <string name="product_sauerkraut">Sauerkraut</string>
+    <string name="product_kombucha">Kombucha</string>
+    <string name="product_pickles">Pickles</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="scan_qr">Scan QR</string>
     <string name="recipe_details_title">Recipe for %s</string>
@@ -31,6 +30,121 @@
     <string name="note_title">Instructions/Note:</string>
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
+
+    <string name="no_batch_data">Error: No batch data</string>
+
+    <!-- Camera and Photos -->
+    <string name="camera_permission_denied">Camera permission denied</string>
+    <string name="no_active_stage_photo">No active stage to add photo</string>
+    <string name="photo_added_to_log">Photo added to log</string>
+
+    <!-- Weight -->
+    <string name="add_weight">Add Weight</string>
+    <string name="invalid_weight">Invalid weight</string>
+    <string name="weight_saved_successfully">Weight saved successfully</string>
+    <string name="error_prefix">Error: %s</string>
+    <string name="initial_weight">Initial Weight: %.1f g</string>
+    <string name="initial_weight_na">Initial Weight: N/A</string>
+    <string name="current_weight">Current Weight: %.1f g</string>
+    <string name="weight_loss">Total weight loss: %.1f g (%.1f%%)</string>
+
+    <!-- Batch -->
+    <string name="batch_saved">Batch saved</string>
+    <string name="not_started">Not started</string>
+    <string name="na">N/A</string>
+    <string name="overdue">Overdue</string>
+    <string name="time_left_format">%d d, %d h left</string>
+
+    <!-- Stages -->
+    <string name="stage_started_notification_scheduled">Stage started &amp; notification scheduled</string>
+    <string name="stage_completed_next_started">Stage completed — next started &amp; notification scheduled</string>
+    <string name="stage_completed">Stage completed</string>
+    <string name="no_active_stage_test">No active stage for test</string>
+    <string name="test_notification_scheduled">Test notification scheduled in 10 seconds</string>
+
+    <!-- PDF Export -->
+    <string name="pdf_export_error">PDF export error: %s</string>
+    <string name="documents_directory_unavailable">Documents directory not available</string>
+    <string name="share_pdf">Share PDF</string>
+    <string name="pdf_saved">PDF saved: %s</string>
+    <string name="creation_date">Creation date: %s</string>
+
+    <!-- PDF Sections -->
+    <string name="product_information">Product Information</string>
+    <string name="product_type">Product type: %s</string>
+    <string name="recipe_ingredients">Recipe (ingredients):</string>
+    <string name="cooking_technology">Cooking technology:</string>
+    <string name="weight_information">Weight Information</string>
+    <string name="initial_weight_label">Initial weight: %.1f g</string>
+    <string name="current_weight_label">Current weight: %.1f g</string>
+    <string name="total_weight_loss">Total weight loss: %.1f g (%.1f%%)</string>
+    <string name="production_stages">Production Stages</string>
+    <string name="stage_header">Stage</string>
+    <string name="duration_header">Duration</string>
+    <string name="planned_start_header">Planned start</string>
+    <string name="planned_end_header">Planned end</string>
+    <string name="actual_start_header">Actual start</string>
+    <string name="actual_end_header">Actual end</string>
+    <string name="weight_change_chart">Weight Change Chart</string>
+    <string name="photos_section">Photos</string>
+    <string name="weight_change_grams">Weight change (g)</string>
+
+    <!-- Duration Format -->
+    <string name="duration_days_hours">%dd %dh</string>
+    <string name="duration_days_only">%dd</string>
+    <string name="duration_hours_only">%dh</string>
+
+    <!-- Label -->
+    <string name="label_preview">Label Preview</string>
+    <string name="label_saved_to_gallery">Label saved to gallery</string>
+    <string name="failed_to_save_label">Failed to save label</string>
+    <string name="failed_to_share_label">Failed to share label</string>
+    <string name="share_label">Share Label</string>
+    <string name="start_date">Start: %s</string>
+    <string name="expected_end">Expected end: %s</string>
+
+    <string name="pdf_saved_to_downloads">PDF saved to Downloads folder</string>
+    <string name="error_saving_pdf">PDF saving error</string>
+
+    <!-- ================== STAGES ================== -->
+    <string name="stage_salting">Salting</string>
+    <string name="stage_curing_drying">Curing and Drying</string>
+    <string name="stage_salting_spices">Salting with Spices</string>
+    <string name="stage_drying">Drying</string>
+    <string name="stage_grinding_stuffing">Grinding and Stuffing</string>
+    <string name="stage_fermentation_drying">Fermentation and Drying</string>
+    <string name="stage_brewing_preparation">Brewing Preparation</string>
+    <string name="stage_primary_fermentation">Primary Fermentation</string>
+    <string name="stage_conditioning_bottling">Conditioning and Bottling</string>
+    <string name="stage_crushing_pressing">Crushing and Pressing</string>
+    <string name="stage_secondary_fermentation_aging">Secondary Fermentation and Aging</string>
+    <string name="stage_steeping_preparation">Steeping and Preparation</string>
+    <string name="stage_fermentation">Fermentation</string>
+    <string name="stage_packing_paste">Packing with Paste</string>
+    <string name="stage_salting_mixing">Salting and Mixing</string>
+    <string name="stage_storage">Storage</string>
+
+    <!-- ================== INGREDIENTS ================== -->
+    <string name="ingredients_cured_meat_basic">Pork/Beef — 1 kg\nSalt — 30 g\nBlack pepper — 5 g\nGarlic — 3 cloves</string>
+    <string name="ingredients_cured_meat_spicy">Pork — 1 kg\nCuring salt — 25 g\nSmoked paprika — 10 g\nCoriander — 5 g</string>
+    <string name="ingredients_cured_sausage">Pork — 700 g\nBeef — 300 g\nCuring salt — 25 g\nPepper — 5 g\nGarlic — 3 cloves\nNatural casing — 1 m</string>
+    <string name="ingredients_beer">Barley malt — 4 kg\nHops — 50 g\nBrewer’s yeast — 1 pack</string>
+    <string name="ingredients_wine">Grapes — 10 kg\nSugar — 2 kg\nWine yeast — 1 pack</string>
+    <string name="ingredients_kvass">Rye bread — 500 g\nSugar — 100 g\nDry yeast — 5 g</string>
+    <string name="ingredients_kimchi">Napa cabbage — 1 kg\nSalt — 50 g\nChili pepper — 30 g\nGarlic — 5 cloves\nGinger — 20 g</string>
+    <string name="ingredients_sauerkraut">White cabbage — 2 kg\nCarrot — 200 g\nSalt — 40 g</string>
+
+    <!-- ================== NOTES ================== -->
+    <string name="note_cured_meat_basic">Keep the meat in salt for 1.5 days, then dry at +4…+8°C for 14 days. **Storage:** in the fridge up to 2 months, vacuum-sealed up to 6 months.</string>
+    <string name="note_cured_meat_spicy">Dry salting with spices for 2 days, then dry for 14 days at +5°C. **Storage:** in the fridge up to 3 months.</string>
+    <string name="note_cured_sausage">Stuff, ferment for 6 days at +18°C, then dry for 2–3 weeks. **Storage:** in the fridge up to 2 months.</string>
+    <string name="note_beer">Fermentation 8 days, conditioning 9 days. **Storage:** bottled at +4°C up to 6 months.</string>
+    <string name="note_wine">Primary fermentation 6 days, secondary 20+ days. **Storage:** bottled at +12°C up to 2 years.</string>
+    <string name="note_kvass">Bread soak 18 h, fermentation 3.5 days. **Storage:** in the fridge up to 5 days.</string>
+    <string name="note_kimchi">Fermentation 5–6 days at room temperature. **Storage:** in the fridge up to 2 months.</string>
+    <string name="note_sauerkraut">Fermentation 10 days at +18°C. **Storage:** in the fridge up to 6 months.</string>
+    <string name="batch_info">Product Information</string>
+    <string name="batch_type">Product type: %1$s</string>
 
     <string-array name="fermentation_types">
         <item>Dry-cured meat (basic)</item>
@@ -43,4 +157,171 @@
         <item>Sauerkraut</item>
         <item>Other</item>
     </string-array>
+
+    <!-- =============== PDF EXPORT STRINGS =============== -->
+    <string name="weight_info_title">Weight Information</string>
+    <string name="initial_weight_text">Initial weight: %.1f g</string>
+    <string name="current_weight_text">Current weight: %.1f g</string>
+    <string name="total_weight_loss_text">Total weight loss: %.1f g (%.1f%%)</string>
+    <string name="stages_production_title">Production Stages</string>
+    <string name="stage_column_header">Stage</string>
+    <string name="duration_column_header">Duration</string>
+    <string name="planned_start_column_header">Planned Start</string>
+    <string name="planned_end_column_header">Planned End</string>
+    <string name="actual_start_column_header">Actual Start</string>
+    <string name="actual_end_column_header">Actual End</string>
+    <string name="weight_chart_title">Weight Change Chart</string>
+    <string name="photos_title">Photos</string>
+    <string name="creation_date_title">Creation date: %s</string>
+    <string name="weight_change_title">Weight change (g)</string>
+
+    <!-- =============== STAGE NOTIFICATION STRINGS =============== -->
+    <string name="stage_completed_notification_title">Stage Completed</string>
+    <string name="stage_completed_notification_text">Stage \"%1$s\" in batch \"%2$s\" has ended</string>
+
+    <!-- =============== REMINDER NOTIFICATION STRINGS =============== -->
+    <string name="reminder_notification_title">CuringTracker</string>
+    <string name="reminder_notification_body">Reminder: check your batches</string>
+
+
+    <!-- =============== BatchListViewModel STRINGS =============== -->
+    <string name="weight_cannot_increase_error">Weight cannot increase (previous: %.1f)</string>
+    <string name="weight_diff_too_large_error">Weight differs by more than 40%% from previous (previous: %.1f)</string>
+    <string name="weight_save_error">Save error: %1$s</string>
+
+    <!-- =============== FileUtils STRINGS =============== -->
+    <!-- Ошибки при копировании файлов -->
+    <string name="file_error_source_not_exists">Source file does not exist: %s</string>
+    <string name="file_error_no_read_access">No read access to file: %s</string>
+    <string name="file_error_source_empty">Source file is empty: %s</string>
+    <string name="file_error_copy_incomplete">Copy incomplete: expected %d bytes, copied %d bytes</string>
+    <string name="file_error_cannot_open_output_stream">Cannot open output stream for URI: %s</string>
+    <string name="file_error_file_unavailable">File unavailable: %s</string>
+    <string name="file_error_access_denied">Access denied: %s</string>
+    <string name="file_error_copy_failed">File copy error: %s</string>
+
+    <!-- Ошибки при копировании из URI -->
+    <string name="file_error_cannot_create_directory">Cannot create directory: %s</string>
+    <string name="file_error_source_stream_empty">Source stream is empty</string>
+    <string name="file_error_no_bytes_copied">No bytes copied</string>
+    <string name="file_error_cannot_open_input_stream">Cannot open input stream for URI: %s</string>
+    <string name="file_error_uri_unavailable">URI unavailable: %s</string>
+    <string name="file_error_access_denied_uri">Access denied to URI: %s</string>
+    <string name="file_error_copy_from_uri_failed">Error copying from URI: %s</string>
+
+    <!-- Общие ошибки -->
+    <string name="file_error_data_copy_failed">Data copy error: %s</string>
+
+    <!-- =============== MainActivity STRINGS =============== -->
+    <!-- Snackbar messages -->
+    <string name="permissions_not_granted">Some permissions not granted — functionality limited</string>
+    <string name="settings">Settings</string>
+    <string name="backup_file_name">ferment_tracker_backup_%d.db</string>
+
+    <!-- Database operations -->
+    <string name="database_not_found">Database not found</string>
+    <string name="database_read_access_denied">No read access to database</string>
+    <string name="database_empty">Database file is empty</string>
+    <string name="insufficient_space">Insufficient free space (%d MB)</string>
+    <string name="backup_created">Backup created (%d KB)</string>
+    <string name="file_not_found">File not found: %s</string>
+    <string name="no_file_access_permission">No file access permission</string>
+    <string name="io_error">Input/output error: %s</string>
+    <string name="unknown_backup_error">Unknown backup error: %s</string>
+    <string name="critical_error_db_reopen">Critical error: failed to reopen database</string>
+
+    <!-- Restore operations -->
+    <string name="backup_file_empty">Backup file is empty or unavailable</string>
+    <string name="backup_file_too_small">Backup file too small (%d bytes). File may be corrupted</string>
+    <string name="db_backup_failed">Failed to backup current DB: %s</string>
+    <string name="restore_failed_db_corrupted">Restore failed: %s\nOld database restored</string>
+    <string name="db_restored">Database restored (%d batches)</string>
+    <string name="db_restored_no_data">Database restored (no data)</string>
+    <string name="restart">Restart</string>
+    <string name="unknown_restore_error">Unknown restore error: %s</string>
+
+    <!-- Database verification -->
+    <string name="db_corrupted">Database corrupted</string>
+    <string name="sqlite_error">SQLite error: %s</string>
+    <string name="db_open_error">Failed to open database: %s</string>
+
+    <!-- Navigation -->
+    <string name="navigation_error">Navigation error to batch</string>
+
+    <!-- Battery optimization -->
+    <string name="battery_optimization_title">Battery Optimization</string>
+    <string name="battery_optimization_message">For reliable notifications, it is recommended to disable battery optimization for this app.</string>
+    <string name="configure">Configure</string>
+    <string name="later">Later</string>
+
+    <!-- =============== CreateBatchFragment STRINGS =============== -->
+    <string name="batch_name_required">Enter batch name</string>
+    <string name="new_stage_name">New stage</string>
+
+    <!-- =============== BatchTemplateFragment STRINGS =============== -->
+    <string name="error_loading_stages">Error loading stages: %s</string>
+    <string name="type_required">Type is required</string>
+    <string name="error_saving_template">Error saving template: %s</string>
+
+    <!-- =============== BatchDetailFragment STRINGS =============== -->
+    <string name="no_active_stage_for_photo">No active stage for adding photo</string>
+    <string name="batch_saved_success">Batch saved</string>
+    <string name="stage_started_notification_scheduled1">Stage started &amp; notification scheduled</string>
+    <string name="stage_completed_next_started1">Stage completed — next started &amp; notification scheduled</string>
+    <string name="no_batch_data_error">No batch data</string>
+    <string name="pdf_saved_success">PDF saved: %s</string>
+    <string name="pdf_export_error_message">PDF export error</string>
+    <string name="pdf_export_error_detailed">PDF export error: %s</string>
+    <string name="label_saved_success">Label saved to gallery</string>
+    <string name="label_save_failed">Failed to save label</string>
+    <string name="label_share_failed">Failed to share label</string>
+    <string name="photo_added_to_log_success">Photo added to log</string>
+
+    <!-- =============== StageAdapter STRINGS =============== -->
+    <string name="weight_format">Weight: %.1f g</string>
+    <string name="weight_na">Weight: N/A</string>
+    <string name="planned_start_format">Planned Start: %s</string>
+    <string name="planned_start_na">Planned Start: N/A</string>
+    <string name="planned_end_format">Planned End: %s</string>
+    <string name="planned_end_na">Planned End: N/A</string>
+    <string name="start_format">Start: %s</string>
+    <string name="start_not_started">Start: Not started</string>
+    <string name="end_format">End: %s</string>
+    <string name="end_ongoing">End: Ongoing</string>
+    <string name="time_left_format_text">Time Left: %s</string>
+    <string name="start_stage_title">Start stage</string>
+    <string name="start_stage_message">Are you sure you want to start this stage?</string>
+    <string name="start_stage_confirm">Yes</string>
+    <string name="complete_stage_title">Complete stage</string>
+    <string name="complete_stage_message">Are you sure you want to complete this stage?</string>
+    <string name="complete_stage_confirm">Yes</string>
+    <string name="duration_format">%.0f h</string>
+    <string name="delete_selected">Delete Selected</string>
+    <string name="add_new_recipe">Add New Recipe</string>
+    <string name="print_label">Print Label</string>
+    <string name="export_to_pdf">Export to PDF</string>
+    <string name="save_batch">Save Batch</string>
+    <string name="journal">Journal</string>
+    <string name="initial_weight_n_a">Initial Weight: N/A</string>
+    <string name="load_template_stages">Load Template Stages</string>
+    <string name="new_recipe_type">New Recipe Type</string>
+    <string name="ingredients">Ingredients</string>
+    <string name="note">Note</string>
+    <string name="add_stage">Add Stage</string>
+    <string name="save_template">Save Template</string>
+    <string name="create_batch">Create Batch</string>
+    <string name="batch_name">Batch Name</string>
+    <string name="initial_weight_grams">Initial Weight (grams)</string>
+    <string name="qr_scanner">QR Scanner</string>
+    <string name="qr">Scan QR Code</string>
+    <string name="stage_name">Stage Name</string>
+    <string name="duration">Duration:</string>
+    <string name="hours">(hours)</string>
+    <string name="start">Start</string>
+    <string name="complete">Complete</string>
+    <string name="remove">Remove</string>
+    <string name="edit_recipes">Edit Recipes</string>
+    <string name="export_db">Export DB</string>
+    <string name="import_db">Import DB</string>
+
 </resources>

@@ -3,21 +3,21 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/menu_edit_recipes"
-        android:title="Edit Recipes"
+        android:title="@string/edit_recipes"
         android:orderInCategory="1"
         app:showAsAction="never" />
 
     <group android:id="@+id/group_db">
         <item
             android:id="@+id/menu_export_db"
-            android:title="Export DB"
+            android:title="@string/export_db"
             android:icon="@android:drawable/ic_menu_save"
             android:orderInCategory="2" />
 <!--            app:showAsAction="ifRoom"-->
             />
         <item
             android:id="@+id/menu_import_db"
-            android:title="Import DB"
+            android:title="@string/import_db"
             android:icon="@android:drawable/ic_menu_upload"
             android:orderInCategory="3" />
 <!--            app:showAsAction="ifRoom" -->

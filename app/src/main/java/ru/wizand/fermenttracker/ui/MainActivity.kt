@@ -48,9 +48,9 @@ class MainActivity : AppCompatActivity() {
         if (denied.isNotEmpty()) {
             Snackbar.make(
                 binding.root,
-                "Некоторые разрешения не предоставлены — функционал ограничен",
+                getString(R.string.permissions_not_granted),
                 Snackbar.LENGTH_LONG
-            ).setAction("Настройки") {
+            ).setAction(getString(R.string.settings)) {
                 val intent = Intent(
                     Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
                     Uri.fromParts("package", packageName, null)
@@ -92,11 +92,11 @@ class MainActivity : AppCompatActivity() {
             v.setPadding(0, 0, systemBars.right, systemBars.bottom)
             insets
         }
-        ViewCompat.setOnApplyWindowInsetsListener(binding.fabScanQr) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(0, 0, systemBars.right, systemBars.bottom + 64)
-            insets
-        }
+//        ViewCompat.setOnApplyWindowInsetsListener(binding.fabScanQr) { v, insets ->
+//            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+//            v.setPadding(0, 0, systemBars.right, systemBars.bottom + 64)
+//            insets
+//        }
 
         ViewCompat.setOnApplyWindowInsetsListener(binding.navHostFragment) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
@@ -111,10 +111,10 @@ class MainActivity : AppCompatActivity() {
                 .navigate(R.id.action_batchList_to_createBatch)
         }
 
-        binding.fabScanQr.setOnClickListener {
-            findNavController(R.id.nav_host_fragment)
-                .navigate(R.id.action_batchList_to_qr)
-        }
+//        binding.fabScanQr.setOnClickListener {
+//            findNavController(R.id.nav_host_fragment)
+//                .navigate(R.id.action_batchList_to_qr)
+//        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -129,7 +129,7 @@ class MainActivity : AppCompatActivity() {
                 true
             }
             R.id.menu_export_db -> {
-                createDocumentLauncher.launch("ferment_tracker_backup_${System.currentTimeMillis()}.db")
+                createDocumentLauncher.launch(getString(R.string.backup_file_name, System.currentTimeMillis()))
                 true
             }
             R.id.menu_import_db -> {
@@ -169,15 +169,15 @@ class MainActivity : AppCompatActivity() {
                 // Проверяем существование и доступность файла БД
                 when {
                     !dbFile.exists() -> {
-                        showError("База данных не найдена")
+                        showError(getString(R.string.database_not_found))
                         return@launch
                     }
                     !dbFile.canRead() -> {
-                        showError("Нет доступа на чтение базы данных")
+                        showError(getString(R.string.database_read_access_denied))
                         return@launch
                     }
                     dbFile.length() == 0L -> {
-                        showError("Файл базы данных пуст")
+                        showError(getString(R.string.database_empty))
                         return@launch
                     }
                 }
@@ -186,7 +186,7 @@ class MainActivity : AppCompatActivity() {
                 val requiredSpace = (dbFile.length() * 1.1).toLong()
                 val availableSpace = dbFile.parentFile?.usableSpace ?: 0L
                 if (availableSpace < requiredSpace) {
-                    showError("Недостаточно свободного места (требуется ${requiredSpace / 1024 / 1024} МБ)")
+                    showError(getString(R.string.insufficient_space, (requiredSpace / 1024 / 1024).toInt()))
                     return@launch
                 }
 
@@ -199,22 +199,22 @@ class MainActivity : AppCompatActivity() {
                 // Переоткрываем БД
                 AppDatabase.getInstance(applicationContext)
 
-                showSuccess("Резервная копия создана (${dbFile.length() / 1024} КБ)")
+                showSuccess(getString(R.string.backup_created, (dbFile.length() / 1024).toInt()))
 
             } catch (e: FileNotFoundException) {
-                showError("Файл не найден: ${e.message}")
+                showError(getString(R.string.file_not_found, e.message))
             } catch (e: SecurityException) {
-                showError("Нет прав доступа к файлу")
+                showError((getString(R.string.no_file_access_permission)))
             } catch (e: IOException) {
-                showError("Ошибка ввода-вывода: ${e.message}")
+                showError(getString(R.string.io_error, e.message))
             } catch (e: Exception) {
-                showError("Неизвестная ошибка при создании резервной копии: ${e.message}")
+                showError(getString(R.string.unknown_backup_error, e.message ?: ""))
             } finally {
                 // Гарантируем, что БД будет переоткрыта
                 try {
                     AppDatabase.getInstance(applicationContext)
                 } catch (e: Exception) {
-                    showError("Критическая ошибка: не удалось переоткрыть базу данных")
+                    showError(getString(R.string.critical_error_db_reopen))
                 }
             }
         }
@@ -231,11 +231,11 @@ class MainActivity : AppCompatActivity() {
 
                 when {
                     fileSize == 0L -> {
-                        showError("Файл резервной копии пуст или недоступен")
+                        showError(getString(R.string.backup_file_empty))
                         return@launch
                     }
                     fileSize < 4096 -> { // SQLite database минимум ~4KB
-                        showError("Файл резервной копии слишком мал (${fileSize} байт). Возможно, файл поврежден")
+                        showError(getString(R.string.backup_file_too_small, fileSize))
                         return@launch
                     }
                 }
@@ -246,7 +246,7 @@ class MainActivity : AppCompatActivity() {
                 val requiredSpace = (fileSize * 1.5).toLong() // дополнительное место для временной копии
                 val availableSpace = dbFile.parentFile?.usableSpace ?: 0L
                 if (availableSpace < requiredSpace) {
-                    showError("Недостаточно свободного места (требуется ${requiredSpace / 1024 / 1024} МБ)")
+                    showError(getString(R.string.insufficient_space, (requiredSpace / 1024 / 1024).toInt()))
                     return@launch
                 }
 
@@ -256,7 +256,7 @@ class MainActivity : AppCompatActivity() {
                     try {
                         dbFile.copyTo(backupFile, overwrite = true)
                     } catch (e: Exception) {
-                        showError("Не удалось создать резервную копию текущей БД: ${e.message}")
+                        showError(getString(R.string.db_backup_failed, e.message))
                         return@launch
                     }
                 }
@@ -279,7 +279,7 @@ class MainActivity : AppCompatActivity() {
                         backupFile.copyTo(dbFile, overwrite = true)
                     }
                     AppDatabase.getInstance(applicationContext)
-                    showError("Восстановление не удалось: ${verificationResult.errorMessage}\nСтарая база данных восстановлена")
+                    showError(getString(R.string.restore_failed_db_corrupted, verificationResult.errorMessage))
                     return@launch
                 }
 
@@ -293,22 +293,22 @@ class MainActivity : AppCompatActivity() {
 
             } catch (e: FileNotFoundException) {
                 restoreBackup(backupFile, getDatabasePath("ferment_tracker_db"))
-                showError("Файл не найден: ${e.message}")
+                showError(getString(R.string.file_not_found, e.message))
             } catch (e: SecurityException) {
                 restoreBackup(backupFile, getDatabasePath("ferment_tracker_db"))
-                showError("Нет прав доступа к файлу")
+                showError(getString(R.string.no_file_access_permission))
             } catch (e: IOException) {
                 restoreBackup(backupFile, getDatabasePath("ferment_tracker_db"))
-                showError("Ошибка ввода-вывода: ${e.message}")
+                showError(getString(R.string.io_error, e.message))
             } catch (e: Exception) {
                 restoreBackup(backupFile, getDatabasePath("ferment_tracker_db"))
-                showError("Неизвестная ошибка при восстановлении: ${e.message}")
+                showError(getString(R.string.unknown_backup_error, e.message ?: ""))
             } finally {
                 // Гарантируем, что БД будет переоткрыта
                 try {
                     AppDatabase.getInstance(applicationContext)
                 } catch (e: Exception) {
-                    showError("Критическая ошибка: не удалось переоткрыть базу данных")
+                    showError(getString(R.string.critical_error_db_reopen))
                 }
                 // Очищаем временный файл
                 backupFile?.delete()
@@ -366,17 +366,17 @@ class MainActivity : AppCompatActivity() {
         } catch (e: android.database.sqlite.SQLiteDatabaseCorruptException) {
             DatabaseVerificationResult(
                 isValid = false,
-                errorMessage = "База данных повреждена"
+                errorMessage = getString(R.string.db_corrupted)
             )
         } catch (e: android.database.sqlite.SQLiteException) {
             DatabaseVerificationResult(
                 isValid = false,
-                errorMessage = "Ошибка SQLite: ${e.message}"
+                errorMessage = getString(R.string.sqlite_error, e.message)
             )
         } catch (e: Exception) {
             DatabaseVerificationResult(
                 isValid = false,
-                errorMessage = "Не удалось открыть базу данных: ${e.message}"
+                errorMessage = getString(R.string.db_open_error, e.message)
             )
         }
     }
@@ -396,16 +396,16 @@ class MainActivity : AppCompatActivity() {
     private fun showRestoreSuccess(batchCount: Int) {
         runOnUiThread {
             val message = if (batchCount > 0) {
-                "База восстановлена ($batchCount партий)"
+                getString(R.string.db_restored, batchCount)
             } else {
-                "База восстановлена (данные отсутствуют)"
+                getString(R.string.db_restored_no_data)
             }
 
             Snackbar.make(
                 binding.root,
                 message,
                 Snackbar.LENGTH_INDEFINITE
-            ).setAction("Перезапустить") {
+            ).setAction(getString(R.string.restart)) {
                 val intent = packageManager.getLaunchIntentForPackage(packageName)
                 intent?.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
                 startActivity(intent)
@@ -481,7 +481,7 @@ class MainActivity : AppCompatActivity() {
                 Log.e("MainActivity", "Navigation error: ${e.message}", e)
                 Snackbar.make(
                     binding.root,
-                    "Ошибка навигации к партии",
+                    getString(R.string.navigation_error),
                     Snackbar.LENGTH_SHORT
                 ).show()
             }
@@ -489,14 +489,21 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun checkBatteryOptimization() {
+        val prefs = getSharedPreferences("battery_optimization_prefs", Context.MODE_PRIVATE)
+        val hasUserDeclined = prefs.getBoolean("user_declined_battery_optimization", false)
+
+        if (hasUserDeclined) return
+
         if (!BatteryOptimizationHelper.isIgnoringBatteryOptimizations(this)) {
             androidx.appcompat.app.AlertDialog.Builder(this)
-                .setTitle("Оптимизация батареи")
-                .setMessage("Для надежной работы уведомлений рекомендуется отключить оптимизацию батареи для этого приложения.")
-                .setPositiveButton("Настроить") { _, _ ->
+                .setTitle(getString(R.string.battery_optimization_title))
+                .setMessage(getString(R.string.battery_optimization_message))
+                .setPositiveButton(getString(R.string.configure)) { _, _ ->
                     BatteryOptimizationHelper.requestIgnoreBatteryOptimizations(this)
                 }
-                .setNegativeButton("Позже", null)
+                .setNegativeButton(getString(R.string.later)) { _, _ ->
+                    prefs.edit().putBoolean("user_declined_battery_optimization", true).apply()
+                }
                 .show()
         }
     }

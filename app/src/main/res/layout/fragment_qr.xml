@@ -8,7 +8,7 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="QR Scanner"
+        android:text="@string/qr_scanner"
         android:textSize="24sp"
         android:textAlignment="center"
         android:layout_marginBottom="32dp" />
@@ -17,6 +17,6 @@
         android:id="@+id/btnScan"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Сканировать QR-код" />
+        android:text="@string/qr" />
 
 </LinearLayout>

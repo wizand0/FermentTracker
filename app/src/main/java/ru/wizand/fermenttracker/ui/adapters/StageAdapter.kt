@@ -1,6 +1,7 @@
 package ru.wizand.fermenttracker.ui.adapters
 
 import android.app.AlertDialog
+import android.app.Application
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.LayoutInflater
@@ -14,6 +15,7 @@ import ru.wizand.fermenttracker.databinding.ItemStageBinding
 import java.text.SimpleDateFormat
 import java.util.Locale
 import java.util.concurrent.TimeUnit
+import ru.wizand.fermenttracker.R
 
 class StageAdapter(
     private val onStartClicked: (Stage) -> Unit = {},
@@ -50,7 +52,7 @@ class StageAdapter(
 
         fun bind(stage: Stage) {
             binding.tvStageName.text = stage.name
-            binding.tvDuration.text = "${stage.durationHours} h"
+            binding.tvDuration.text = binding.root.context.getString(R.string.duration_format, stage.durationHours.toDouble())
 
             // ========== Для duration ==========
             // Удаляем ВСЕ старые watchers из etDuration
@@ -85,17 +87,25 @@ class StageAdapter(
 
             // Показываем вес только для активного этапа (если известен)
             binding.tvCurrentWeight.text = if (isActive) {
-                batchCurrentWeight?.let { "Weight: $it g" } ?: "Weight: N/A"
+                batchCurrentWeight?.let { binding.root.context.getString(R.string.weight_format, it) } ?: binding.root.context.getString(R.string.weight_na)
             } else {
-                "N/A"
+                binding.root.context.getString(R.string.na) // используем существующую строку
             }
 
-            binding.tvPlannedStartTime.text = stage.plannedStartTime?.let { "Planned Start: ${formatDate(it)}" } ?: "Planned Start: N/A"
-            binding.tvPlannedEndTime.text = stage.plannedEndTime?.let { "Planned End: ${formatDate(it)}" } ?: "Planned End: N/A"
-            binding.tvStartTime.text = stage.startTime?.let { "Start: ${formatDate(it)}" } ?: "Start: Not started"
-            binding.tvEndTime.text = stage.endTime?.let { "End: ${formatDate(it)}" } ?: "End: Ongoing"
+            binding.tvPlannedStartTime.text = stage.plannedStartTime?.let {
+                binding.root.context.getString(R.string.planned_start_format, formatDate(it))
+            } ?: binding.root.context.getString(R.string.planned_start_na)
+            binding.tvPlannedEndTime.text = stage.plannedEndTime?.let {
+                binding.root.context.getString(R.string.planned_end_format, formatDate(it))
+            } ?: binding.root.context.getString(R.string.planned_end_na)
+            binding.tvStartTime.text = stage.startTime?.let {
+                binding.root.context.getString(R.string.start_format, formatDate(it))
+            } ?: binding.root.context.getString(R.string.start_not_started)
+            binding.tvEndTime.text = stage.endTime?.let {
+                binding.root.context.getString(R.string.end_format, formatDate(it))
+            } ?: binding.root.context.getString(R.string.end_ongoing)
 
-            binding.tvTimeLeft.text = "Time Left: ${computeTimeLeftText(stage)}"
+            binding.tvTimeLeft.text = binding.root.context.getString(R.string.time_left_format_text, computeTimeLeftText(stage))
 
             val btnStartStage = binding.btnStartStage
             val btnCompleteStage = binding.btnCompleteStage
@@ -109,9 +119,9 @@ class StageAdapter(
             btnStartStage.setOnClickListener {
                 val context = binding.root.context
                 AlertDialog.Builder(context)
-                    .setTitle("Start stage")
-                    .setMessage("Are you sure you want to start this stage?")
-                    .setPositiveButton("Yes") { _, _ ->
+                    .setTitle(binding.root.context.getString(R.string.start_stage_title))
+                    .setMessage(binding.root.context.getString(R.string.start_stage_message))
+                    .setPositiveButton(binding.root.context.getString(R.string.start_stage_confirm)) { _, _ ->
                         onStartClicked(stage)
                     }
                     .setNegativeButton("Cancel", null)
@@ -121,9 +131,9 @@ class StageAdapter(
             btnCompleteStage.setOnClickListener {
                 val context = binding.root.context
                 AlertDialog.Builder(context)
-                    .setTitle("Complete stage")
-                    .setMessage("Are you sure you want to complete this stage?")
-                    .setPositiveButton("Yes") { _, _ ->
+                    .setTitle(binding.root.context.getString(R.string.complete_stage_title))
+                    .setMessage(binding.root.context.getString(R.string.complete_stage_message))
+                    .setPositiveButton(binding.root.context.getString(R.string.complete_stage_confirm)) { _, _ ->
                         onCompleteClicked(stage)
                     }
                     .setNegativeButton("Cancel", null)

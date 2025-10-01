@@ -15,6 +15,8 @@
     <uses-permission
         android:name="android.permission.WRITE_EXTERNAL_STORAGE"
         android:maxSdkVersion="28" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="28" />
 
     <!-- Note: REQUEST_IGNORE_BATTERY_OPTIMIZATIONS можно запросить, но это может
          привести к отклонению приложения в Google Play. Лучше направить пользователя

@@ -40,7 +40,7 @@
             android:id="@+id/tvDuration"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Duration:"
+            android:text="@string/duration"
             android:textAppearance="?attr/textAppearanceBodyMedium"
             android:layout_marginTop="8dp"
             app:layout_constraintStart_toStartOf="parent"
@@ -53,7 +53,7 @@
             android:id="@+id/tilDuration"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:hint="(hours)"
+            android:hint="@string/hours"
             app:layout_constraintStart_toEndOf="@id/tvDuration"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tvStageName"
@@ -135,7 +135,7 @@
             style="@style/Widget.MaterialComponents.Button.OutlinedButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="Start"
+            android:text="@string/start"
 
             android:visibility="invisible"
 
@@ -151,7 +151,7 @@
             style="@style/Widget.MaterialComponents.Button.OutlinedButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="Complete"
+            android:text="@string/complete"
 
             android:visibility="invisible"
 
@@ -166,7 +166,7 @@
             style="@style/Widget.MaterialComponents.Button.TextButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Remove"
+            android:text="@string/remove"
             android:visibility="gone"
             android:layout_marginTop="8dp"
             app:layout_constraintTop_toBottomOf="@id/btnCompleteStage"

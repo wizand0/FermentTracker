@@ -1,23 +1,21 @@
-<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">CuringTracker</string>
     <string name="add_batch">Добавить партию</string>
     <string name="save">Сохранить</string>
+    <string name="label_batch_name">Название партии</string>
+    <string name="label_product_type">Тип продукта</string>
+    <string name="label_start_weight">Начальный вес (кг)</string>
+    <string name="button_load_template">Загрузить этапы из шаблона</string>
+    <string name="no_batches">Пока нет партий. Нажмите +, чтобы добавить.</string>
     <string name="error_invalid_weight">Введите корректный вес > 0</string>
-    <string name="label_batch_name">Batch name</string>
-    <string name="label_product_type">Product type</string>
-    <string name="label_start_weight">Start weight (kg)</string>
-    <string name="button_load_template">Load template stages</string>
-    <string name="no_batches">No batches yet. Tap + to add.</string>
-    <string name="error_name_required">Please enter a name</string>
-    <string name="batch_created">Batch created</string>
-    <string name="add_weight">Add weight</string>
-    <string name="add_photo">Add photo</string>
-    <string name="next_stage">Next</string>
-    <string name="title_create_batch">Create batch</string>
-    <string name="title_batch_detail">Batch detail</string>
-    <string name="qr_image">QR image</string>
-    <string name="share">Share</string>
+    <string name="error_name_required">Введите название</string>
+    <string name="batch_created">Партия создана</string>
+    <string name="add_photo">Добавить фото</string>
+    <string name="next_stage">Далее</string>
+    <string name="title_create_batch">Создание партии</string>
+    <string name="title_batch_detail">Детали партии</string>
+    <string name="qr_image">QR-код</string>
+    <string name="share">Поделиться</string>
     <string name="title_qr">QR-сканер</string>
     <string name="product_cured_meat">Сыровяленое мясо</string>
     <string name="product_cured_sausage">Сыровяленая колбаса</string>
@@ -25,24 +23,304 @@
     <string name="product_sauerkraut">Квашеная капуста</string>
     <string name="product_kombucha">Комбуча</string>
     <string name="product_pickles">Солёные огурцы</string>
-    <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="scan_qr">Scan QR</string>
+    <string name="hello_blank_fragment">Привет, пустой фрагмент</string>
+    <string name="scan_qr">Сканировать QR</string>
+    <string name="recipe_details_title">Рецепт для %s</string>
+    <string name="ingredients_title">Ингредиенты:</string>
+    <string name="note_title">Инструкции/Заметки:</string>
+    <string name="ok">ОК</string>
+    <string name="cancel">Отмена</string>
 
-    <string name="recipe_details_title">Recipe for %s</string>
-    <string name="ingredients_title">Ingredients:</string>
-    <string name="note_title">Instructions/Note:</string>
-    <string name="ok">OK</string>
-    <string name="cancel">Cancel</string>
+    <string name="no_batch_data">Ошибка: Нет данных о партии</string>
+
+    <!-- Камера и Фото -->
+    <string name="camera_permission_denied">Доступ к камере запрещён</string>
+    <string name="no_active_stage_photo">Нет активного этапа для добавления фото</string>
+    <string name="photo_added_to_log">Фото добавлено в журнал</string>
+
+    <!-- Вес -->
+    <string name="add_weight">Добавить вес</string>
+    <string name="invalid_weight">Некорректный вес</string>
+    <string name="weight_saved_successfully">Вес успешно сохранён</string>
+    <string name="error_prefix">Ошибка: %s</string>
+    <string name="initial_weight">Начальный вес: %.1f г</string>
+    <string name="initial_weight_na">Начальный вес: нет данных</string>
+    <string name="current_weight">Текущий вес: %.1f г</string>
+    <string name="weight_loss">Общая потеря веса: %.1f г (%.1f%%)</string>
+
+    <!-- Партия -->
+    <string name="batch_saved">Партия сохранена</string>
+    <string name="not_started">Не начато</string>
+    <string name="na">Н/Д</string>
+    <string name="overdue">Просрочено</string>
+    <string name="time_left_format">%d д, %d ч осталось</string>
+
+    <!-- Этапы -->
+    <string name="stage_started_notification_scheduled">Этап начат и уведомление запланировано</string>
+    <string name="stage_completed_next_started">Этап завершён — следующий начат и уведомление запланировано</string>
+    <string name="stage_completed">Этап завершён</string>
+    <string name="no_active_stage_test">Нет активного этапа для теста</string>
+    <string name="test_notification_scheduled">Тестовое уведомление запланировано через 10 секунд</string>
+
+    <!-- Экспорт в PDF -->
+    <string name="pdf_export_error">Ошибка экспорта PDF: %s</string>
+    <string name="documents_directory_unavailable">Каталог документов недоступен</string>
+    <string name="share_pdf">Поделиться PDF</string>
+    <string name="pdf_saved">PDF сохранён: %s</string>
+    <string name="creation_date">Дата создания: %s</string>
+
+    <!-- Разделы PDF -->
+    <string name="product_information">Информация о продукте</string>
+    <string name="product_type">Тип продукта: %s</string>
+    <string name="recipe_ingredients">Рецепт (ингредиенты):</string>
+    <string name="cooking_technology">Технология приготовления:</string>
+    <string name="weight_information">Информация о весе</string>
+    <string name="initial_weight_label">Начальный вес: %.1f г</string>
+    <string name="current_weight_label">Текущий вес: %.1f г</string>
+    <string name="total_weight_loss">Общая потеря веса: %.1f г (%.1f%%)</string>
+    <string name="production_stages">Этапы производства</string>
+    <string name="stage_header">Этап</string>
+    <string name="duration_header">Длительность</string>
+    <string name="planned_start_header">Запланированное начало</string>
+    <string name="planned_end_header">Запланированный конец</string>
+    <string name="actual_start_header">Фактическое начало</string>
+    <string name="actual_end_header">Фактический конец</string>
+    <string name="weight_change_chart">График изменения веса</string>
+    <string name="photos_section">Фото</string>
+    <string name="weight_change_grams">Изменение веса (г)</string>
+
+    <!-- Формат длительности -->
+    <string name="duration_days_hours">%dд %dч</string>
+    <string name="duration_days_only">%dд</string>
+    <string name="duration_hours_only">%dч</string>
+
+    <!-- Этикетка -->
+    <string name="label_preview">Предпросмотр этикетки</string>
+    <string name="label_saved_to_gallery">Этикетка сохранена в галерею</string>
+    <string name="failed_to_save_label">Не удалось сохранить этикетку</string>
+    <string name="failed_to_share_label">Не удалось поделиться этикеткой</string>
+    <string name="share_label">Поделиться этикеткой</string>
+    <string name="start_date">Начало: %s</string>
+    <string name="expected_end">Окончание: %s</string>
+
+    <string name="pdf_saved_to_downloads">PDF сохранён в папку Загрузки</string>
+    <string name="error_saving_pdf">Ошибка сохранения PDF</string>
+
+    <!-- ================== ЭТАПЫ ================== -->
+    <string name="stage_salting">Посол</string>
+    <string name="stage_curing_drying">Вяление и сушка</string>
+    <string name="stage_salting_spices">Посол с приправами</string>
+    <string name="stage_drying">Сушка</string>
+    <string name="stage_grinding_stuffing">Измельчение и набивка</string>
+    <string name="stage_fermentation_drying">Ферментация и сушка</string>
+    <string name="stage_brewing_preparation">Подготовка к варке</string>
+    <string name="stage_primary_fermentation">Первичное брожение</string>
+    <string name="stage_conditioning_bottling">Выдержка и розлив</string>
+    <string name="stage_crushing_pressing">Дробление и прессование</string>
+    <string name="stage_secondary_fermentation_aging">Вторичное брожение и выдержка</string>
+    <string name="stage_steeping_preparation">Замачивание и подготовка</string>
+    <string name="stage_fermentation">Брожение</string>
+    <string name="stage_packing_paste">Упаковка с пастой</string>
+    <string name="stage_salting_mixing">Посол и перемешивание</string>
+    <string name="stage_storage">Хранение</string>
+
+    <!-- ================== INGREDIENTS ================== -->
+    <string name="ingredients_cured_meat_basic">Мясо свинины/говядины — 1 кг\nСоль — 30 г\nПерец чёрный — 5 г\nЧеснок — 3 зубчика</string>
+    <string name="ingredients_cured_meat_spicy">Свинина — 1 кг\nСоль нитритная — 25 г\nПаприка копчёная — 10 г\nКориандр — 5 г</string>
+    <string name="ingredients_cured_sausage">Свинина — 700 г\nГовядина — 300 г\nСоль нитритная — 25 г\nПерец — 5 г\nЧеснок — 3 зубчика\nОболочка натуральная — 1 м</string>
+    <string name="ingredients_beer">Солод ячменный — 4 кг\nХмель — 50 г\nДрожжи пивные — 1 пакет</string>
+    <string name="ingredients_wine">Виноград — 10 кг\nСахар — 2 кг\nДрожжи винные — 1 пакет</string>
+    <string name="ingredients_kvass">Ржаной хлеб — 500 г\nСахар — 100 г\nДрожжи сухие — 5 г</string>
+    <string name="ingredients_kimchi">Капуста пекинская — 1 кг\nСоль — 50 г\nПерец чили — 30 г\nЧеснок — 5 зубчиков\nИмбирь — 20 г</string>
+    <string name="ingredients_sauerkraut">Капуста белокочанная — 2 кг\nМорковь — 200 г\nСоль — 40 г</string>
+
+    <!-- ================== NOTES ================== -->
+    <string name="note_cured_meat_basic">Выдерживать мясо в соли 1,5 суток, затем сушить при +4…+8°C 14 дней. **Хранение:** в холодильнике до 2 месяцев, в вакууме — до 6 месяцев.</string>
+    <string name="note_cured_meat_spicy">Сухой посол с приправами 2 суток, затем сушка 14 дней при +5°C. **Хранение:** в холодильнике до 3 месяцев.</string>
+    <string name="note_cured_sausage">Фаршировать, ферментировать 6 дней при +18°C, затем сушить 2–3 недели. **Хранение:** в холодильнике до 2 месяцев.</string>
+    <string name="note_beer">Брожение 8 дней, дображивание 9 дней. **Хранение:** в бутылках при +4°C до 6 месяцев.</string>
+    <string name="note_wine">Первичное брожение 6 дней, вторичное 20+ дней. **Хранение:** в бутылках при +12°C до 2 лет.</string>
+    <string name="note_kvass">Выдержка хлеба 18 ч, ферментация 3,5 дня. **Хранение:** в холодильнике до 5 дней.</string>
+    <string name="note_kimchi">Ферментация 5–6 дней при комнатной температуре. **Хранение:** в холодильнике до 2 месяцев.</string>
+    <string name="note_sauerkraut">Ферментация 10 дней при +18°C. **Хранение:** в холодильнике до 6 месяцев.</string>
+    <string name="batch_info">Информация о продукте</string>
+    <string name="batch_type">Тип продукта: %1$s</string>
 
     <string-array name="fermentation_types">
-        <item>Dry-cured meat (basic)</item>
-        <item>Dry-cured meat (spicy)</item>
-        <item>Dry-cured sausage</item>
-        <item>Beer</item>
-        <item>Wine</item>
-        <item>Kvass</item>
-        <item>Kimchi</item>
-        <item>Sauerkraut</item>
-        <item>Other</item>
+        <item>Сыровяленое мясо (базовый)</item>
+        <item>Сыровяленое мясо (острое)</item>
+        <item>Сыровяленая колбаса</item>
+        <item>Пиво</item>
+        <item>Вино</item>
+        <item>Квас</item>
+        <item>Кимчи</item>
+        <item>Квашеная капуста</item>
+        <item>Другое</item>
     </string-array>
+
+    <!-- =============== PDF EXPORT STRINGS =============== -->
+    <string name="weight_info_title">Информация о весе</string>
+    <string name="initial_weight_text">Начальный вес: %.1f г</string>
+    <string name="current_weight_text">Текущий вес: %.1f г</string>
+    <string name="total_weight_loss_text">Общая потеря веса: %.1f г (%.1f%%)</string>
+    <string name="stages_production_title">Этапы производства</string>
+    <string name="stage_column_header">Этап</string>
+    <string name="duration_column_header">Длительность</string>
+    <string name="planned_start_column_header">План начало</string>
+    <string name="planned_end_column_header">План конец</string>
+    <string name="actual_start_column_header">Факт начало</string>
+    <string name="actual_end_column_header">Факт конец</string>
+    <string name="weight_chart_title">График изменения веса</string>
+    <string name="photos_title">Фотографии</string>
+    <string name="creation_date_title">Дата создания: %s</string>
+    <string name="weight_change_title">Изменение веса (г)</string>
+
+    <!-- =============== STAGE NOTIFICATION STRINGS =============== -->
+    <string name="stage_completed_notification_title">Этап завершён</string>
+    <string name="stage_completed_notification_text">Этап \"%1$s\" в партии \"%2$s\" подошёл к концу</string>
+
+    <!-- =============== REMINDER NOTIFICATION STRINGS =============== -->
+    <string name="reminder_notification_title">CuringTracker</string>
+    <string name="reminder_notification_body">Напоминание: проверьте свои партии</string>
+
+    <!-- =============== BatchListViewModel STRINGS =============== -->
+    <string name="weight_cannot_increase_error">Вес не может увеличиваться (предыдущий: %.1f)</string>
+    <string name="weight_diff_too_large_error">Вес отличается более чем на 40%% от предыдущего (предыдущий: %.1f)</string>
+    <string name="weight_save_error">Ошибка при сохранении: %1$s</string>
+
+    <!-- =============== FileUtils STRINGS =============== -->
+    <!-- Ошибки при копировании файлов -->
+    <string name="file_error_source_not_exists">Исходный файл не существует: %s</string>
+    <string name="file_error_no_read_access">Нет доступа на чтение файла: %s</string>
+    <string name="file_error_source_empty">Исходный файл пуст: %s</string>
+    <string name="file_error_copy_incomplete">Копирование неполное: ожидалось %d байт, скопировано %d байт</string>
+    <string name="file_error_cannot_open_output_stream">Не удалось открыть поток записи для URI: %s</string>
+    <string name="file_error_file_unavailable">Файл недоступен: %s</string>
+    <string name="file_error_access_denied">Отказано в доступе: %s</string>
+    <string name="file_error_copy_failed">Ошибка при копировании файла: %s</string>
+
+    <!-- Ошибки при копировании из URI -->
+    <string name="file_error_cannot_create_directory">Не удалось создать директорию: %s</string>
+    <string name="file_error_source_stream_empty">Исходный поток пуст</string>
+    <string name="file_error_no_bytes_copied">Не скопировано ни одного байта</string>
+    <string name="file_error_cannot_open_input_stream">Не удалось открыть поток чтения для URI: %s</string>
+    <string name="file_error_uri_unavailable">URI недоступен: %s</string>
+    <string name="file_error_access_denied_uri">Отказано в доступе к URI: %s</string>
+    <string name="file_error_copy_from_uri_failed">Ошибка при копировании из URI: %s</string>
+
+    <!-- Общие ошибки -->
+    <string name="file_error_data_copy_failed">Ошибка при копировании данных: %s</string>
+
+    <!-- =============== MainActivity STRINGS =============== -->
+    <!-- Snackbar messages -->
+    <string name="permissions_not_granted">Некоторые разрешения не предоставлены — функционал ограничен</string>
+    <string name="settings">Настройки</string>
+    <string name="backup_file_name">ferment_tracker_backup_%d.db</string>
+
+    <!-- Database operations -->
+    <string name="database_not_found">База данных не найдена</string>
+    <string name="database_read_access_denied">Нет доступа на чтение базы данных</string>
+    <string name="database_empty">Файл базы данных пуст</string>
+    <string name="insufficient_space">Недостаточно свободного места (%d МБ)</string>
+    <string name="backup_created">Резервная копия создана (%d КБ)</string>
+    <string name="file_not_found">Файл не найден: %s</string>
+    <string name="no_file_access_permission">Нет прав доступа к файлу</string>
+    <string name="io_error">Ошибка ввода-вывода: %s</string>
+    <string name="unknown_backup_error">Неизвестная ошибка при создании резервной копии: %s</string>
+    <string name="critical_error_db_reopen">Критическая ошибка: не удалось переоткрыть базу данных</string>
+
+    <!-- Restore operations -->
+    <string name="backup_file_empty">Файл резервной копии пуст или недоступен</string>
+    <string name="backup_file_too_small">Файл резервной копии слишком мал (%d байт). Возможно, файл поврежден</string>
+    <string name="db_backup_failed">Не удалось создать резервную копию текущей БД: %s</string>
+    <string name="restore_failed_db_corrupted">Восстановление не удалось: %s\nСтарая база данных восстановлена</string>
+    <string name="db_restored">База восстановлена (%d партий)</string>
+    <string name="db_restored_no_data">База восстановлена (данные отсутствуют)</string>
+    <string name="restart">Перезапустить</string>
+    <string name="unknown_restore_error">Неизвестная ошибка при восстановлении: %s</string>
+
+    <!-- Database verification -->
+    <string name="db_corrupted">База данных повреждена</string>
+    <string name="sqlite_error">Ошибка SQLite: %s</string>
+    <string name="db_open_error">Не удалось открыть базу данных: %s</string>
+
+    <!-- Navigation -->
+    <string name="navigation_error">Ошибка навигации к партии</string>
+
+    <!-- Battery optimization -->
+    <string name="battery_optimization_title">Оптимизация батареи</string>
+    <string name="battery_optimization_message">Для надежной работы уведомлений рекомендуется отключить оптимизацию батареи для этого приложения.</string>
+    <string name="configure">Настроить</string>
+    <string name="later">Позже</string>
+
+    <!-- =============== CreateBatchFragment STRINGS =============== -->
+    <string name="batch_name_required">Введите название партии</string>
+    <string name="new_stage_name">Новый этап</string>
+
+    <!-- =============== BatchTemplateFragment STRINGS =============== -->
+    <string name="error_loading_stages">Ошибка загрузки этапов: %s</string>
+    <string name="type_required">Тип обязателен</string>
+    <string name="error_saving_template">Ошибка сохранения шаблона: %s</string>
+
+    <!-- =============== BatchDetailFragment STRINGS =============== -->
+    <string name="no_active_stage_for_photo">Нет активного этапа для добавления фото</string>
+    <string name="batch_saved_success">Партия сохранена</string>
+    <string name="stage_started_notification_scheduled1">Этап начат и уведомление запланировано</string>
+    <string name="stage_completed_next_started1">Этап завершён — следующий начат и уведомление запланировано</string>
+    <string name="no_batch_data_error">Нет данных о партии</string>
+    <string name="pdf_saved_success">PDF сохранен: %s</string>
+    <string name="pdf_export_error_message">Ошибка экспорта PDF</string>
+    <string name="pdf_export_error_detailed">Ошибка экспорта PDF: %s</string>
+    <string name="label_saved_success">Этикетка сохранена в галерею</string>
+    <string name="label_save_failed">Не удалось сохранить этикетку</string>
+    <string name="label_share_failed">Не удалось поделиться этикеткой</string>
+    <string name="photo_added_to_log_success">Фото добавлено в журнал</string>
+
+    <!-- =============== StageAdapter STRINGS =============== -->
+    <string name="weight_format">Вес: %.1f г</string>
+    <string name="weight_na">Вес: Н/Д</string>
+    <string name="planned_start_format">Плановое начало: %s</string>
+    <string name="planned_start_na">Плановое начало: Н/Д</string>
+    <string name="planned_end_format">Плановый конец: %s</string>
+    <string name="planned_end_na">Плановый конец: Н/Д</string>
+    <string name="start_format">Начало: %s</string>
+    <string name="start_not_started">Начало: Не начато</string>
+    <string name="end_format">Конец: %s</string>
+    <string name="end_ongoing">Конец: В процессе</string>
+    <string name="time_left_format_text">Осталось времени: %s</string>
+    <string name="start_stage_title">Начать этап</string>
+    <string name="start_stage_message">Вы уверены, что хотите начать этот этап?</string>
+    <string name="start_stage_confirm">Да</string>
+    <string name="complete_stage_title">Завершить этап</string>
+    <string name="complete_stage_message">Вы уверены, что хотите завершить этот этап?</string>
+    <string name="complete_stage_confirm">Да</string>
+    <string name="duration_format">%.0f ч</string>
+    <string name="delete_selected">Удалить выбранное</string>
+    <string name="add_new_recipe">Добавить новый рецепт</string>
+    <string name="print_label">Печать этикетки</string>
+    <string name="export_to_pdf">Экспорт в PDF</string>
+    <string name="save_batch">Сохранить партию</string>
+    <string name="journal">Журнал</string>
+    <string name="initial_weight_n_a">Начальный вес: Н/Д</string>
+    <string name="load_template_stages">Загрузить этапы из шаблона</string>
+    <string name="new_recipe_type">Новый тип рецепта</string>
+    <string name="ingredients">Ингредиенты</string>
+    <string name="note">Заметка</string>
+    <string name="add_stage">Добавить этап</string>
+    <string name="save_template">Сохранить шаблон</string>
+    <string name="create_batch">Создать партию</string>
+    <string name="batch_name">Название партии</string>
+    <string name="initial_weight_grams">Начальный вес (граммы)</string>
+    <string name="qr_scanner">QR-сканер</string>
+    <string name="qr">Сканировать QR-код</string>
+    <string name="stage_name">Название этапа</string>
+    <string name="duration">Длительность:</string>
+    <string name="hours">(часы)</string>
+    <string name="start">Начать</string>
+    <string name="complete">Завершить</string>
+    <string name="remove">Удалить</string>
+    <string name="edit_recipes">Редактировать рецепты</string>
+    <string name="export_db">Экспорт БД</string>
+    <string name="import_db">Импорт БД</string>
+
 </resources>

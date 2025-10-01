@@ -115,8 +115,9 @@ class BatchRepository(
         return batchDao.getAllRecipeTypes()
     }
 
-    // Added: Get recipe by its type
-    suspend fun getRecipeByType(type: String): Recipe? = batchDao.getRecipeByType(type)
+    suspend fun getRecipeByType(type: String): Recipe? {
+        return batchDao.getRecipeByType(type)
+    }
 
     suspend fun updateRecipe(recipe: Recipe) {
         batchDao.updateRecipe(recipe)
@@ -129,6 +130,7 @@ class BatchRepository(
     suspend fun insertStageTemplate(template: StageTemplate) {
         batchDao.insertStageTemplate(template)
     }
+
 
 //    suspend fun getStageTemplatesForType(recipeType: String): List<StageTemplate> {
 //        return batchDao.getStageTemplatesForType(recipeType)

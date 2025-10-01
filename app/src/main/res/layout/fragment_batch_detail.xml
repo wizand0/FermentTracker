@@ -67,7 +67,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
-                        android:text="Initial Weight: N/A" />
+                        android:text="@string/initial_weight_n_a" />
 
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
@@ -85,17 +85,17 @@
             </com.google.android.material.textfield.TextInputLayout>
 
             <!-- QR -->
-            <com.google.android.material.textfield.TextInputLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="QR Code"
-                android:layout_marginTop="12dp">
+<!--            <com.google.android.material.textfield.TextInputLayout-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:hint="QR Code"-->
+<!--                android:layout_marginTop="12dp">-->
 
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/etQrCode"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
-            </com.google.android.material.textfield.TextInputLayout>
+<!--                <com.google.android.material.textfield.TextInputEditText-->
+<!--                    android:id="@+id/etQrCode"-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="wrap_content" />-->
+<!--            </com.google.android.material.textfield.TextInputLayout>-->
 
             <!-- RecyclerView stages -->
             <androidx.recyclerview.widget.RecyclerView
@@ -108,7 +108,7 @@
                 android:id="@+id/tvLogsTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Journal"
+                android:text="@string/journal"
                 android:textSize="18sp"
                 android:textStyle="bold"
                 android:layout_marginTop="16dp" />
@@ -124,7 +124,7 @@
                 android:id="@+id/btnSaveBatch"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Save Batch"
+                android:text="@string/save_batch"
                 style="@style/Widget.Material3.Button.IconButton.Filled"
                 android:layout_marginTop="16dp" />
 
@@ -132,7 +132,7 @@
                 android:id="@+id/btnAddPhoto"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Add Photo"
+                android:text="@string/add_photo"
                 style="@style/Widget.Material3.Button.OutlinedButton"
                 android:layout_marginTop="8dp" />
 
@@ -140,7 +140,7 @@
                 android:id="@+id/btnAddWeight"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Add Weight"
+                android:text="@string/add_weight"
                 style="@style/Widget.Material3.Button.OutlinedButton"
                 android:layout_marginTop="8dp" />
 
@@ -148,24 +148,32 @@
                 android:id="@+id/btnExportPdf"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Export to PDF"
+                android:text="@string/export_to_pdf"
                 style="@style/Widget.Material3.Button.OutlinedButton"
                 android:layout_marginTop="8dp" />
 
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnAddStage"
+                android:id="@+id/btnPrintLabel"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Add Stage"
+                android:text="@string/print_label"
                 style="@style/Widget.Material3.Button.OutlinedButton"
                 android:layout_marginTop="8dp" />
 
-            <Button
-                android:id="@+id/btnTestNotification"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="🔔 Test Notification (10s)"
-                android:backgroundTint="@android:color/holo_orange_dark" />
+<!--            <com.google.android.material.button.MaterialButton-->
+<!--                android:id="@+id/btnAddStage"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:text="Add Stage"-->
+<!--                style="@style/Widget.Material3.Button.OutlinedButton"-->
+<!--                android:layout_marginTop="8dp" />-->
+
+<!--            <Button-->
+<!--                android:id="@+id/btnTestNotification"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:text="🔔 Test Notification (10s)"-->
+<!--                android:backgroundTint="@android:color/holo_orange_dark" />-->
 
         </LinearLayout>
     </ScrollView>

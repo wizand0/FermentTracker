@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import ru.wizand.fermenttracker.utils.NotificationHelper
+import ru.wizand.fermenttracker.R
 
 class StageNotificationWorker(
     private val context: Context,
@@ -21,10 +22,10 @@ class StageNotificationWorker(
 
         NotificationHelper.showNotification(
             context,
-            "Этап завершён",
-            "Этап \"$stageName\" в партии \"$batchName\" подошёл к концу",
+            context.getString(R.string.stage_completed_notification_title),
+            context.getString(R.string.stage_completed_notification_text, stageName, batchName),
             notificationId,
-            batchId  // Добавлен недостающий параметр
+            batchId
         )
 
         return Result.success()

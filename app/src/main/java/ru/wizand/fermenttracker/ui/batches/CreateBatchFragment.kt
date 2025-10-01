@@ -1,17 +1,13 @@
 // ru/wizand/fermenttracker/ui/batches/CreateBatchFragment.kt
 package ru.wizand.fermenttracker.ui.batches
 
-import android.app.Dialog
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
-import android.widget.ScrollView
 import android.widget.TextView
-import androidx.appcompat.app.AlertDialog
 import androidx.core.widget.NestedScrollView
-import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
@@ -24,7 +20,7 @@ import kotlinx.coroutines.withContext
 import ru.wizand.fermenttracker.R
 import ru.wizand.fermenttracker.data.db.entities.Batch
 import ru.wizand.fermenttracker.data.db.entities.Recipe
-import ru.wizand.fermenttracker.data.db.entities.Stage // Убедимся, что импортируем обновлённый Stage
+import ru.wizand.fermenttracker.data.db.entities.Stage
 import ru.wizand.fermenttracker.databinding.FragmentCreateBatchBinding
 import ru.wizand.fermenttracker.ui.adapters.EditableStageAdapter
 import ru.wizand.fermenttracker.vm.BatchListViewModel
@@ -194,7 +190,7 @@ class CreateBatchFragment : Fragment() {
             stages.add(Stage( // Указываем все обязательные поля
                 id = UUID.randomUUID().toString(), // Генерируем UUID
                 batchId = "", // batchId пока пустой, будет установлен позже
-                name = "New Stage",
+                name = getString(R.string.new_stage_name),
                 durationHours = 24, // Указываем Double
                 orderIndex = stages.size
             ))
@@ -205,7 +201,7 @@ class CreateBatchFragment : Fragment() {
             val initialWeightText = binding.etInitialWeight.text.toString()
             val initialWeight = initialWeightText.toDoubleOrNull()
             if (name.isEmpty()) {
-                binding.etBatchName.error = "Batch name is required"
+                binding.etBatchName.error = getString(R.string.batch_name_required)
                 return@setOnClickListener
             }
 
@@ -238,7 +234,7 @@ class CreateBatchFragment : Fragment() {
                 startDate = now,
                 currentStage = calculatedStages.firstOrNull()?.name ?: "",
                 notes = binding.etNotes.text.toString(),
-                qrCode = binding.etQrCode.text.toString(),
+//                qrCode = binding.etQrCode.text.toString(),
                 initialWeightGr = initialWeight,
                 plannedCompletionDate = now + totalDurationMs // Added
             )

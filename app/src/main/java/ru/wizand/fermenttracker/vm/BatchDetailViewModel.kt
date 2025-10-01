@@ -4,6 +4,7 @@ import android.app.Application
 import androidx.lifecycle.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import ru.wizand.fermenttracker.data.db.AppDatabase
 import ru.wizand.fermenttracker.data.db.entities.*
 import ru.wizand.fermenttracker.data.repository.BatchRepository
@@ -52,6 +53,10 @@ class BatchDetailViewModel(
     // Добавьте этот метод:
     fun scheduleStageNotification(stage: Stage, batch: Batch) {
         repository.scheduleStageNotification(stage, batch)
+    }
+
+    suspend fun getRecipeForBatch(productType: String): Recipe? = withContext(Dispatchers.IO) {
+        repository.getRecipeByType(productType)
     }
 
     class Factory(
