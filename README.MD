@@ -20,7 +20,11 @@ FermentTracker is an Android application designed to help users manage and track
 |--------------------------|---------------------------|---------------------------|---------------------------|
 | ![](images/screenshot1.png) | ![](images/screenshot3.png) | ![](images/screenshot3.png) | ![](images/screenshot4.png) |
 
+### Screenshots
 
+| Print label                 | Edit recipes                | recipes's list              | Export/Import               |
+|-----------------------------|-----------------------------|-----------------------------|-----------------------------|
+| ![](images/screenshot5.png) | ![](images/screenshot6.png) | ![](images/screenshot7.png) | ![](images/screenshot8.png) |
 
 *(Note: Replace these URLs with actual screenshot links hosted on GitHub or another service.)*
 
