@@ -1,7 +1,5 @@
 package ru.wizand.fermenttracker.ui.adapters
 
-import android.text.Editable
-import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
@@ -9,8 +7,14 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import ru.wizand.fermenttracker.data.db.entities.StageTemplate
 import ru.wizand.fermenttracker.databinding.ItemEditableStageBinding
-import java.text.SimpleDateFormat
-import java.util.Locale
+
+/**
+ * Sealed class для payloads, используемых при частичном обновлении элементов списка.
+ */
+sealed class StageTemplatePayload {
+    data class NameChanged(val newName: String) : StageTemplatePayload()
+    data class DurationChanged(val newDuration: Long) : StageTemplatePayload()
+}
 
 class EditableStageTemplateAdapter(
     private val onRemoveStage: (position: Int) -> Unit
@@ -21,78 +25,103 @@ class EditableStageTemplateAdapter(
         return VH(binding)
     }
 
-    override fun onBindViewHolder(holder: VH, position: Int) = holder.bind(getItem(position), position)
+    override fun onBindViewHolder(holder: VH, position: Int) {
+        holder.bind(getItem(position), position)
+    }
 
-    inner class VH(private val b: ItemEditableStageBinding) : RecyclerView.ViewHolder(b.root) {
-        private val sdf = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault())
+    /**
+     * Обрабатывает частичные обновления элементов списка через payloads
+     */
+    override fun onBindViewHolder(holder: VH, position: Int, payloads: List<Any>) {
+        if (payloads.isEmpty()) {
+            onBindViewHolder(holder, position)
+        } else {
+            val item = getItem(position)
+            payloads.forEach { payload ->
+                when (payload) {
+                    is StageTemplatePayload.NameChanged -> holder.bindNameChanged(item, payload.newName)
+                    is StageTemplatePayload.DurationChanged -> holder.bindDurationChanged(item, payload.newDuration)
+                }
+            }
+        }
+    }
+
+    inner class VH(private val binding: ItemEditableStageBinding) : RecyclerView.ViewHolder(binding.root) {
+
+        init {
+            // Устанавливаем слушатели один раз в init блоке, а не при каждом bind()
+            binding.etStageName.setOnFocusChangeListener { _, hasFocus ->
+                if (!hasFocus) {
+                    // Когда поле теряет фокус, обрабатываем изменение имени
+                    val adapterPosition = bindingAdapterPosition
+                    if (adapterPosition != RecyclerView.NO_POSITION) {
+                        val template = currentList[adapterPosition]
+                        val newName = binding.etStageName.text.toString()
+
+                        if (newName != template.name) {
+                            // Обновляем модель
+                            val updatedTemplate = template.copy(name = newName)
+                            val newList = currentList.toMutableList()
+                            newList[adapterPosition] = updatedTemplate
+                            submitList(newList)
+                        }
+                    }
+                }
+            }
+
+            binding.etDuration.setOnFocusChangeListener { _, hasFocus ->
+                if (!hasFocus) {
+                    // Когда поле теряет фокус, обрабатываем изменение длительности
+                    val adapterPosition = bindingAdapterPosition
+                    if (adapterPosition != RecyclerView.NO_POSITION) {
+                        val template = currentList[adapterPosition]
+                        val newDuration = binding.etDuration.text.toString().toLongOrNull() ?: 0L
+
+                        if (newDuration != template.durationHours) {
+                            // Обновляем модель
+                            val updatedTemplate = template.copy(durationHours = newDuration)
+                            val newList = currentList.toMutableList()
+                            newList[adapterPosition] = updatedTemplate
+                            submitList(newList)
+                        }
+                    }
+                }
+            }
+        }
 
         fun bind(template: StageTemplate, pos: Int) {
-            // ========== Для имени ==========
-            // Удаляем ВСЕ старые watchers из etStageName
-            while (b.etStageName.tag != null) {
-                (b.etStageName.tag as? TextWatcher)?.let {
-                    b.etStageName.removeTextChangedListener(it)
-                }
-                b.etStageName.tag = null
-            }
-
-            b.etStageName.setText(template.name)
-
-            // Создаем новый watcher для имени
-            val nameWatcher = object : TextWatcher {
-                override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-                override fun afterTextChanged(s: Editable?) {
-                    val newName = s.toString()
-                    if (newName != template.name && pos < currentList.size) {
-                        val updated = template.copy(name = newName)
-                        val mutableList = currentList.toMutableList()
-                        if (pos < mutableList.size) {
-                            mutableList[pos] = updated
-                            submitList(mutableList)
-                        }
-                    }
-                }
-            }
-            b.etStageName.tag = nameWatcher
-            b.etStageName.addTextChangedListener(nameWatcher)
-
-            // ========== Для duration ==========
-            // Удаляем ВСЕ старые watchers из etDuration
-            while (b.etDuration.tag != null) {
-                (b.etDuration.tag as? TextWatcher)?.let {
-                    b.etDuration.removeTextChangedListener(it)
-                }
-                b.etDuration.tag = null
-            }
-
-            b.etDuration.setText(template.durationHours.toString())
-
-            // Создаем новый watcher для duration
-            val durationWatcher = object : TextWatcher {
-                override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-                override fun afterTextChanged(s: Editable?) {
-                    val newDuration = s.toString().toLongOrNull() ?: 0L
-                    if (newDuration != template.durationHours && pos < currentList.size) {
-                        val updated = template.copy(durationHours = newDuration)
-                        val mutableList = currentList.toMutableList()
-                        if (pos < mutableList.size) {
-                            mutableList[pos] = updated
-                            submitList(mutableList)
-                        }
-                    }
-                }
-            }
-            b.etDuration.tag = durationWatcher
-            b.etDuration.addTextChangedListener(durationWatcher)
+            binding.etStageName.setText(template.name)
+            binding.etDuration.setText(template.durationHours.toString())
 
             // Кнопка удаления стадии
-            b.btnRemoveStage.setOnClickListener {
+            binding.btnRemoveStage.setOnClickListener {
                 if (pos < currentList.size) {
                     onRemoveStage(pos)
                 }
             }
+        }
+
+        /**
+         * Обрабатывает изменение имени через payload
+         */
+        fun bindNameChanged(template: StageTemplate, newName: String) {
+            binding.etStageName.setText(newName)
+        }
+
+        /**
+         * Обрабатывает изменение длительности через payload
+         */
+        fun bindDurationChanged(template: StageTemplate, newDuration: Long) {
+            binding.etDuration.setText(newDuration.toString())
+        }
+
+        /**
+         * Очищает слушатели для предотвращения утечек памяти
+         */
+        fun clearListeners() {
+            binding.etStageName.setOnFocusChangeListener(null)
+            binding.etDuration.setOnFocusChangeListener(null)
+            binding.btnRemoveStage.setOnClickListener(null)
         }
     }
 

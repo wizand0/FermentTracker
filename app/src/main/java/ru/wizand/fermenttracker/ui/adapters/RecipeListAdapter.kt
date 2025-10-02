@@ -12,6 +12,13 @@ import androidx.recyclerview.widget.RecyclerView
 import ru.wizand.fermenttracker.R
 import ru.wizand.fermenttracker.data.db.entities.Recipe
 
+/**
+ * Sealed class для payloads, используемых при частичном обновлении элементов списка.
+ */
+sealed class RecipePayload {
+    data class SelectionChanged(val isSelected: Boolean) : RecipePayload()
+}
+
 class RecipeListAdapter(
     private val onSelectionChanged: (Int) -> Unit,
     private val onRecipeClicked: (Recipe) -> Unit
@@ -32,23 +39,50 @@ class RecipeListAdapter(
         holder.bind(recipe, isSelected(recipe))
     }
 
-    private fun toggleSelection(recipe: Recipe) {
-        if (selectedItems.contains(recipe)) {
-            selectedItems.remove(recipe)
+    override fun onBindViewHolder(holder: RecipeViewHolder, position: Int, payloads: List<Any>) {
+        if (payloads.isEmpty()) {
+            onBindViewHolder(holder, position)
         } else {
-            selectedItems.add(recipe)
+            val recipe = getItem(position)
+            payloads.forEach { payload ->
+                when (payload) {
+                    is RecipePayload.SelectionChanged -> {
+                        holder.updateSelection(recipe, payload.isSelected)
+                    }
+                }
+            }
         }
-        onSelectionChanged(selectedItems.size)
-        notifyItemChanged(currentList.indexOf(recipe))  // Только обновляем изменившийся элемент
+    }
+
+    private fun toggleSelection(recipe: Recipe) {
+        val position = currentList.indexOf(recipe)
+        if (position != -1) {
+            val wasSelected = selectedItems.contains(recipe)
+            if (wasSelected) {
+                selectedItems.remove(recipe)
+            } else {
+                selectedItems.add(recipe)
+            }
+            onSelectionChanged(selectedItems.size)
+            notifyItemChanged(position, RecipePayload.SelectionChanged(!wasSelected))
+        }
     }
 
     fun getSelectedItems(): List<Recipe> = selectedItems.toList()
 
     fun clearSelection() {
+        val positionsToClear = selectedItems.mapNotNull { recipe ->
+            currentList.indexOf(recipe).takeIf { it != -1 }
+        }
+
         selectedItems.clear()
         multiSelectMode = false
         onSelectionChanged(0)
-        notifyDataSetChanged()  // Здесь ок, так как очищаем все
+
+        // Обновляем только элементы, которые были выбраны
+        positionsToClear.forEach { position ->
+            notifyItemChanged(position, RecipePayload.SelectionChanged(false))
+        }
     }
 
     private fun isSelected(recipe: Recipe) = selectedItems.contains(recipe)
@@ -61,10 +95,7 @@ class RecipeListAdapter(
             txtName.text = recipe.type
             txtType.text = recipe.ingredients
 
-            itemView.setBackgroundColor(
-                if (selected) ContextCompat.getColor(itemView.context, android.R.color.holo_blue_light)
-                else Color.TRANSPARENT
-            )
+            updateSelection(recipe, selected)
 
             itemView.setOnClickListener {
                 if (multiSelectMode) {
@@ -79,6 +110,13 @@ class RecipeListAdapter(
                 toggleSelection(recipe)
                 true
             }
+        }
+
+        fun updateSelection(recipe: Recipe, selected: Boolean) {
+            itemView.setBackgroundColor(
+                if (selected) ContextCompat.getColor(itemView.context, android.R.color.holo_blue_light)
+                else Color.TRANSPARENT
+            )
         }
     }
 }

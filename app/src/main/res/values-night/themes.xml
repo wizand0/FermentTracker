@@ -3,46 +3,21 @@
 
     <!-- Основная тема приложения (Material3, поддержка DayNight) -->
     <style name="Theme.FermentTracker" parent="Theme.Material3.DayNight">
-        <!-- Добавьте эти атрибуты для явного отключения дефолтного ActionBar -->
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
 
-        <!-- Остальной код темы остаётся без изменений -->
-        <item name="android:actionOverflowMenuStyle">@style/OverflowMenuStyle</item>
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorOnPrimary">@color/onBackground</item>
+        <item name="colorSecondary">@color/colorSecondary</item>
 
-        <item name="colorPrimary">@color/md_theme_primary</item>
-        <item name="colorOnPrimary">@color/md_theme_onPrimary</item>
-        <item name="colorPrimaryContainer">@color/md_theme_primaryContainer</item>
-        <item name="colorOnPrimaryContainer">@color/md_theme_onPrimaryContainer</item>
+        <item name="android:windowBackground">@color/background</item>
+        <item name="android:textColorPrimary">@color/onBackground</item>
+        <item name="android:colorBackground">@color/background</item>
+        <item name="android:navigationBarColor">@color/background</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
 
-        <item name="colorSecondary">@color/md_theme_secondary</item>
-        <item name="colorOnSecondary">@color/md_theme_onSecondary</item>
-        <item name="colorSecondaryContainer">@color/md_theme_secondaryContainer</item>
-        <item name="colorOnSecondaryContainer">@color/md_theme_onSecondaryContainer</item>
-
-        <item name="colorTertiary">@color/md_theme_tertiary</item>
-        <item name="colorOnTertiary">@color/md_theme_onTertiary</item>
-
-<!--        <item name="colorBackground">@color/md_theme_background</item>-->
-        <item name="colorOnBackground">@color/md_theme_onBackground</item>
-
-        <item name="colorSurface">@color/md_theme_surface</item>
-        <item name="colorOnSurface">@color/md_theme_onSurface</item>
-
-        <!-- Surface variant for Cards/Sheets -->
-        <item name="colorSurfaceVariant">@color/md_theme_surfaceVariant</item>
-        <item name="colorOnSurfaceVariant">@color/md_theme_onSurfaceVariant</item>
-
-        <!-- Elevation overlay (optional) -->
-        <item name="android:navigationBarColor">?attr/colorSurface</item>
-        <item name="android:statusBarColor">?attr/colorPrimary</item>
-
-        <!-- Material 3 component defaults -->
-        <item name="materialButtonStyle">@style/Widget.Material3.Button</item>
-<!--        <item name="materialCardViewStyle">@style/Widget.Material3.CardView</item>-->
-
-        <!-- Use system UI light/dark contrast automatically -->
-        <item name="android:forceDarkAllowed">true</item>
+        <item name="colorSurface">@color/surface</item>
+        <item name="colorOnSurface">@color/onSurface</item>
     </style>
 
     <!-- Тема для окон/диалогов (если нужно) -->

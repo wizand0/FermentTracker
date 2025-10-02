@@ -13,18 +13,10 @@ object RecipeTemplates {
             // Dry-cured meat (basic)
             types[0] to (
                     listOf(
-                        Stage(
-                            name = context.getString(R.string.stage_salting),
-                            durationHours = 36,
-                            orderIndex = 0,
-                            batchId = ""
-                        ),
-                        Stage(
-                            name = context.getString(R.string.stage_curing_drying),
-                            durationHours = 336,
-                            orderIndex = 1,
-                            batchId = ""
-                        )
+                        Stage(name = context.getString(R.string.stage_meat_preparation), durationHours = 6, orderIndex = 0, batchId = ""),
+                        Stage(name = context.getString(R.string.stage_salting), durationHours = 144, orderIndex = 1, batchId = ""),
+                        Stage(name = context.getString(R.string.stage_drying_spices), durationHours = 48, orderIndex = 2, batchId = ""),
+                        Stage(name = context.getString(R.string.stage_drying_curing), durationHours = 336, orderIndex = 3, batchId = "")
                     ) to Recipe(
                         type = types[0],
                         ingredients = context.getString(R.string.ingredients_cured_meat_basic),
@@ -35,18 +27,9 @@ object RecipeTemplates {
             // Dry-cured meat (spicy variation)
             types[1] to (
                     listOf(
-                        Stage(
-                            name = context.getString(R.string.stage_salting_spices),
-                            durationHours = 48,
-                            orderIndex = 0,
-                            batchId = ""
-                        ),
-                        Stage(
-                            name = context.getString(R.string.stage_drying),
-                            durationHours = 336,
-                            orderIndex = 1,
-                            batchId = ""
-                        )
+                        Stage(name = context.getString(R.string.stage_meat_preparation), durationHours = 6, orderIndex = 0, batchId = ""),
+                        Stage(name = context.getString(R.string.stage_salting_spices), durationHours = 48, orderIndex = 1, batchId = ""),
+                        Stage(name = context.getString(R.string.stage_drying), durationHours = 336, orderIndex = 2, batchId = "")
                     ) to Recipe(
                         type = types[1],
                         ingredients = context.getString(R.string.ingredients_cured_meat_spicy),
@@ -57,18 +40,9 @@ object RecipeTemplates {
             // Dry-cured sausage
             types[2] to (
                     listOf(
-                        Stage(
-                            name = context.getString(R.string.stage_grinding_stuffing),
-                            durationHours = 18,
-                            orderIndex = 0,
-                            batchId = ""
-                        ),
-                        Stage(
-                            name = context.getString(R.string.stage_fermentation_drying),
-                            durationHours = 144,
-                            orderIndex = 1,
-                            batchId = ""
-                        )
+                        Stage(name = context.getString(R.string.stage_grinding_stuffing), durationHours = 12, orderIndex = 0, batchId = ""),
+                        Stage(name = context.getString(R.string.stage_warm_fermentation), durationHours = 72, orderIndex = 1, batchId = ""),
+                        Stage(name = context.getString(R.string.stage_drying_curing), durationHours = 720, orderIndex = 2, batchId = "")
                     ) to Recipe(
                         type = types[2],
                         ingredients = context.getString(R.string.ingredients_cured_sausage),
@@ -79,24 +53,13 @@ object RecipeTemplates {
             // Beer
             types[3] to (
                     listOf(
-                        Stage(
-                            name = context.getString(R.string.stage_brewing_preparation),
-                            durationHours = 8,
-                            orderIndex = 0,
-                            batchId = ""
-                        ),
-                        Stage(
-                            name = context.getString(R.string.stage_primary_fermentation),
-                            durationHours = 192,
-                            orderIndex = 1,
-                            batchId = ""
-                        ),
-                        Stage(
-                            name = context.getString(R.string.stage_conditioning_bottling),
-                            durationHours = 216,
-                            orderIndex = 2,
-                            batchId = ""
-                        )
+                        Stage(name = context.getString(R.string.stage_mash), durationHours = 2, orderIndex = 0, batchId = ""),
+                        Stage(name = context.getString(R.string.stage_lauter_sparge), durationHours = 1, orderIndex = 1, batchId = ""),
+                        Stage(name = context.getString(R.string.stage_boil), durationHours = 2, orderIndex = 2, batchId = ""),
+                        Stage(name = context.getString(R.string.stage_cooling_pitching), durationHours = 4, orderIndex = 3, batchId = ""),
+                        Stage(name = context.getString(R.string.stage_primary_fermentation), durationHours = 168, orderIndex = 4, batchId = ""),
+                        Stage(name = context.getString(R.string.stage_conditioning), durationHours = 168, orderIndex = 5, batchId = ""),
+                        Stage(name = context.getString(R.string.stage_bottling_carbonation), durationHours = 72, orderIndex = 6, batchId = "")
                     ) to Recipe(
                         type = types[3],
                         ingredients = context.getString(R.string.ingredients_beer),
@@ -107,24 +70,10 @@ object RecipeTemplates {
             // Wine
             types[4] to (
                     listOf(
-                        Stage(
-                            name = context.getString(R.string.stage_crushing_pressing),
-                            durationHours = 9,
-                            orderIndex = 0,
-                            batchId = ""
-                        ),
-                        Stage(
-                            name = context.getString(R.string.stage_primary_fermentation),
-                            durationHours = 144,
-                            orderIndex = 1,
-                            batchId = ""
-                        ),
-                        Stage(
-                            name = context.getString(R.string.stage_secondary_fermentation_aging),
-                            durationHours = 480,
-                            orderIndex = 2,
-                            batchId = ""
-                        )
+                        Stage(name = context.getString(R.string.stage_crushing_pressing), durationHours = 12, orderIndex = 0, batchId = ""),
+                        Stage(name = context.getString(R.string.stage_primary_fermentation), durationHours = 192, orderIndex = 1, batchId = ""),
+                        Stage(name = context.getString(R.string.stage_secondary_fermentation), durationHours = 720, orderIndex = 2, batchId = ""),
+                        Stage(name = context.getString(R.string.stage_aging), durationHours = 1512, orderIndex = 3, batchId = "")
                     ) to Recipe(
                         type = types[4],
                         ingredients = context.getString(R.string.ingredients_wine),
@@ -137,13 +86,13 @@ object RecipeTemplates {
                     listOf(
                         Stage(
                             name = context.getString(R.string.stage_steeping_preparation),
-                            durationHours = 18,
+                            durationHours = 12,
                             orderIndex = 0,
                             batchId = ""
                         ),
                         Stage(
                             name = context.getString(R.string.stage_fermentation),
-                            durationHours = 84,
+                            durationHours = 72,
                             orderIndex = 1,
                             batchId = ""
                         )

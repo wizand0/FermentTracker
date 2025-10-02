@@ -168,8 +168,11 @@ class PdfExporter(private val context: Context) {
     // ========== PRIVATE HELPER METHODS ==========
 
     private fun addTitle(document: Document, batch: Batch) {
-        val titleFont = PdfFontFactory.createFont(StandardFonts.HELVETICA_BOLD)
-        val dateFont = PdfFontFactory.createFont(StandardFonts.HELVETICA)
+//        val titleFont = PdfFontFactory.createFont(StandardFonts.HELVETICA_BOLD)
+//        val dateFont = PdfFontFactory.createFont(StandardFonts.HELVETICA)
+
+        val titleFont = getFontFromAssets(isBold = true)
+        val dateFont = getFontFromAssets(isBold = false)
 
         val title = Paragraph(batch.name)
             .setFont(titleFont)
@@ -188,8 +191,11 @@ class PdfExporter(private val context: Context) {
     }
 
     private fun addProductInfo(document: Document, batch: Batch, recipe: Recipe?) {
-        val boldFont = PdfFontFactory.createFont(StandardFonts.HELVETICA_BOLD)
-        val regularFont = PdfFontFactory.createFont(StandardFonts.HELVETICA)
+//        val boldFont = PdfFontFactory.createFont(StandardFonts.HELVETICA_BOLD)
+//        val regularFont = PdfFontFactory.createFont(StandardFonts.HELVETICA)
+
+        val boldFont = getFontFromAssets(isBold = true)
+        val regularFont = getFontFromAssets(isBold = false)
 
         document.add(Paragraph(context.getString(R.string.product_information))
             .setFont(boldFont)
@@ -235,8 +241,11 @@ class PdfExporter(private val context: Context) {
     }
 
     private fun addWeightInfo(document: Document, batch: Batch, logs: List<BatchLog>) {
-        val boldFont = PdfFontFactory.createFont(StandardFonts.HELVETICA_BOLD)
-        val regularFont = PdfFontFactory.createFont(StandardFonts.HELVETICA)
+//        val boldFont = PdfFontFactory.createFont(StandardFonts.HELVETICA_BOLD)
+//        val regularFont = PdfFontFactory.createFont(StandardFonts.HELVETICA)
+
+        val boldFont = getFontFromAssets(isBold = true)
+        val regularFont = getFontFromAssets(isBold = false)
 
         document.add(Paragraph(context.getString(R.string.weight_info_title))
             .setFont(boldFont)
@@ -264,8 +273,11 @@ class PdfExporter(private val context: Context) {
     }
 
     private fun addStagesTable(document: Document, stages: List<Stage>) {
-        val boldFont = PdfFontFactory.createFont(StandardFonts.HELVETICA_BOLD)
-        val regularFont = PdfFontFactory.createFont(StandardFonts.HELVETICA)
+//        val boldFont = PdfFontFactory.createFont(StandardFonts.HELVETICA_BOLD)
+//        val regularFont = PdfFontFactory.createFont(StandardFonts.HELVETICA)
+
+        val boldFont = getFontFromAssets(isBold = true)
+        val regularFont = getFontFromAssets(isBold = false)
 
         document.add(Paragraph(context.getString(R.string.stages_production_title))
             .setFont(boldFont)
@@ -308,7 +320,9 @@ class PdfExporter(private val context: Context) {
     }
 
     private fun addWeightChart(document: Document, logs: List<BatchLog>) {
-        val boldFont = PdfFontFactory.createFont(StandardFonts.HELVETICA_BOLD)
+//        val boldFont = PdfFontFactory.createFont(StandardFonts.HELVETICA_BOLD)
+
+        val boldFont = getFontFromAssets(isBold = true)
 
         document.add(Paragraph(context.getString(R.string.weight_chart_title))
             .setFont(boldFont)
@@ -330,8 +344,11 @@ class PdfExporter(private val context: Context) {
     }
 
     private fun addPhotosSection(document: Document, photos: List<Photo>) {
-        val boldFont = PdfFontFactory.createFont(StandardFonts.HELVETICA_BOLD)
-        val regularFont = PdfFontFactory.createFont(StandardFonts.HELVETICA)
+//        val boldFont = PdfFontFactory.createFont(StandardFonts.HELVETICA_BOLD)
+//        val regularFont = PdfFontFactory.createFont(StandardFonts.HELVETICA)
+
+        val boldFont = getFontFromAssets(isBold = true)
+        val regularFont = getFontFromAssets(isBold = false)
 
         document.add(Paragraph(context.getString(R.string.photos_title))
             .setFont(boldFont)
@@ -509,5 +526,12 @@ class PdfExporter(private val context: Context) {
             days > 0 -> context.getString(R.string.duration_days_only, days)
             else -> context.getString(R.string.duration_hours_only, remainingHours)
         }
+    }
+
+    private fun getFontFromAssets(isBold: Boolean): com.itextpdf.kernel.font.PdfFont {
+        val fontName = if (isBold) "fonts/OpenSans-Bold.ttf" else "fonts/OpenSans.ttf"
+        val inputStream = context.assets.open(fontName)
+        val fontData = inputStream.readBytes()
+        return PdfFontFactory.createFont(fontData, "Identity-H", PdfFontFactory.EmbeddingStrategy.PREFER_EMBEDDED)
     }
 }

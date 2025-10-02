@@ -1,14 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Новый корневой элемент: FrameLayout -->
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    android:background="@color/semi_transparent_light_bg">
+    android:background="?attr/colorSurface">
 
-    <!-- ScrollView теперь внутри FrameLayout -->
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -23,13 +21,15 @@
                 android:id="@+id/spinnerRecipeType"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:backgroundTint="?attr/colorPrimary"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent" />
 
             <!-- Load Template Button -->
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnLoadTemplate"
+                style="@style/Widget.Material3.Button.OutlinedButton"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:text="@string/load_template_stages"
@@ -44,6 +44,9 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:hint="@string/new_recipe_type"
+                app:boxBackgroundMode="outline"
+                app:boxStrokeColor="?attr/colorPrimary"
+                app:hintTextColor="?attr/colorOnSurface"
                 android:layout_marginTop="16dp"
                 app:layout_constraintTop_toBottomOf="@id/btnLoadTemplate"
                 app:layout_constraintStart_toStartOf="parent"
@@ -53,6 +56,7 @@
                     android:id="@+id/etNewType"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:textColor="?attr/colorOnSurface"
                     tools:text="Custom Recipe" />
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -62,6 +66,9 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:hint="@string/ingredients"
+                app:boxBackgroundMode="outline"
+                app:boxStrokeColor="?attr/colorPrimary"
+                app:hintTextColor="?attr/colorOnSurface"
                 android:layout_marginTop="16dp"
                 app:layout_constraintTop_toBottomOf="@id/tilNewType"
                 app:layout_constraintStart_toStartOf="parent"
@@ -71,6 +78,7 @@
                     android:id="@+id/etIngredients"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:textColor="?attr/colorOnSurface"
                     tools:text="Salt, Pepper, Garlic" />
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -80,6 +88,9 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:hint="@string/note"
+                app:boxBackgroundMode="outline"
+                app:boxStrokeColor="?attr/colorPrimary"
+                app:hintTextColor="?attr/colorOnSurface"
                 android:layout_marginTop="16dp"
                 app:layout_constraintTop_toBottomOf="@id/tilIngredients"
                 app:layout_constraintStart_toStartOf="parent"
@@ -89,6 +100,7 @@
                     android:id="@+id/etNote"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:textColor="?attr/colorOnSurface"
                     tools:text="Best kept cool" />
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -98,6 +110,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
+                android:background="?attr/colorSurfaceVariant"
                 app:layout_constraintTop_toBottomOf="@id/tilNote"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent" />
@@ -105,7 +118,7 @@
             <!-- Buttons -->
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnAddStage"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                style="@style/Widget.Material3.Button.OutlinedButton"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:text="@string/add_stage"
@@ -116,7 +129,7 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnSaveTemplate"
-                style="@style/Widget.MaterialComponents.Button"
+                style="@style/Widget.Material3.Button"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:text="@string/save_template"

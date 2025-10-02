@@ -11,7 +11,7 @@ data class Batch(
     val name: String,
     val type: String, // Оставляем type
     val startDate: Long,
-    val currentStage: String,
+    val currentStage: String?,
     val notes: String,
     val isActive: Boolean = true,
     val qrCode: String? = null,

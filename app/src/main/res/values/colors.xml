@@ -36,4 +36,13 @@
     <color name="ct_gray_900">#121212</color>
 
     <color name="semi_transparent_light_bg">#CCFFFFFF</color>
+
+    <color name="colorPrimary">#6200EE</color>
+    <color name="colorPrimaryVariant">#3700B3</color>
+    <color name="colorSecondary">#03DAC6</color>
+    <color name="background">#FFFFFF</color>
+    <color name="onBackground">#000000</color>
+    <color name="surface">#F5F5F5</color>
+    <color name="onSurface">#212121</color>
+
 </resources>

@@ -123,26 +123,190 @@
     <string name="stage_packing_paste">Packing with Paste</string>
     <string name="stage_salting_mixing">Salting and Mixing</string>
     <string name="stage_storage">Storage</string>
+    <string name="stage_meat_preparation">Meat preparation</string>
+    <string name="stage_drying_spices">Drying with spices</string>
+    <string name="stage_warm_fermentation">Warm fermentation</string>
+    <string name="stage_mash">Mashing</string>
+    <string name="stage_lauter_sparge">Lautering/Sparging</string>
+    <string name="stage_boil">Boiling</string>
+    <string name="stage_cooling_pitching">Cooling and pitching yeast</string>
+    <string name="stage_conditioning">Conditioning</string>
+    <string name="stage_bottling_carbonation">Bottling and carbonation</string>
+    <string name="stage_secondary_fermentation">Secondary fermentation</string>
+    <string name="stage_aging">Aging</string>
 
-    <!-- ================== INGREDIENTS ================== -->
-    <string name="ingredients_cured_meat_basic">Pork/Beef — 1 kg\nSalt — 30 g\nBlack pepper — 5 g\nGarlic — 3 cloves</string>
-    <string name="ingredients_cured_meat_spicy">Pork — 1 kg\nCuring salt — 25 g\nSmoked paprika — 10 g\nCoriander — 5 g</string>
-    <string name="ingredients_cured_sausage">Pork — 700 g\nBeef — 300 g\nCuring salt — 25 g\nPepper — 5 g\nGarlic — 3 cloves\nNatural casing — 1 m</string>
-    <string name="ingredients_beer">Barley malt — 4 kg\nHops — 50 g\nBrewer’s yeast — 1 pack</string>
-    <string name="ingredients_wine">Grapes — 10 kg\nSugar — 2 kg\nWine yeast — 1 pack</string>
-    <string name="ingredients_kvass">Rye bread — 500 g\nSugar — 100 g\nDry yeast — 5 g</string>
-    <string name="ingredients_kimchi">Napa cabbage — 1 kg\nSalt — 50 g\nChili pepper — 30 g\nGarlic — 5 cloves\nGinger — 20 g</string>
-    <string name="ingredients_sauerkraut">White cabbage — 2 kg\nCarrot — 200 g\nSalt — 40 g</string>
+    <!-- ================== INGREDIENTS (en) ================== -->
+    <string name="ingredients_cured_meat_basic">Meat (pork/beef) — 1 kg\nSalt (regular) — 25–30 g (≈2.5–3% of meat weight)\nCuring salt (Prague Powder #1) — 2.5 g (optional, follow manufacturer instructions)\nBlack pepper (ground) — 3–5 g\nGarlic (minced) — 3 cloves\nOptions: coriander, smoked paprika to taste</string>
+    <string name="ingredients_cured_meat_spicy">Pork — 1 kg\nSalt (regular) — 25 g\nCuring salt (Prague Powder #1) — 2.5 g (optional)\nSmoked paprika — 8–12 g\nCoriander — 4–6 g\nGarlic (minced) — 3 cloves\nOptions: chili flakes for heat</string>
+    <string name="ingredients_cured_sausage">Fat (pork) — 300 g\nLean pork or beef — 700 g\nSalt (regular) — 25 g per 1 kg of mince (≈2.5%)\nCuring salt (Prague Powder #1) — 2.5 g per 1 kg (optional)\nPepper (ground) — 4–6 g\nGarlic (minced) — 3 cloves\nCasings (natural or collagen) — length/diameter as required\nOptions: starter culture (follow supplier instructions) for controlled fermentation</string>
+    <string name="ingredients_beer">Barley malt — 4 kg (approx. for a ~20 L batch)\nHops — 40–60 g (style-dependent)\nBrewer\'s yeast — 1 packet (strain-specific)\nWater — ~20 L\nOptions: fermentable sugars/additives per recipe</string>
+    <string name="ingredients_wine">Grapes — 8–12 kg (depends on variety and desired yield)\nSugar — as required by recipe/taste (e.g. 0–2 kg for chaptalization)\nWine yeast — 1 packet (strain-specific)\nOptions: acid adjustments/yeast nutrients as needed</string>
+    <string name="ingredients_kvass">Rye bread (toasted crumbs/crusts) — 300–500 g (for ~5 L)\nSugar — 100–200 g (depending on desired sweetness)\nDry yeast — 5–7 g (or spontaneous fermentation)\nWater — 5 L\nOptions: raisins/honey/herbs for flavor</string>
+    <string name="ingredients_kimchi">Napa cabbage — 1 kg\nSalt — 20–30 g (≈2–3% of weight)\nChili (powder/paste) — 20–30 g (adjust for heat)\nGarlic — 4–6 cloves\nGinger — 15–25 g\nOptions: fish sauce/shrimp paste 1–2 tbsp; carrot/daikon to taste</string>
+    <string name="ingredients_sauerkraut">White cabbage — 1–2 kg (or required amount)\nCarrot — 100–200 g (optional)\nSalt — 20–40 g (≈2% of cabbage weight; 20 g per 1 kg)\nOptions: caraway seed, bay leaf to taste</string>
 
-    <!-- ================== NOTES ================== -->
-    <string name="note_cured_meat_basic">Keep the meat in salt for 1.5 days, then dry at +4…+8°C for 14 days. **Storage:** in the fridge up to 2 months, vacuum-sealed up to 6 months.</string>
-    <string name="note_cured_meat_spicy">Dry salting with spices for 2 days, then dry for 14 days at +5°C. **Storage:** in the fridge up to 3 months.</string>
-    <string name="note_cured_sausage">Stuff, ferment for 6 days at +18°C, then dry for 2–3 weeks. **Storage:** in the fridge up to 2 months.</string>
-    <string name="note_beer">Fermentation 8 days, conditioning 9 days. **Storage:** bottled at +4°C up to 6 months.</string>
-    <string name="note_wine">Primary fermentation 6 days, secondary 20+ days. **Storage:** bottled at +12°C up to 2 years.</string>
-    <string name="note_kvass">Bread soak 18 h, fermentation 3.5 days. **Storage:** in the fridge up to 5 days.</string>
-    <string name="note_kimchi">Fermentation 5–6 days at room temperature. **Storage:** in the fridge up to 2 months.</string>
-    <string name="note_sauerkraut">Fermentation 10 days at +18°C. **Storage:** in the fridge up to 6 months.</string>
+    <!-- ================== NOTES (detailed procedures) ================== -->
+
+    <string name="note_cured_meat_basic">
+        1) Meat preparation:\n
+        - Choose chilled meat with little blood and a fresh smell (pork or beef). Trim excess membranes but leave some fat — it adds flavor and protects during drying.\n
+        2) Dry salting (method similar to your own):\n
+        - Put a thin layer of salt in the bottom of a clean food-safe container (use a mix of regular salt and curing/nitrite salt if the recipe calls for it — see warnings).\n
+        - Place the piece of meat and completely cover it with the salt mixture (about 2–3% of the meat weight in total salt mix; for 1 kg of meat this is roughly 25–30 g of ordinary salt; if you use nitrite salt, reduce the amount of ordinary salt accordingly).\n
+        - Leave in the refrigerator (+4…+8°C) for 4–6 days. A lot of liquid is released during the first 1–2 days — drain it, pat the meat dry and replace the salt if necessary. From day 3–6 less liquid appears — check firmness and salt penetration.\n
+        3) Drying and spices:\n
+        - Remove the meat, quickly rinse off excess salt if needed, and pat dry with a towel.\n
+        - Rub in dry spices (pepper, garlic, coriander, etc.). Wrap in parchment paper or breathable cloth and tie with butcher\'s twine.\n
+        - Note: change the parchment/cloth during the first 2–3 days to prevent local wet spots and mold.\n
+        4) Drying/curing:\n
+        - Place on a curing rack in a refrigerator or curing chamber at +4…+8°C with relative humidity of 70–85%.\n
+        - Drying takes 14–20 days depending on the thickness of the cut and desired dryness.\n
+        5) Checks and doneness:\n
+        - Check aroma (should be pleasant, "meaty", no rotten smell) and surface — a light white bloom (beneficial mold) is acceptable, but green or black mold is not. Slice a test piece to check taste and texture.\n
+        6) Storage:\n
+        - Store in the refrigerator (vacuum-packed or tightly wrapped) up to 2 months; vacuum-packed up to 6 months at stable temperature.\n
+        7) Warnings:\n
+        - Curing (nitrite) salt helps protect against botulism in wet or improper conditions, but excessive use is dangerous — follow dosages exactly. For home use, use nitrite salt only in tested recipes and correct amounts, or use commercial curing mixes / starter cultures.\n
+        - Strict hygiene, refrigeration and temperature control are key to safety.
+    </string>
+
+    <string name="note_cured_meat_spicy">
+        1) Preparation and salting:\n
+        - Choose a piece of pork (or a mix), trim large membranes. Calculate salt: a combination of nitrite and regular salt according to the recipe (follow the nitrite salt package instructions precisely).\n
+        - Rub the meat evenly with the salt and dry spice mixture (smoked paprika, coriander, garlic). Place in a container and keep at +4…+8°C for 48 hours.\n
+        2) Rinse / spices:\n
+        - After the salting time, rinse and dry if necessary, then coat with an additional spice mix to boost aroma.\n
+        3) Curing/drying:\n
+        - Dry at +4…+8°C, humidity 70–85%, for 14–20 days. For extra pungency you can do a short maturation stage at slightly higher temperature (+8…+10°C) for the first 2–3 days.\n
+        4) Checks:\n
+        - Inspect surface and smell; change parchment as needed.\n
+        5) Storage:\n
+        - Refrigerate for up to 3 months; vacuum-packed up to 6 months.\n
+        6) Safety note:\n
+        - Nitrites help prevent botulism but are toxic at high doses. Do not exceed recommended amounts.
+    </string>
+
+    <string name="note_cured_sausage">
+        1) Ingredient selection:\n
+        - Ratio: about 70% lean meat + 30% fat (for traditional dry sausages). Use fresh chilled cuts of pork and/or beef.\n
+        2) Grinding and mixing:\n
+        - Chill meat and fat to ~2–6°C for easier processing.\n
+        - Grind through a coarse plate first, then a finer plate for uniform texture, or use a food processor.\n
+        - Add salt (regular + nitrite if the recipe calls for it), spices, garlic and, optionally, starter culture (lactic acid bacteria) — starter cultures improve fermentation stability and safety.\n
+        - Mix thoroughly until salt and spices are evenly distributed. Keep the mince temperature below 10°C (preferably 4–8°C).\n
+        3) Stuffing into casings:\n
+        - Stuff the mince into natural or collagen casings of the desired diameter. Remove air pockets and tie the ends.\n
+        4) Fermentation (critical step):\n
+        - Place the sausages in a fermentation chamber at +18…+24°C and relative humidity 85–95% for 24–72 hours (time depends on the culture and desired acidity). During this time pH drops — important for flavor and safety.\n
+        - If using a starter culture, follow the manufacturer’s instructions for temperature and timing.\n
+        5) Drying/curing:\n
+        - After fermentation move to a chamber with lower temperature +10…+14°C and humidity 70–85%.\n
+        - Drying takes from 2 to 6 weeks depending on casing diameter and target final moisture. Check weight and appearance periodically.\n
+        6) External care:\n
+        - A white surface coating (beneficial mold) may develop — this is normal. Remove and clean areas with black/green mold using a mild salt solution.\n
+        7) Storage:\n
+        - When desired dryness is reached, store in the fridge or a cool place; in vacuum packaging they can last several months. Monitor smell and appearance.\n
+        8) Warnings:\n
+        - Follow the temperature profile: warm fermentation (+18…+24°C) is crucial to reach correct acidity; then dry at lower temperatures.\n
+        - For beginners, use tested recipes with starter cultures and precise measurements for salt and nitrites.
+    </string>
+
+    <string name="note_beer">
+        1) Ingredients and preparation:\n
+        - Malt, hops, water and yeast are the main components. Calculate original gravity (OG) according to the recipe.\n
+        2) Mash:\n
+        - Heat water to mash temperature (typically 62–68°C depending on desired body) and hold for 60–90 minutes to extract fermentable sugars. Keep the temperature stable.\n
+        3) Lauter / sparge:\n
+        - Separate wort from the grain and rinse with hot water (72–78°C) to recover remaining sugars.\n
+        4) Boil:\n
+        - Boil the wort for 60–90 minutes, adding hops according to the schedule for bitterness, flavor and preservation. Watch for boilovers and hot break.\n
+        5) Cooling and pitching:\n
+        - Rapidly cool the wort to fermentation temperature (typically +18–22°C for ales, +8–12°C for lagers) and transfer to the fermenter.\n
+        - Pitch the yeast. Aerate the wort before pitching to support yeast health.\n
+        6) Primary fermentation:\n
+        - Hold at a stable temperature for 5–14 days (depends on yeast strain). Monitor activity (krausen, drop in gravity).\n
+        7) Conditioning / maturation:\n
+        - Transfer to a secondary fermenter for conditioning at a lower temperature for 7–14 days or longer for a cleaner profile.\n
+        8) Bottling / carbonation:\n
+        - Bottle with priming sugar for natural carbonation or keg and force-carbonate. When bottling, monitor sugar dose and sanitation — overactive secondary fermentation can cause bottle failure.\n
+        9) Storage:\n
+        - Condition in bottles/kegs at +4°C for several weeks to months. Shelf life depends on the style — typically up to 6 months for stable flavor.\n
+        10) Safety note:\n
+        - When bottle-conditioning, use correct sugar amounts and good sanitation to avoid excessive pressure.
+    </string>
+
+    <string name="note_wine">
+        1) Raw material preparation:\n
+        - Select healthy grapes and remove rotten berries. Washing is optional; handle in clean equipment.\n
+        2) Crushing / pressing:\n
+        - Crush grapes to release juice (press before fermentation for white wines; ferment on skins for reds).\n
+        3) Must preparation and yeast addition:\n
+        - Measure sugar and acidity; adjust if necessary (add sugar or acid as needed).\n
+        - Prepare the must and pitch selected wine yeast.\n
+        4) Primary fermentation:\n
+        - Ferment at controlled temperatures: usually +18–25°C for reds, +12–18°C for whites. Duration 5–14 days depending on variety and temperature.\n
+        5) Separation of solids / pressing (for reds):\n
+        - After active fermentation separate the wine from the skins and transfer to a secondary vessel.\n
+        6) Secondary fermentation and aging:\n
+        - Age in barrels/demijohns at lower temperatures; the period may be weeks to months or years depending on style.\n
+        7) Stabilization and bottling:\n
+        - Rack off lees, stabilize as needed and, if required, add a small measured dose of SO2 (sulfites) for preservation — follow instructions and measure accurately.\n
+        8) Storage:\n
+        - Store bottles at stable temperature (typically +10–14°C) and horizontally for corked closures. Aging times depend on the grape and style — from months to years.\n
+        9) Warnings:\n
+        - Sanitation and correct sulfite dosing are important; if unsure, follow tested step-by-step guides and use proper equipment.
+    </string>
+
+    <string name="note_kvass">
+        1) Bread preparation (infusion/soaking):\n
+        - Use rye bread (toasted breadcrumbs or crusts). For 5 L of water usually 300–500 g of bread.\n
+        - Pour hot (not boiling) water over the bread (~80°C) and let it steep for 6–12 hours (your 18-hour reference is also acceptable for a stronger infusion).\n
+        2) Straining and sweetening:\n
+        - Strain the infusion, add sugar (amount per recipe, e.g. 100–200 g per 5 L depending on desired sweetness) and cool to 20–30°C.\n
+        3) Adding yeast:\n
+        - Add a small amount of dry yeast (5–7 g per 5 L) or leave for spontaneous fermentation (longer and less predictable).\n
+        4) Fermentation:\n
+        - Keep at room temperature (+18–24°C) for 1–3 days until noticeable fermentation occurs (depends on yeast and temperature). Your 3.5 days is a typical total time to reach desired acidity and carbonation.\n
+        5) Settling and bottling:\n
+        - Strain and transfer to bottles. For light carbonation, add a little sugar at bottling. Monitor pressure — store cold to slow fermentation.\n
+        6) Storage:\n
+        - In the refrigerator — up to 5 days for peak freshness; flavor will change over longer storage.\n
+        7) Warnings:\n
+        - When carbonating in bottles watch pressure — use strong bottles and reasonable sugar amounts.
+    </string>
+
+    <string name="note_kimchi">
+        1) Preparing and salting the cabbage:\n
+        - Break napa cabbage into leaves or pieces, sprinkle with salt (about 2–3% of weight) and leave for 2–6 hours, turning occasionally to help brine form.\n
+        2) Rinsing and pressing:\n
+        - Rinse leaves to remove excess salt and lightly press, leaving enough salt for fermentation.\n
+        3) Preparing the paste/filling:\n
+        - Chop garlic, ginger and chili; mix with fish sauce/shrimp paste and a little sugar to taste; add carrots/daikon if desired.\n
+        4) Packing:\n
+        - Rub the paste between the leaves thoroughly and pack tightly into a jar or container to eliminate air pockets. Keep the vegetables submerged under brine (use a weight or container of water on top).\n
+        5) Fermentation:\n
+        - Leave at room temperature (+18–22°C) for 2–7 days (depending on desired sourness). Your 5–6 day note is a normal range. Taste daily to track progress.\n
+        6) Storage:\n
+        - Once desired fermentation is reached, refrigerate — keeps up to 2 months and will develop flavor slowly.\n
+        7) Warnings:\n
+        - Ensure ingredients remain under brine; if unpleasant smells or unusual mold appear, discard the batch.
+    </string>
+
+    <string name="note_sauerkraut">
+        1) Preparation and salting:\n
+        - Shred cabbage thinly, sprinkle with salt (about 2% of cabbage weight — 20 g per 1 kg) and mix thoroughly until juice is released.\n
+        2) Packing and pressing:\n
+        - Pack the cabbage tightly into a clean jar or crock, pressing firmly so the released juice covers it. Use a weight or a container of water to apply pressure.\n
+        3) Fermentation:\n
+        - Keep at +16–22°C for 7–14 days for active fermentation; then move to +10–16°C for slow maturation for several more weeks (your 10 days at +18°C is a suitable baseline).\n
+        4) Checks and storage:\n
+        - When flavor and acidity are right, transfer to cold storage (+2–6°C). In the fridge sauerkraut keeps well — up to 6 months.\n
+        5) Warnings:\n
+        - The cabbage must remain submerged in brine; white benign scum on the surface is normal, but green or black mold is not.
+    </string>
+
+
+
     <string name="batch_info">Product Information</string>
     <string name="batch_type">Product type: %1$s</string>
 
@@ -323,5 +487,6 @@
     <string name="edit_recipes">Edit Recipes</string>
     <string name="export_db">Export DB</string>
     <string name="import_db">Import DB</string>
+    <string name="stage_drying_curing">Drying and curing</string>
 
 </resources>
