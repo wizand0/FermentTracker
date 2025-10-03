@@ -31,6 +31,12 @@
     <string name="ok">ОК</string>
     <string name="cancel">Отмена</string>
 
+    <string name="edit_batch">Редактировать партию</string>
+    <string name="start_date_format">Дата начала: %s</string>
+
+    <string name="delete_batch">Удалить партию</string>
+    <string name="batch_deleted">Партия удалена</string>
+
     <string name="no_batch_data">Ошибка: Нет данных о партии</string>
 
     <!-- Камера и Фото -->
@@ -487,6 +493,9 @@
     <string name="edit_recipes">Редактировать рецепты</string>
     <string name="export_db">Экспорт БД</string>
     <string name="import_db">Импорт БД</string>
+    <string name="retry">Retry</string>
+    <string name="no_batches_yet">No batches yet</string>
+    <string name="create_first_batch_hint">Create first batch</string>
 
 
 </resources>

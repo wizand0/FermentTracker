@@ -1,3 +1,4 @@
+// src/main/java/ru/wizand/fermenttracker/ui/adapters/LogsAdapter.kt
 package ru.wizand.fermenttracker.ui.adapters
 
 import android.view.LayoutInflater
@@ -5,12 +6,14 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import coil.load
+import coil.transform.RoundedCornersTransformation
 import ru.wizand.fermenttracker.data.db.entities.BatchLog
 import ru.wizand.fermenttracker.databinding.ItemLogBinding
-import ru.wizand.fermenttracker.utils.ImageUtils
+import java.io.File
 import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
+import java.util.*
+import ru.wizand.fermenttracker.R
 
 class LogsAdapter : ListAdapter<BatchLog, LogsAdapter.VH>(DIFF) {
 
@@ -33,9 +36,13 @@ class LogsAdapter : ListAdapter<BatchLog, LogsAdapter.VH>(DIFF) {
             b.tvWeight.text = log.weightGr?.toString() ?: "N/A"
 
             log.photoPath?.let { path ->
-                // Используем оптимизированную загрузку с thumbnails 640x480
-                val bitmap = ImageUtils.decodeSampledBitmapFromFile(path, 640, 480)
-                b.ivPhoto.setImageBitmap(bitmap)
+                b.ivPhoto.load(File(path)) {
+                    crossfade(true)
+                    placeholder(R.drawable.ic_placeholder)
+                    error(R.drawable.ic_error)
+                    size(640, 480) // Изменение размера для экономии памяти
+                    transformations(RoundedCornersTransformation(8f))
+                }
             } ?: run {
                 b.ivPhoto.setImageDrawable(null)
             }

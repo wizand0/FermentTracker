@@ -5,7 +5,12 @@ import android.content.Context
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.viewModelScope
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
+import androidx.paging.cachedIn
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import ru.wizand.fermenttracker.data.db.AppDatabase
@@ -21,6 +26,16 @@ class BatchListViewModel(application: Application) : AndroidViewModel(applicatio
     val repository: BatchRepository // public
     private val batchDao = AppDatabase.getInstance(application).batchDao()
     val batches: LiveData<List<Batch>>
+
+    // Добавляем Flow с PagingData для Paging 3
+    val batchesPaged: Flow<PagingData<Batch>> = Pager(
+        config = PagingConfig(
+            pageSize = 20,
+            enablePlaceholders = false,
+            prefetchDistance = 5
+        ),
+        pagingSourceFactory = { batchDao.getAllBatchesPaged() }
+    ).flow.cachedIn(viewModelScope)
 
     // Added: LiveData состояния активного этапа
     private val _activeStageId = MutableLiveData<String?>(null)
@@ -231,5 +246,9 @@ class BatchListViewModel(application: Application) : AndroidViewModel(applicatio
 
     fun scheduleStageNotification(stage: Stage, batch: Batch) {
         repository.scheduleStageNotification(stage, batch)
+    }
+
+    suspend fun updateBatch(batch: Batch) {
+        repository.updateBatch(batch)
     }
 }

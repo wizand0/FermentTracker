@@ -1,3 +1,4 @@
+// src/main/java/ru/wizand/fermenttracker/ui/adapters/PhotosAdapter.kt
 package ru.wizand.fermenttracker.ui.adapters
 
 import android.view.LayoutInflater
@@ -5,12 +6,14 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import coil.load
+import coil.transform.RoundedCornersTransformation
 import ru.wizand.fermenttracker.data.db.entities.Photo
 import ru.wizand.fermenttracker.databinding.ItemPhotoBinding
-import ru.wizand.fermenttracker.utils.ImageUtils
+import java.io.File
 import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
+import java.util.*
+import ru.wizand.fermenttracker.R
 
 class PhotosAdapter : ListAdapter<Photo, PhotosAdapter.VH>(DIFF) {
 
@@ -25,9 +28,13 @@ class PhotosAdapter : ListAdapter<Photo, PhotosAdapter.VH>(DIFF) {
 
     inner class VH(private val b: ItemPhotoBinding) : RecyclerView.ViewHolder(b.root) {
         fun bind(photo: Photo) {
-            // Используем оптимизированную загрузку с thumbnails 640x480
-            val bitmap = ImageUtils.decodeSampledBitmapFromFile(photo.filePath, 640, 480)
-            b.ivPhoto.setImageBitmap(bitmap)
+            b.ivPhoto.load(File(photo.filePath)) {
+                crossfade(true)
+                placeholder(R.drawable.ic_placeholder)
+                error(R.drawable.ic_error)
+                size(640, 480) // Изменение размера для экономии памяти
+                transformations(RoundedCornersTransformation(8f))
+            }
 
             b.tvTimestamp.text = SimpleDateFormat(
                 "yyyy-MM-dd HH:mm",

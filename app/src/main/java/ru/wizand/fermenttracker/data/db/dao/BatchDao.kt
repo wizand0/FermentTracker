@@ -1,6 +1,7 @@
 package ru.wizand.fermenttracker.data.db.dao
 
 import androidx.lifecycle.LiveData
+import androidx.paging.PagingSource
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
@@ -13,8 +14,8 @@ import ru.wizand.fermenttracker.data.db.entities.Batch
 import ru.wizand.fermenttracker.data.db.entities.BatchLog
 import ru.wizand.fermenttracker.data.db.entities.Photo
 import ru.wizand.fermenttracker.data.db.entities.Stage
-import ru.wizand.fermenttracker.data.db.entities.Recipe // Added
-import ru.wizand.fermenttracker.data.db.entities.StageTemplate // Added
+import ru.wizand.fermenttracker.data.db.entities.Recipe
+import ru.wizand.fermenttracker.data.db.entities.StageTemplate
 
 @Dao
 interface BatchDao {
@@ -36,6 +37,10 @@ interface BatchDao {
 
     @Query("SELECT * FROM batches")
     fun getAllBatches(): LiveData<List<Batch>>
+
+    // Исправленный метод для Paging 3
+    @Query("SELECT * FROM batches ORDER BY startDate DESC")
+    fun getAllBatchesPaged(): PagingSource<Int, Batch>
 
     @Query("SELECT * FROM batches WHERE id = :batchId")
     fun getBatchById(batchId: String): LiveData<Batch?>

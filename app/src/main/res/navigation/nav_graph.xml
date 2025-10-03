@@ -21,12 +21,26 @@
                 android:name="batchId"
                 app:argType="string" />
         </action>
+        <!-- Добавляем действие для редактирования партии -->
+        <action
+            android:id="@+id/action_batchList_to_editBatch"
+            app:destination="@id/createBatchFragment">
+            <argument
+                android:name="batchId"
+                app:argType="string" />
+        </action>
     </fragment>
 
     <fragment
         android:id="@+id/createBatchFragment"
         android:name="ru.wizand.fermenttracker.ui.batches.CreateBatchFragment"
         android:label="Create Batch">
+        <!-- Добавляем аргумент для batchId, чтобы фрагмент мог определить, создается ли новая партия или редактируется существующая -->
+        <argument
+            android:name="batchId"
+            android:defaultValue="@null"
+            app:argType="string"
+            app:nullable="true" />
         <action
             android:id="@+id/action_createBatch_to_batchTemplate"
             app:destination="@id/batchTemplateFragment">

@@ -36,6 +36,8 @@ import ru.wizand.fermenttracker.utils.ImageUtils
 import ru.wizand.fermenttracker.utils.NotificationHelper
 import java.io.FileNotFoundException
 import java.io.IOException
+import coil.ImageLoader
+//import org.koin.android.ext.android.get
 
 class MainActivity : AppCompatActivity() {
 
@@ -86,12 +88,6 @@ class MainActivity : AppCompatActivity() {
 
         checkBatteryOptimization()
 
-
-        ViewCompat.setOnApplyWindowInsetsListener(binding.fabAdd) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(0, 0, systemBars.right, systemBars.bottom)
-            insets
-        }
 //        ViewCompat.setOnApplyWindowInsetsListener(binding.fabScanQr) { v, insets ->
 //            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
 //            v.setPadding(0, 0, systemBars.right, systemBars.bottom + 64)
@@ -106,10 +102,6 @@ class MainActivity : AppCompatActivity() {
 
         ensureCriticalPermissions()
 
-        binding.fabAdd.setOnClickListener {
-            findNavController(R.id.nav_host_fragment)
-                .navigate(R.id.action_batchList_to_createBatch)
-        }
 
 //        binding.fabScanQr.setOnClickListener {
 //            findNavController(R.id.nav_host_fragment)
@@ -442,7 +434,11 @@ class MainActivity : AppCompatActivity() {
     override fun onTrimMemory(level: Int) {
         super.onTrimMemory(level)
         if (level >= ComponentCallbacks2.TRIM_MEMORY_MODERATE) {
-            ImageUtils.clearCache()
+            // Очищаем кэш Coil вместо ImageUtils
+            val imageLoader = ImageLoader.Builder(this).build()
+            imageLoader.memoryCache?.clear()
+            // Для более агрессивной очистки можно также очистить дисковый кэш:
+            // imageLoader.diskCache?.clear()
         }
     }
 
