@@ -2,7 +2,13 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/batchListFragment">
+    app:startDestination="@id/dashboardFragment">
+
+    <fragment
+        android:id="@+id/dashboardFragment"
+        android:name="ru.wizand.fermenttracker.ui.dashboard.DashboardFragment"
+        android:label="@string/nav_home" />
+
 
     <fragment
         android:id="@+id/batchListFragment"
@@ -21,7 +27,6 @@
                 android:name="batchId"
                 app:argType="string" />
         </action>
-        <!-- Добавляем действие для редактирования партии -->
         <action
             android:id="@+id/action_batchList_to_editBatch"
             app:destination="@id/createBatchFragment">
@@ -32,10 +37,19 @@
     </fragment>
 
     <fragment
+        android:id="@+id/recipesFragment"
+        android:name="ru.wizand.fermenttracker.ui.recipes.RecipesFragment"
+        android:label="@string/nav_recipes" />
+
+    <fragment
+        android:id="@+id/settingsFragment"
+        android:name="ru.wizand.fermenttracker.ui.settings.SettingsFragment"
+        android:label="@string/nav_settings" />
+
+    <fragment
         android:id="@+id/createBatchFragment"
         android:name="ru.wizand.fermenttracker.ui.batches.CreateBatchFragment"
         android:label="Create Batch">
-        <!-- Добавляем аргумент для batchId, чтобы фрагмент мог определить, создается ли новая партия или редактируется существующая -->
         <argument
             android:name="batchId"
             android:defaultValue="@null"
@@ -81,7 +95,7 @@
 
     <fragment
         android:id="@+id/qrFragment"
-        android:name="ru.wizand.fermenttracker.ui.batches.QrFragment"
+        android:name="ru.wizand.fermenttracker.ui.batches.QRFragment"
         android:label="QR Scanner">
         <action
             android:id="@+id/action_qr_to_batchDetail"
@@ -96,5 +110,4 @@
             app:popUpTo="@id/createBatchFragment"
             app:popUpToInclusive="false" />
     </fragment>
-
 </navigation>

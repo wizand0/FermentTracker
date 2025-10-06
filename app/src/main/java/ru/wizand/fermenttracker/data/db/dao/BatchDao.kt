@@ -138,4 +138,11 @@ interface BatchDao {
      */
     @Query("SELECT COUNT(*) FROM recipes")
     fun getRecipeCount(): Int
+
+
+    @Query("SELECT COUNT(*) FROM batches WHERE isActive = 1")
+    fun getActiveBatchesCount(): Int?
+
+    @Query("SELECT AVG((initialWeightGr - currentWeightGr) / initialWeightGr * 100) FROM batches WHERE type IN ('Dry-cured meat', 'Dry-cured sausage') AND isActive = 0 AND initialWeightGr IS NOT NULL AND currentWeightGr IS NOT NULL")
+    fun getAverageWeightLoss(): Double?
 }

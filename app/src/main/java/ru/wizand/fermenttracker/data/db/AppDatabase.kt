@@ -5,6 +5,7 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import ru.wizand.fermenttracker.data.db.dao.BatchDao
+import ru.wizand.fermenttracker.data.db.dao.StageDao
 import ru.wizand.fermenttracker.data.db.entities.*
 
 @Database(
@@ -14,6 +15,7 @@ import ru.wizand.fermenttracker.data.db.entities.*
 )
 abstract class AppDatabase : RoomDatabase() {
     abstract fun batchDao(): BatchDao
+    abstract fun stageDao(): StageDao
 
     companion object {
         @Volatile

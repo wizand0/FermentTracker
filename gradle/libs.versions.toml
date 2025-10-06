@@ -20,6 +20,7 @@ mpandroidchart = "v3.1.0"
 navigationFragmentKtx = "2.9.5"
 recyclerview = "1.4.0"
 roomRuntime = "2.8.1"
+swiperefreshlayout = "1.1.0"
 workRuntimeKtx = "2.10.5"
 zxingAndroidEmbedded = "4.3.0"
 pagingCommon = "3.3.6"
@@ -40,6 +41,7 @@ androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref =
 androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "roomRuntime" }
 androidx-room-paging = { module = "androidx.room:room-paging", version.ref = "roomRuntime" }
 androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "roomRuntime" }
+androidx-swiperefreshlayout = { module = "androidx.swiperefreshlayout:swiperefreshlayout", version.ref = "swiperefreshlayout" }
 androidx-work-runtime-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "workRuntimeKtx" }
 coil = { module = "io.coil-kt:coil", version.ref = "coil" }
 core = { module = "com.google.zxing:core", version.ref = "core" }

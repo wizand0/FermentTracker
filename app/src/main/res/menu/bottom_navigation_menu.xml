@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/dashboardFragment"
+        android:icon="@drawable/ic_home"
+        android:title="@string/nav_home" />
+
+    <item
+        android:id="@+id/batchListFragment"
+        android:icon="@drawable/ic_food"
+        android:title="@string/nav_batches" />
+
+    <item
+        android:id="@+id/recipesFragment"
+        android:icon="@drawable/ic_recipe"
+        android:title="@string/nav_recipes" />
+
+    <item
+        android:id="@+id/settingsFragment"
+        android:icon="@drawable/ic_settings"
+        android:title="@string/nav_settings" />
+
+</menu>

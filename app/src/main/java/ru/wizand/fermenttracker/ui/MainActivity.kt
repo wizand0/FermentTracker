@@ -1,506 +1,64 @@
 package ru.wizand.fermenttracker.ui
 
-import android.Manifest
-import android.content.ComponentCallbacks2
-import android.content.Intent
-import android.content.pm.PackageManager
-import android.net.Uri
-import android.os.Build
 import android.os.Bundle
-import android.provider.Settings
-import android.view.Menu
-import android.view.MenuItem
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowCompat
-import androidx.core.view.WindowInsetsCompat
-import androidx.navigation.findNavController
-import com.google.android.material.snackbar.Snackbar
+import androidx.lifecycle.lifecycleScope
+import androidx.navigation.NavController
+import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.ui.AppBarConfiguration
+import androidx.navigation.ui.setupActionBarWithNavController
+import androidx.navigation.ui.setupWithNavController
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import ru.wizand.fermenttracker.R
 import ru.wizand.fermenttracker.data.db.AppDatabase
-import ru.wizand.fermenttracker.databinding.ActivityMainBinding
 import ru.wizand.fermenttracker.data.db.RecipeTemplates
-import ru.wizand.fermenttracker.data.db.entities.StageTemplate
-import ru.wizand.fermenttracker.data.repository.BatchRepository
-import ru.wizand.fermenttracker.utils.FileUtils
-import java.io.File
-import android.content.Context
-import android.util.Log
-import androidx.lifecycle.lifecycleScope
-import ru.wizand.fermenttracker.utils.BatteryOptimizationHelper
-import ru.wizand.fermenttracker.utils.ImageUtils
-import ru.wizand.fermenttracker.utils.NotificationHelper
-import java.io.FileNotFoundException
-import java.io.IOException
-import coil.ImageLoader
-//import org.koin.android.ext.android.get
+import ru.wizand.fermenttracker.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
-
-    private val multiplePermissionsLauncher = registerForActivityResult(
-        ActivityResultContracts.RequestMultiplePermissions()
-    ) { result ->
-        val denied = result.filterValues { granted -> !granted }.keys
-        if (denied.isNotEmpty()) {
-            Snackbar.make(
-                binding.root,
-                getString(R.string.permissions_not_granted),
-                Snackbar.LENGTH_LONG
-            ).setAction(getString(R.string.settings)) {
-                val intent = Intent(
-                    Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
-                    Uri.fromParts("package", packageName, null)
-                )
-                startActivity(intent)
-            }.show()
-        }
-    }
-
-    private val createDocumentLauncher =
-        registerForActivityResult(ActivityResultContracts.CreateDocument("application/octet-stream")) { uri ->
-            if (uri != null) performBackup(uri)
-        }
-
-    private val openDocumentLauncher =
-        registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
-            if (uri != null) performRestore(uri)
-        }
+    private lateinit var navController: NavController
+    private lateinit var appBarConfiguration: AppBarConfiguration
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        NotificationHelper.createChannel(this)
-        WindowCompat.setDecorFitsSystemWindows(window, false)
-
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        // Toolbar
         setSupportActionBar(binding.toolbar)
 
-        initializeTemplates()
+        // Навигация
+        val navHostFragment =
+            supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
+        navController = navHostFragment.navController
+        binding.bottomNavigation.setupWithNavController(navController)
 
-        // Обработка открытия батча из уведомления
-        handleNotificationIntent(intent)
+        // Верхняя панель
+        appBarConfiguration = AppBarConfiguration(
+            setOf(
+                R.id.dashboardFragment,
+                R.id.batchListFragment,
+                R.id.recipesFragment,
+                R.id.settingsFragment
+            )
+        )
+        setupActionBarWithNavController(navController, appBarConfiguration)
 
-        checkBatteryOptimization()
-
-//        ViewCompat.setOnApplyWindowInsetsListener(binding.fabScanQr) { v, insets ->
-//            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-//            v.setPadding(0, 0, systemBars.right, systemBars.bottom + 64)
-//            insets
-//        }
-
-        ViewCompat.setOnApplyWindowInsetsListener(binding.navHostFragment) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
-        }
-
-        ensureCriticalPermissions()
-
-
-//        binding.fabScanQr.setOnClickListener {
-//            findNavController(R.id.nav_host_fragment)
-//                .navigate(R.id.action_batchList_to_qr)
-//        }
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.main_menu, menu)
-        return true
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            R.id.menu_edit_recipes -> {
-                startActivity(Intent(this, RecipeEditorActivity::class.java))
-                true
-            }
-            R.id.menu_export_db -> {
-                createDocumentLauncher.launch(getString(R.string.backup_file_name, System.currentTimeMillis()))
-                true
-            }
-            R.id.menu_import_db -> {
-                openDocumentLauncher.launch(arrayOf("*/*"))
-                true
-            }
-            else -> super.onOptionsItemSelected(item)
-        }
-    }
-
-    private fun ensureCriticalPermissions() {
-        val perms = mutableListOf<String>()
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-            perms.add(Manifest.permission.CAMERA)
-        }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
-                perms.add(Manifest.permission.POST_NOTIFICATIONS)
-            }
-        }
-        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.P) {
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                perms.add(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-            }
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                perms.add(Manifest.permission.READ_EXTERNAL_STORAGE)
-            }
-        }
-        if (perms.isNotEmpty()) multiplePermissionsLauncher.launch(perms.toTypedArray())
-    }
-
-    private fun performBackup(targetUri: Uri) {
-        lifecycleScope.launch(Dispatchers.IO) {
-            try {
-                val dbFile = getDatabasePath("ferment_tracker_db")
-
-                // Проверяем существование и доступность файла БД
-                when {
-                    !dbFile.exists() -> {
-                        showError(getString(R.string.database_not_found))
-                        return@launch
-                    }
-                    !dbFile.canRead() -> {
-                        showError(getString(R.string.database_read_access_denied))
-                        return@launch
-                    }
-                    dbFile.length() == 0L -> {
-                        showError(getString(R.string.database_empty))
-                        return@launch
-                    }
-                }
-
-                // Проверяем свободное место (нужно минимум столько же, сколько занимает БД + 10% запас)
-                val requiredSpace = (dbFile.length() * 1.1).toLong()
-                val availableSpace = dbFile.parentFile?.usableSpace ?: 0L
-                if (availableSpace < requiredSpace) {
-                    showError(getString(R.string.insufficient_space, (requiredSpace / 1024 / 1024).toInt()))
-                    return@launch
-                }
-
-                // Закрываем БД перед копированием для консистентности
-                AppDatabase.closeInstance()
-
-                // Выполняем копирование
-                FileUtils.copyFileToUri(dbFile, targetUri, this@MainActivity)
-
-                // Переоткрываем БД
-                AppDatabase.getInstance(applicationContext)
-
-                showSuccess(getString(R.string.backup_created, (dbFile.length() / 1024).toInt()))
-
-            } catch (e: FileNotFoundException) {
-                showError(getString(R.string.file_not_found, e.message))
-            } catch (e: SecurityException) {
-                showError((getString(R.string.no_file_access_permission)))
-            } catch (e: IOException) {
-                showError(getString(R.string.io_error, e.message))
-            } catch (e: Exception) {
-                showError(getString(R.string.unknown_backup_error, e.message ?: ""))
-            } finally {
-                // Гарантируем, что БД будет переоткрыта
-                try {
-                    AppDatabase.getInstance(applicationContext)
-                } catch (e: Exception) {
-                    showError(getString(R.string.critical_error_db_reopen))
-                }
-            }
-        }
-    }
-
-    private fun performRestore(sourceUri: Uri) {
-        lifecycleScope.launch(Dispatchers.IO) {
-            var backupFile: File? = null
-            try {
-                // Проверяем размер исходного файла
-                val fileSize = contentResolver.openFileDescriptor(sourceUri, "r")?.use { fd ->
-                    fd.statSize
-                } ?: 0L
-
-                when {
-                    fileSize == 0L -> {
-                        showError(getString(R.string.backup_file_empty))
-                        return@launch
-                    }
-                    fileSize < 4096 -> { // SQLite database минимум ~4KB
-                        showError(getString(R.string.backup_file_too_small, fileSize))
-                        return@launch
-                    }
-                }
-
-                val dbFile = getDatabasePath("ferment_tracker_db")
-
-                // Проверяем свободное место
-                val requiredSpace = (fileSize * 1.5).toLong() // дополнительное место для временной копии
-                val availableSpace = dbFile.parentFile?.usableSpace ?: 0L
-                if (availableSpace < requiredSpace) {
-                    showError(getString(R.string.insufficient_space, (requiredSpace / 1024 / 1024).toInt()))
-                    return@launch
-                }
-
-                // Создаем резервную копию текущей БД
-                backupFile = File(dbFile.parentFile, "ferment_tracker_db.backup")
-                if (dbFile.exists()) {
-                    try {
-                        dbFile.copyTo(backupFile, overwrite = true)
-                    } catch (e: Exception) {
-                        showError(getString(R.string.db_backup_failed, e.message))
-                        return@launch
-                    }
-                }
-
-                // Закрываем текущую БД
-                AppDatabase.closeInstance()
-
-                // Создаем директорию если нужно
-                dbFile.parentFile?.mkdirs()
-
-                // Копируем новую БД
-                FileUtils.copyUriToFile(sourceUri, dbFile, this@MainActivity)
-
-                // Проверяем целостность восстановленной БД
-                val verificationResult = verifyDatabase()
-
-                if (!verificationResult.isValid) {
-                    // Восстанавливаем старую БД
-                    if (backupFile?.exists() == true) {
-                        backupFile.copyTo(dbFile, overwrite = true)
-                    }
-                    AppDatabase.getInstance(applicationContext)
-                    showError(getString(R.string.restore_failed_db_corrupted, verificationResult.errorMessage))
-                    return@launch
-                }
-
-                // Удаляем временную резервную копию
-                backupFile?.delete()
-
-                // Переоткрываем БД
-                AppDatabase.getInstance(applicationContext)
-
-                showRestoreSuccess(verificationResult.batchCount)
-
-            } catch (e: FileNotFoundException) {
-                restoreBackup(backupFile, getDatabasePath("ferment_tracker_db"))
-                showError(getString(R.string.file_not_found, e.message))
-            } catch (e: SecurityException) {
-                restoreBackup(backupFile, getDatabasePath("ferment_tracker_db"))
-                showError(getString(R.string.no_file_access_permission))
-            } catch (e: IOException) {
-                restoreBackup(backupFile, getDatabasePath("ferment_tracker_db"))
-                showError(getString(R.string.io_error, e.message))
-            } catch (e: Exception) {
-                restoreBackup(backupFile, getDatabasePath("ferment_tracker_db"))
-                showError(getString(R.string.unknown_backup_error, e.message ?: ""))
-            } finally {
-                // Гарантируем, что БД будет переоткрыта
-                try {
-                    AppDatabase.getInstance(applicationContext)
-                } catch (e: Exception) {
-                    showError(getString(R.string.critical_error_db_reopen))
-                }
-                // Очищаем временный файл
-                backupFile?.delete()
-            }
-        }
-    }
-
-    /**
-     * Восстанавливает резервную копию БД в случае ошибки
-     */
-    private fun restoreBackup(backupFile: File?, targetFile: File) {
-        try {
-            if (backupFile?.exists() == true) {
-                AppDatabase.closeInstance()
-                backupFile.copyTo(targetFile, overwrite = true)
-                AppDatabase.getInstance(applicationContext)
-            }
-        } catch (e: Exception) {
-            // Логируем, но не показываем пользователю, чтобы не перегружать информацией
-            e.printStackTrace()
-        }
-    }
-
-    /**
-     * Результат проверки целостности базы данных
-     */
-    private data class DatabaseVerificationResult(
-        val isValid: Boolean,
-        val errorMessage: String? = null,
-        val batchCount: Int = 0
-    )
-
-    /**
-     * Проверяет целостность базы данных после восстановления
-     */
-    private fun verifyDatabase(): DatabaseVerificationResult {
-        return try {
-            val db = AppDatabase.getInstance(applicationContext)
-
-            // Проверяем, что БД открывается и доступна
+        // === Добавляем шаблоны рецептов при первом запуске ===
+        lifecycleScope.launch(Dispatchers.IO) {   // <-- добавили IO
+            val db = AppDatabase.getInstance(this@MainActivity)
             val dao = db.batchDao()
 
-            // Проверяем, что можем выполнять запросы
-            val batchCount = dao.getBatchCount()
-
-            // Проверяем наличие базовых таблиц
             val recipeCount = dao.getRecipeCount()
-
-            // БД валидна, если она открывается и можно выполнять запросы
-            // (даже если данных нет - это может быть новая пустая БД)
-            DatabaseVerificationResult(
-                isValid = true,
-                batchCount = batchCount
-            )
-        } catch (e: android.database.sqlite.SQLiteDatabaseCorruptException) {
-            DatabaseVerificationResult(
-                isValid = false,
-                errorMessage = getString(R.string.db_corrupted)
-            )
-        } catch (e: android.database.sqlite.SQLiteException) {
-            DatabaseVerificationResult(
-                isValid = false,
-                errorMessage = getString(R.string.sqlite_error, e.message)
-            )
-        } catch (e: Exception) {
-            DatabaseVerificationResult(
-                isValid = false,
-                errorMessage = getString(R.string.db_open_error, e.message)
-            )
-        }
-    }
-
-    private fun showError(message: String) {
-        runOnUiThread {
-            Snackbar.make(binding.root, message, Snackbar.LENGTH_LONG).show()
-        }
-    }
-
-    private fun showSuccess(message: String) {
-        runOnUiThread {
-            Snackbar.make(binding.root, message, Snackbar.LENGTH_LONG).show()
-        }
-    }
-
-    private fun showRestoreSuccess(batchCount: Int) {
-        runOnUiThread {
-            val message = if (batchCount > 0) {
-                getString(R.string.db_restored, batchCount)
-            } else {
-                getString(R.string.db_restored_no_data)
-            }
-
-            Snackbar.make(
-                binding.root,
-                message,
-                Snackbar.LENGTH_INDEFINITE
-            ).setAction(getString(R.string.restart)) {
-                val intent = packageManager.getLaunchIntentForPackage(packageName)
-                intent?.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
-                startActivity(intent)
-                finish()
-            }.show()
-        }
-    }
-
-    private fun initializeTemplates() {
-        val prefs = getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
-        val isFirstRun = prefs.getBoolean("first_run", true)
-        if (isFirstRun) {
-            val repository = BatchRepository(AppDatabase.getInstance(this).batchDao(), this)
-            lifecycleScope.launch(Dispatchers.IO) {
-                val templates = RecipeTemplates.getTemplateStages(this@MainActivity)
-                templates.forEach { (type, pair) ->
-                    val recipe = pair.second
-                    repository.insertRecipe(recipe)
-                    pair.first.forEachIndexed { index, stage ->
-                        val template = StageTemplate(
-                            recipeType = type,
-                            name = stage.name,
-                            durationHours = stage.durationHours.toLong(),
-                            orderIndex = index
-                        )
-                        repository.insertStageTemplate(template)
-                    }
-                }
-                prefs.edit().putBoolean("first_run", false).apply()
+            if (recipeCount == 0) {
+                RecipeTemplates.saveToDatabase(this@MainActivity)
             }
         }
     }
 
-    override fun onTrimMemory(level: Int) {
-        super.onTrimMemory(level)
-        if (level >= ComponentCallbacks2.TRIM_MEMORY_MODERATE) {
-            // Очищаем кэш Coil вместо ImageUtils
-            val imageLoader = ImageLoader.Builder(this).build()
-            imageLoader.memoryCache?.clear()
-            // Для более агрессивной очистки можно также очистить дисковый кэш:
-            // imageLoader.diskCache?.clear()
-        }
-    }
-
-    override fun onNewIntent(intent: Intent) {
-        super.onNewIntent(intent)
-        // Убедитесь, что intent не nullable
-        setIntent(intent)  // если нужно обновить intent
-        handleNotificationIntent(intent)
-    }
-
-//    override fun onNewIntent(intent: Intent?) {
-//        super.onNewIntent(intent)
-//        intent?.let { handleNotificationIntent(it) }
-//    }
-
-    private fun handleNotificationIntent(intent: Intent) {
-        intent.getStringExtra("batchId")?.let { batchId ->
-            try {
-                val navController = findNavController(R.id.nav_host_fragment)
-
-                // Проверяем текущий destination
-                val currentDestination = navController.currentDestination?.id
-
-                // Если мы не на BatchListFragment, сначала переходим туда
-                if (currentDestination != R.id.batchListFragment) {
-                    navController.navigate(R.id.batchListFragment)
-                }
-
-                // Используем правильное имя, сгенерированное SafeArgs
-                val action = ru.wizand.fermenttracker.ui.batches.BatchListFragmentDirections
-                    .actionBatchListToBatchDetail(batchId)  // ← Исправлено имя
-                navController.navigate(action)
-
-                Log.d("MainActivity", "Navigated to batch: $batchId from notification")
-            } catch (e: Exception) {
-                Log.e("MainActivity", "Navigation error: ${e.message}", e)
-                Snackbar.make(
-                    binding.root,
-                    getString(R.string.navigation_error),
-                    Snackbar.LENGTH_SHORT
-                ).show()
-            }
-        }
-    }
-
-    private fun checkBatteryOptimization() {
-        val prefs = getSharedPreferences("battery_optimization_prefs", Context.MODE_PRIVATE)
-        val hasUserDeclined = prefs.getBoolean("user_declined_battery_optimization", false)
-
-        if (hasUserDeclined) return
-
-        if (!BatteryOptimizationHelper.isIgnoringBatteryOptimizations(this)) {
-            androidx.appcompat.app.AlertDialog.Builder(this)
-                .setTitle(getString(R.string.battery_optimization_title))
-                .setMessage(getString(R.string.battery_optimization_message))
-                .setPositiveButton(getString(R.string.configure)) { _, _ ->
-                    BatteryOptimizationHelper.requestIgnoreBatteryOptimizations(this)
-                }
-                .setNegativeButton(getString(R.string.later)) { _, _ ->
-                    prefs.edit().putBoolean("user_declined_battery_optimization", true).apply()
-                }
-                .show()
-        }
+    override fun onSupportNavigateUp(): Boolean {
+        return navController.navigateUp() || super.onSupportNavigateUp()
     }
 }

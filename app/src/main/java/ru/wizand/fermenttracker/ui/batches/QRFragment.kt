@@ -9,17 +9,20 @@ import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.NavController
+import androidx.navigation.Navigation
 import androidx.navigation.fragment.findNavController
 import kotlinx.coroutines.launch
 import ru.wizand.fermenttracker.R
 import ru.wizand.fermenttracker.databinding.FragmentQrBinding
 import ru.wizand.fermenttracker.vm.BatchListViewModel
 
-class QrFragment : Fragment() {
+class QRFragment : Fragment() {
 
     private var _binding: FragmentQrBinding? = null
     private val binding get() = _binding!!
     private val viewModel: BatchListViewModel by activityViewModels()
+    private lateinit var navController: NavController
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -32,11 +35,15 @@ class QrFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        // Инициализируем NavController
+        navController = Navigation.findNavController(view)
+
         setupQrScanner()
     }
 
     private fun setupQrScanner() {
-        // Placeholder for testing
+        // Placeholder для тестирования
         handleQrResult("test_qr_code")
     }
 
@@ -45,8 +52,11 @@ class QrFragment : Fragment() {
             try {
                 val batch = viewModel.findBatchByQrCode(qrCode)
                 if (batch != null) {
-                    val action = QrFragmentDirections.actionQrToBatchDetail(batch.id)
-                    findNavController().navigate(action)
+                    // Используем Bundle вместо сгенерированного Directions
+                    val bundle = Bundle().apply {
+                        putString("batchId", batch.id)
+                    }
+                    navController.navigate(R.id.action_qr_to_batchDetail, bundle)
                 } else {
                     showNotFoundDialog(qrCode)
                 }
@@ -62,7 +72,7 @@ class QrFragment : Fragment() {
             .setMessage("QR-код $qrCode не найден в базе данных")
             .setPositiveButton("OK", null)
             .setNegativeButton("Создать новый") { _, _ ->
-                findNavController().navigate(R.id.action_qr_to_createBatch)
+                navController.navigate(R.id.action_qr_to_createBatch)
             }
             .show()
     }
