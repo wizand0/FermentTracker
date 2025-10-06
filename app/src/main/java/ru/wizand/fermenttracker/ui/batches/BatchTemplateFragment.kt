@@ -44,7 +44,8 @@ class BatchTemplateFragment : Fragment() {
         setupRecyclerView()
         setupButtons()
 
-        val initialType = arguments?.getString("recipe_type")
+        // Проверяем оба возможных аргумента: recipe_type (из RecipesFragment) и selectedType (из CreateBatchFragment)
+        val initialType = arguments?.getString("recipe_type") ?: arguments?.getString("selectedType")
         if (initialType != null) {
             // Editing existing: Pre-load type and stages
             binding.etNewType.setText(initialType)
@@ -169,18 +170,7 @@ class BatchTemplateFragment : Fragment() {
     }
 
     private fun goBack() {
-        try {
-            // Пытаемся найти NavController безопасно
-            val navController = findNavController()
-            if (navController.currentDestination?.id == R.id.batchTemplateFragment) {
-                navController.popBackStack()
-            } else {
-                requireActivity().onBackPressedDispatcher.onBackPressed()
-            }
-        } catch (e: IllegalStateException) {
-            // NavController не найден - мы в RecipeEditorActivity
-            requireActivity().onBackPressedDispatcher.onBackPressed()
-        }
+        findNavController().popBackStack()
     }
 
     override fun onDestroyView() {

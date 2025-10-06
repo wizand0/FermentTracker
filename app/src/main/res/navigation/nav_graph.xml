@@ -39,7 +39,16 @@
     <fragment
         android:id="@+id/recipesFragment"
         android:name="ru.wizand.fermenttracker.ui.recipes.RecipesFragment"
-        android:label="@string/nav_recipes" />
+        android:label="@string/nav_recipes">
+        <action
+            android:id="@+id/action_recipes_to_batchTemplate"
+            app:destination="@id/batchTemplateFragment">
+            <argument
+                android:name="recipe_type"
+                app:argType="string"
+                app:nullable="true" />
+        </action>
+    </fragment>
 
     <fragment
         android:id="@+id/settingsFragment"
@@ -74,6 +83,10 @@
         <argument
             android:name="selectedType"
             app:argType="string" />
+        <argument
+            android:name="recipe_type"
+            app:argType="string"
+            app:nullable="true" />
         <action
             android:id="@+id/action_batchTemplate_to_createBatch"
             app:destination="@id/createBatchFragment"
