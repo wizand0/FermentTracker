@@ -9,7 +9,7 @@
     android:fitsSystemWindows="true"
     tools:context=".ui.MainActivity">
 
-    <!-- ImageView для фона -->
+    <!-- Фоновое изображение -->
     <ImageView
         android:id="@+id/background_image_view"
         android:layout_width="match_parent"
@@ -18,12 +18,14 @@
         android:src="@drawable/background"
         android:clickable="false"
         android:focusable="false"
-        android:contentDescription="Background" />
+        android:contentDescription="@string/app_name" />
 
+    <!-- Toolbar -->
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/app_bar_layout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:fitsSystemWindows="true">
 
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/toolbar"
@@ -35,6 +37,7 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
+    <!-- Навигация -->
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/nav_host_fragment"
         android:name="androidx.navigation.fragment.NavHostFragment"
@@ -44,11 +47,18 @@
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         app:navGraph="@navigation/nav_graph" />
 
+    <!-- Нижняя панель -->
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNavigation"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="56dp"
         android:layout_gravity="bottom"
+        android:background="?attr/colorSurface"
+        android:elevation="8dp"
+        android:paddingBottom="0dp"
+        app:itemIconSize="22dp"
+        app:itemTextAppearanceActive="@style/TextAppearance.MaterialComponents.Body2"
+        app:itemTextAppearanceInactive="@style/TextAppearance.MaterialComponents.Body2"
         app:menu="@menu/bottom_navigation_menu"
         app:labelVisibilityMode="labeled" />
 

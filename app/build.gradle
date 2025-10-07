@@ -14,8 +14,8 @@ android {
         applicationId "ru.wizand.fermenttracker"
         minSdk 29
         targetSdk 36
-        versionCode 19
-        versionName "1.20"
+        versionCode 20
+        versionName "1.21"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
