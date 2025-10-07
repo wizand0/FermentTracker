@@ -1,4 +1,3 @@
-// ru/wizand/fermenttracker/ui/batches/CreateBatchFragment.kt
 package ru.wizand.fermenttracker.ui.batches
 
 import android.os.Bundle
@@ -25,14 +24,14 @@ import ru.wizand.fermenttracker.data.db.entities.Recipe
 import ru.wizand.fermenttracker.data.db.entities.Stage
 import ru.wizand.fermenttracker.databinding.FragmentCreateBatchBinding
 import ru.wizand.fermenttracker.ui.adapters.EditableStageAdapter
-import ru.wizand.fermenttracker.vm.BatchListViewModel
+import ru.wizand.fermenttracker.vm.SharedViewModel
 import java.util.*
 import java.util.concurrent.TimeUnit
 
 class CreateBatchFragment : Fragment() {
     private var _binding: FragmentCreateBatchBinding? = null
     private val binding get() = _binding!!
-    private val viewModel: BatchListViewModel by activityViewModels()
+    private val viewModel: SharedViewModel by activityViewModels()
     private lateinit var stageAdapter: EditableStageAdapter
     private var stages: MutableList<Stage> = mutableListOf()
 
@@ -132,7 +131,7 @@ class CreateBatchFragment : Fragment() {
                         val batchStages = viewModel.getStagesForBatchLive(id)
 
                         // Наблюдаем за изменениями в списке этапов
-                        batchStages.observe(viewLifecycleOwner) { stageList ->
+                        batchStages.observe(viewLifecycleOwner) { stageList: List<Stage> ->
                             stages = stageList.toMutableList()
                             stageAdapter.submitList(stages.toList())
                         }
@@ -316,27 +315,27 @@ class CreateBatchFragment : Fragment() {
             if (isEditMode) {
                 // В режиме редактирования обновляем существующую партию
                 CoroutineScope(Dispatchers.IO).launch {
-                    viewModel.repository.updateBatch(batch)
+                    viewModel.updateBatch(batch)
 
                     // Получаем старые этапы
                     val oldStages = viewModel.getStagesForBatchLive(batchIdToUse)
 
                     // Используем lifecycleScope для наблюдения за LiveData
                     lifecycleScope.launch {
-                        oldStages.observe(viewLifecycleOwner) { stageList ->
+                        oldStages.observe(viewLifecycleOwner) { stageList: List<Stage> ->
                             // Удаляем старые этапы
                             CoroutineScope(Dispatchers.IO).launch {
-                                stageList.forEach { stage ->
-                                    viewModel.repository.deleteStage(stage.id)
+                                stageList.forEach { stage: Stage ->
+                                    viewModel.deleteStage(stage.id)
                                 }
 
                                 // Добавляем новые этапы
-                                calculatedStages.forEach { stage ->
-                                    viewModel.repository.addStage(stage)
+                                calculatedStages.forEach { stage: Stage ->
+                                    viewModel.addStage(stage)
                                 }
 
                                 // Планируем уведомления
-                                calculatedStages.forEach { stage ->
+                                calculatedStages.forEach { stage: Stage ->
                                     viewModel.scheduleStageNotification(stage, batch)
                                 }
                             }
@@ -352,7 +351,7 @@ class CreateBatchFragment : Fragment() {
                     viewModel.scheduleStageNotification(stage, batch)
                 }
             }
-
+            viewModel.refreshDashboardData()
             findNavController().popBackStack()
         }
     }

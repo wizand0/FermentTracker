@@ -2,23 +2,14 @@ package ru.wizand.fermenttracker.data.db.dao
 
 import androidx.lifecycle.LiveData
 import androidx.paging.PagingSource
-import androidx.room.Dao
-import androidx.room.Delete
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
-import androidx.room.Transaction
-import androidx.room.Update
+import androidx.room.*
 import kotlinx.coroutines.flow.Flow
-import ru.wizand.fermenttracker.data.db.entities.Batch
-import ru.wizand.fermenttracker.data.db.entities.BatchLog
-import ru.wizand.fermenttracker.data.db.entities.Photo
-import ru.wizand.fermenttracker.data.db.entities.Stage
-import ru.wizand.fermenttracker.data.db.entities.Recipe
-import ru.wizand.fermenttracker.data.db.entities.StageTemplate
+import ru.wizand.fermenttracker.data.db.entities.*
 
 @Dao
 interface BatchDao {
+
+    // === Основные операции с партиями ===
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertBatch(batch: Batch)
@@ -35,26 +26,23 @@ interface BatchDao {
     @Query("DELETE FROM batches WHERE id = :batchId")
     suspend fun deleteBatch(batchId: String)
 
-    @Query("SELECT * FROM batches")
+    // Сортировка по дате старта (новые сверху)
+    @Query("SELECT * FROM batches ORDER BY startDate DESC")
     fun getAllBatches(): LiveData<List<Batch>>
 
-    // Исправленный метод для Paging 3
     @Query("SELECT * FROM batches ORDER BY startDate DESC")
     fun getAllBatchesPaged(): PagingSource<Int, Batch>
 
     @Query("SELECT * FROM batches WHERE id = :batchId")
     fun getBatchById(batchId: String): LiveData<Batch?>
 
-    // Added: Get recipe by its type
-    @Query("SELECT * FROM recipes WHERE type = :type LIMIT 1")
-    suspend fun getRecipeByType(type: String): Recipe? // Return null if not found
-
-    // Added: synchronous single-shot fetch (useful from repository / suspend functions)
     @Query("SELECT * FROM batches WHERE id = :batchId LIMIT 1")
     suspend fun getBatchByIdOnce(batchId: String): Batch?
 
     @Query("SELECT * FROM batches WHERE qrCode = :qrCode LIMIT 1")
     suspend fun findBatchByQrCode(qrCode: String): Batch?
+
+    // === Этапы (Stages) ===
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertStage(stage: Stage)
@@ -68,24 +56,8 @@ interface BatchDao {
     @Query("SELECT * FROM stages WHERE batchId = :batchId ORDER BY orderIndex ASC")
     fun getStagesForBatch(batchId: String): LiveData<List<Stage>>
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertPhoto(photo: Photo)
-
-    @Query("SELECT photos.* FROM photos INNER JOIN stages ON photos.stageId = stages.id WHERE stages.batchId = :batchId ORDER BY photos.timestamp DESC")
-    fun getPhotosForBatch(batchId: String): LiveData<List<Photo>>
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertLog(log: BatchLog)
-
-    @Query("SELECT * FROM batch_logs WHERE batchId = :batchId ORDER BY timestamp DESC")
-    fun getLogsForBatch(batchId: String): LiveData<List<BatchLog>>
-
-    // Added: get last non-null weight from logs
-    @Query("SELECT weightGr FROM batch_logs WHERE batchId = :batchId AND weightGr IS NOT NULL ORDER BY timestamp DESC LIMIT 1")
-    suspend fun getLastLogWeight(batchId: String): Double?
-
-    @Query("SELECT * FROM stages WHERE batchId = :batchId ORDER BY orderIndex")
-    fun getStagesForBatchFlow(batchId: String): kotlinx.coroutines.flow.Flow<List<Stage>>
+    @Query("SELECT * FROM stages WHERE batchId = :batchId ORDER BY orderIndex ASC")
+    fun getStagesForBatchFlow(batchId: String): Flow<List<Stage>>
 
     @Query("SELECT * FROM stages WHERE batchId = :batchId AND startTime IS NOT NULL AND endTime IS NULL LIMIT 1")
     suspend fun getActiveStage(batchId: String): Stage?
@@ -99,7 +71,32 @@ interface BatchDao {
     @Query("SELECT * FROM stages WHERE batchId = :batchId AND orderIndex = :orderIndex LIMIT 1")
     suspend fun getStageByOrder(batchId: String, orderIndex: Int): Stage?
 
-    // Added: Recipe and StageTemplate methods
+    // === Фото ===
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertPhoto(photo: Photo)
+
+    @Query("""
+        SELECT photos.* FROM photos
+        INNER JOIN stages ON photos.stageId = stages.id
+        WHERE stages.batchId = :batchId
+        ORDER BY photos.timestamp DESC
+    """)
+    fun getPhotosForBatch(batchId: String): LiveData<List<Photo>>
+
+    // === Логи ===
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertLog(log: BatchLog)
+
+    @Query("SELECT * FROM batch_logs WHERE batchId = :batchId ORDER BY timestamp DESC")
+    fun getLogsForBatch(batchId: String): LiveData<List<BatchLog>>
+
+    @Query("SELECT weightGr FROM batch_logs WHERE batchId = :batchId AND weightGr IS NOT NULL ORDER BY timestamp DESC LIMIT 1")
+    suspend fun getLastLogWeight(batchId: String): Double?
+
+    // === Рецепты ===
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertRecipe(recipe: Recipe)
 
@@ -109,11 +106,16 @@ interface BatchDao {
     @Query("SELECT type FROM recipes")
     suspend fun getAllRecipeTypes(): List<String>
 
+    @Query("SELECT * FROM recipes WHERE type = :type LIMIT 1")
+    suspend fun getRecipeByType(type: String): Recipe?
+
     @Update
     suspend fun updateRecipe(recipe: Recipe)
 
     @Query("DELETE FROM recipes WHERE type = :type")
     suspend fun deleteRecipe(type: String)
+
+    // === Шаблоны этапов ===
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertStageTemplate(template: StageTemplate)
@@ -127,22 +129,24 @@ interface BatchDao {
     @Query("DELETE FROM stage_templates WHERE id = :id")
     suspend fun deleteStageTemplate(id: String)
 
-    /**
-     * Получить количество партий для проверки целостности БД
-     */
+    // === Метрики для Dashboard ===
+
     @Query("SELECT COUNT(*) FROM batches")
     fun getBatchCount(): Int
 
-    /**
-     * Получить количество рецептов для проверки целостности БД
-     */
     @Query("SELECT COUNT(*) FROM recipes")
     fun getRecipeCount(): Int
-
 
     @Query("SELECT COUNT(*) FROM batches WHERE isActive = 1")
     fun getActiveBatchesCount(): Int?
 
-    @Query("SELECT AVG((initialWeightGr - currentWeightGr) / initialWeightGr * 100) FROM batches WHERE type IN ('Dry-cured meat', 'Dry-cured sausage') AND isActive = 0 AND initialWeightGr IS NOT NULL AND currentWeightGr IS NOT NULL")
+    @Query("""
+        SELECT AVG((initialWeightGr - currentWeightGr) / initialWeightGr * 100)
+        FROM batches
+        WHERE type IN ('Dry-cured meat', 'Dry-cured sausage')
+          AND isActive = 0
+          AND initialWeightGr IS NOT NULL
+          AND currentWeightGr IS NOT NULL
+    """)
     fun getAverageWeightLoss(): Double?
 }

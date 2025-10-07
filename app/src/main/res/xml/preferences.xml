@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <PreferenceCategory android:title="@string/settings_category_database">
+        <Preference
+            android:key="export_db"
+            android:title="@string/export_db"
+            android:icon="@drawable/ic_export" />
+        <Preference
+            android:key="import_db"
+            android:title="@string/import_db"
+            android:icon="@drawable/ic_import" />
+        <Preference
+            android:key="clear_all_data"
+            android:title="@string/clear_all_data"
+            android:icon="@drawable/ic_delete" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/settings_category_notifications">
+        <SwitchPreferenceCompat
+            android:key="notifications_enabled"
+            android:title="@string/notifications_enabled"
+            android:defaultValue="true"
+            android:icon="@drawable/ic_notifications" />
+        <ListPreference
+            android:key="reminder_time"
+            android:title="@string/reminder_time"
+            android:entries="@array/reminder_times"
+            android:entryValues="@array/reminder_times_values"
+            android:defaultValue="morning"
+            android:icon="@drawable/ic_time" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/settings_category_display">
+        <ListPreference
+            android:key="weight_units"
+            android:title="@string/weight_units"
+            android:entries="@array/weight_units"
+            android:entryValues="@array/weight_units_values"
+            android:defaultValue="grams"
+            android:icon="@drawable/ic_weight" />
+        <SwitchPreferenceCompat
+            android:key="dark_theme"
+            android:title="@string/dark_theme"
+            android:defaultValue="false"
+            android:icon="@drawable/ic_theme" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/settings_category_about">
+        <Preference
+            android:key="version"
+            android:title="@string/version"
+            android:summary="@string/version_format"
+            android:selectable="false"
+            android:icon="@drawable/ic_info" />
+        <Preference
+            android:key="licenses"
+            android:title="@string/open_source_licenses"
+            android:icon="@drawable/ic_license" />
+    </PreferenceCategory>
+
+</PreferenceScreen>

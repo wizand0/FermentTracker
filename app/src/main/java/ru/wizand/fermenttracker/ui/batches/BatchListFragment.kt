@@ -17,13 +17,13 @@ import ru.wizand.fermenttracker.R
 import ru.wizand.fermenttracker.databinding.FragmentBatchListBinding
 import ru.wizand.fermenttracker.ui.adapters.BatchPagingAdapter
 import ru.wizand.fermenttracker.ui.adapters.LoadStateAdapter
-import ru.wizand.fermenttracker.vm.BatchListViewModel
+import ru.wizand.fermenttracker.vm.SharedViewModel
 
 class BatchListFragment : Fragment() {
 
     private var _binding: FragmentBatchListBinding? = null
     private val binding get() = _binding!!
-    private val viewModel: BatchListViewModel by activityViewModels()
+    private val viewModel: SharedViewModel by activityViewModels()
 
     private val adapter = BatchPagingAdapter(
         onItemClick = { batch ->
@@ -33,7 +33,7 @@ class BatchListFragment : Fragment() {
             findNavController().navigate(R.id.action_batchList_to_batchDetail, bundle)
         },
         onDeleteClick = { batch ->
-            viewModel.deleteBatch(batch)
+            viewModel.deleteBatch(batch.id)
             Toast.makeText(context, getString(R.string.batch_deleted), Toast.LENGTH_SHORT).show()
         },
         onEditClick = { batch ->
@@ -103,10 +103,6 @@ class BatchListFragment : Fragment() {
         binding.btnRetry.setOnClickListener {
             adapter.retry()
         }
-
-//        binding.btnCreateFirstBatch.setOnClickListener {
-//            findNavController().navigate(R.id.action_batchList_to_createBatch)
-//        }
 
         binding.fabAddBatch.setOnClickListener {
             findNavController().navigate(R.id.action_batchList_to_createBatch)

@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">FermentTracker</string>
     <string name="add_batch">Add batch</string>
@@ -30,57 +31,103 @@
     <string name="note_title">Instructions/Note:</string>
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
-    <string name="event_passed">Событие уже прошло</string>
-    <string name="stage_not_completed">Этап не завершён</string>
+    <string name="event_passed">Event has already passed</string>
+    <string name="stage_not_completed">Stage not completed</string>
 
+    <!-- Settings Categories -->
+    <string name="settings_category_database">Database</string>
+    <string name="settings_category_notifications">Notifications</string>
+    <string name="settings_category_display">Display</string>
+    <string name="settings_category_about">About</string>
 
+    <!-- Database Settings -->
+    <string name="clear_all_data">Clear all data</string>
 
+    <!-- Notification Settings -->
+    <string name="notifications_enabled">Enable notifications</string>
+    <string name="reminder_time">Reminder time</string>
+
+    <!-- Display Settings -->
+    <string name="weight_units">Weight units</string>
+    <string name="dark_theme">Dark theme</string>
+
+    <!-- About Settings -->
+    <string name="version">Version</string>
+    <string name="open_source_licenses">Licenses</string>
+    <string name="version_format">%s</string>
+
+    <!-- Arrays -->
+    <string-array name="reminder_times">
+        <item>Morning</item>
+        <item>Day</item>
+        <item>Evening</item>
+    </string-array>
+
+    <string-array name="reminder_times_values">
+        <item>morning</item>
+        <item>day</item>
+        <item>evening</item>
+    </string-array>
+
+    <string-array name="weight_units">
+        <item>Grams</item>
+        <item>Kilograms</item>
+        <item>Pounds</item>
+    </string-array>
+
+    <string-array name="weight_units_values">
+        <item>grams</item>
+        <item>kilograms</item>
+        <item>pounds</item>
+    </string-array>
 
     <!-- Dashboard -->
-    <string name="dashboard_title">Панель управления</string>
-    <string name="active_batches">Активные партии</string>
-    <string name="completed_stages_week">Завершено этапов за неделю</string>
-    <string name="avg_weight_loss">Средняя потеря веса</string>
-    <string name="next_event">Ближайшее событие</string>
-    <string name="no_upcoming_events">Нет предстоящих событий</string>
-    <string name="recent_notifications">Недавние уведомления</string>
-    <string name="stage_completed_on">Этап завершён %s</string>
-    <string name="completed">Завершено</string>
+    <string name="dashboard_title">Dashboard</string>
+    <string name="active_batches">Active batches</string>
+    <string name="completed_stages_week">Stages completed this week</string>
+    <string name="avg_weight_loss">Average weight loss</string>
+    <string name="next_event">Next event</string>
+    <string name="no_upcoming_events">No upcoming events</string>
+    <string name="recent_notifications">Recent notifications</string>
+    <string name="stage_completed_on">Stage completed on %s</string>
+    <string name="completed">Completed</string>
+
+    <!-- Dashboard values -->
+    <string name="zero_value">0</string>
+    <string name="zero_percent_value">0%</string>
 
     <!-- Navigation -->
-    <string name="nav_home">Главная</string>
-    <string name="nav_batches">Партии</string>
-    <string name="nav_recipes">Рецепты</string>
-    <string name="nav_settings">Настройки</string>
+    <string name="nav_home">Home</string>
+    <string name="nav_batches">Batches</string>
+    <string name="nav_recipes">Recipes</string>
+    <string name="nav_settings">Settings</string>
 
     <!-- Plurals for time -->
     <plurals name="minutes_until">
-        <item quantity="one">Через %d минуту</item>
-        <item quantity="few">Через %d минуты</item>
-        <item quantity="many">Через %d минут</item>
-        <item quantity="other">Через %d минут</item>
+        <item quantity="one">In %d minute</item>
+        <item quantity="two">In %d minutes</item>
+        <item quantity="few">In %d minutes</item>
+        <item quantity="many">In %d minutes</item>
+        <item quantity="other">In %d minutes</item>
     </plurals>
     <plurals name="hours_until">
-        <item quantity="one">Через %d час</item>
-        <item quantity="few">Через %d часа</item>
-        <item quantity="many">Через %d часов</item>
-        <item quantity="other">Через %d часов</item>
+        <item quantity="one">In %d hour</item>
+        <item quantity="two">In %d hours</item>
+        <item quantity="few">In %d hours</item>
+        <item quantity="many">In %d hours</item>
+        <item quantity="other">In %d hours</item>
     </plurals>
     <plurals name="days_until">
-        <item quantity="one">Через %d день</item>
-        <item quantity="few">Через %d дня</item>
-        <item quantity="many">Через %d дней</item>
-        <item quantity="other">Через %d дней</item>
+        <item quantity="one">In %d day</item>
+        <item quantity="two">In %d days</item>
+        <item quantity="few">In %d days</item>
+        <item quantity="many">In %d days</item>
+        <item quantity="other">In %d days</item>
     </plurals>
 
     <!-- Coming soon messages -->
-    <string name="recipes_coming_soon">Рецепты скоро будут доступны</string>
-    <string name="settings_coming_soon">Настройки скоро будут доступны</string>
-
-
-
-
-
+    <string name="recipes_coming_soon">Recipes coming soon</string>
+    <string name="settings_coming_soon">Settings coming soon</string>
 
     <string name="edit_batch">Edit batch</string>
     <string name="start_date_format">Start date: %s</string>
@@ -103,14 +150,14 @@
     <string name="initial_weight">Initial Weight: %.1f g</string>
     <string name="initial_weight_na">Initial Weight: N/A</string>
     <string name="current_weight">Current Weight: %.1f g</string>
-    <string name="weight_loss">Total weight loss: %.1f g (%.1f%%)</string>
+    <string name="weight_loss" formatted="false">Total weight loss: %.1f g (%.1f%%)</string>
 
     <!-- Batch -->
     <string name="batch_saved">Batch saved</string>
     <string name="not_started">Not started</string>
     <string name="na">N/A</string>
     <string name="overdue">Overdue</string>
-    <string name="time_left_format">%d d, %d h left</string>
+    <string name="time_left_format" formatted="false">%d d, %d h left</string>
 
     <!-- Stages -->
     <string name="stage_started_notification_scheduled">Stage started &amp; notification scheduled</string>
@@ -134,7 +181,7 @@
     <string name="weight_information">Weight Information</string>
     <string name="initial_weight_label">Initial weight: %.1f g</string>
     <string name="current_weight_label">Current weight: %.1f g</string>
-    <string name="total_weight_loss">Total weight loss: %.1f g (%.1f%%)</string>
+    <string name="total_weight_loss" formatted="false">Total weight loss: %.1f g (%.1f%%)</string>
     <string name="production_stages">Production Stages</string>
     <string name="stage_header">Stage</string>
     <string name="duration_header">Duration</string>
@@ -147,7 +194,7 @@
     <string name="weight_change_grams">Weight change (g)</string>
 
     <!-- Duration Format -->
-    <string name="duration_days_hours">%dd %dh</string>
+    <string name="duration_days_hours" formatted="false">%dd %dh</string>
     <string name="duration_days_only">%dd</string>
     <string name="duration_hours_only">%dh</string>
 
@@ -204,7 +251,7 @@
 
     <!-- ================== NOTES (detailed procedures) ================== -->
 
-    <string name="note_cured_meat_basic">
+    <string name="note_cured_meat_basic" formatted="false">
         1) Meat preparation:\n
         - Choose chilled meat with little blood and a fresh smell (pork or beef). Trim excess membranes but leave some fat — it adds flavor and protects during drying.\n
         2) Dry salting (method similar to your own):\n
@@ -255,7 +302,7 @@
         - Stuff the mince into natural or collagen casings of the desired diameter. Remove air pockets and tie the ends.\n
         4) Fermentation (critical step):\n
         - Place the sausages in a fermentation chamber at +18…+24°C and relative humidity 85–95% for 24–72 hours (time depends on the culture and desired acidity). During this time pH drops — important for flavor and safety.\n
-        - If using a starter culture, follow the manufacturer’s instructions for temperature and timing.\n
+        - If using a starter culture, follow the manufacturer\'s instructions for temperature and timing.\n
         5) Drying/curing:\n
         - After fermentation move to a chamber with lower temperature +10…+14°C and humidity 70–85%.\n
         - Drying takes from 2 to 6 weeks depending on casing diameter and target final moisture. Check weight and appearance periodically.\n
@@ -362,7 +409,6 @@
         - The cabbage must remain submerged in brine; white benign scum on the surface is normal, but green or black mold is not.
     </string>
 
-
     <string name="batch_info">Product Information</string>
     <string name="batch_type">Product type: %1$s</string>
 
@@ -382,7 +428,7 @@
     <string name="weight_info_title">Weight Information</string>
     <string name="initial_weight_text">Initial weight: %.1f g</string>
     <string name="current_weight_text">Current weight: %.1f g</string>
-    <string name="total_weight_loss_text">Total weight loss: %.1f g (%.1f%%)</string>
+    <string name="total_weight_loss_text" formatted="false">Total weight loss: %.1f g (%.1f%%)</string>
     <string name="stages_production_title">Production Stages</string>
     <string name="stage_column_header">Stage</string>
     <string name="duration_column_header">Duration</string>
@@ -403,24 +449,23 @@
     <string name="reminder_notification_title">CuringTracker</string>
     <string name="reminder_notification_body">Reminder: check your batches</string>
 
-
     <!-- =============== BatchListViewModel STRINGS =============== -->
     <string name="weight_cannot_increase_error">Weight cannot increase (previous: %.1f)</string>
     <string name="weight_diff_too_large_error">Weight differs by more than 40%% from previous (previous: %.1f)</string>
     <string name="weight_save_error">Save error: %1$s</string>
 
     <!-- =============== FileUtils STRINGS =============== -->
-    <!-- Ошибки при копировании файлов -->
+    <!-- File copy errors -->
     <string name="file_error_source_not_exists">Source file does not exist: %s</string>
     <string name="file_error_no_read_access">No read access to file: %s</string>
     <string name="file_error_source_empty">Source file is empty: %s</string>
-    <string name="file_error_copy_incomplete">Copy incomplete: expected %d bytes, copied %d bytes</string>
+    <string name="file_error_copy_incomplete" formatted="false">Copy incomplete: expected %d bytes, copied %d bytes</string>
     <string name="file_error_cannot_open_output_stream">Cannot open output stream for URI: %s</string>
     <string name="file_error_file_unavailable">File unavailable: %s</string>
     <string name="file_error_access_denied">Access denied: %s</string>
     <string name="file_error_copy_failed">File copy error: %s</string>
 
-    <!-- Ошибки при копировании из URI -->
+    <!-- URI copy errors -->
     <string name="file_error_cannot_create_directory">Cannot create directory: %s</string>
     <string name="file_error_source_stream_empty">Source stream is empty</string>
     <string name="file_error_no_bytes_copied">No bytes copied</string>
@@ -429,7 +474,7 @@
     <string name="file_error_access_denied_uri">Access denied to URI: %s</string>
     <string name="file_error_copy_from_uri_failed">Error copying from URI: %s</string>
 
-    <!-- Общие ошибки -->
+    <!-- General errors -->
     <string name="file_error_data_copy_failed">Data copy error: %s</string>
 
     <!-- =============== MainActivity STRINGS =============== -->
@@ -547,5 +592,5 @@
     <string name="retry">Retry</string>
     <string name="no_batches_yet">No batches yet</string>
     <string name="create_first_batch_hint">Create first batch</string>
-
+    <string name="search">Search</string>
 </resources>

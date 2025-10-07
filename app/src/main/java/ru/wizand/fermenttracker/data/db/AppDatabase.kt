@@ -1,6 +1,7 @@
 package ru.wizand.fermenttracker.data.db
 
 import android.content.Context
+import android.util.Log
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
@@ -21,8 +22,6 @@ abstract class AppDatabase : RoomDatabase() {
         @Volatile
         private var INSTANCE: AppDatabase? = null
 
-        // ... (твои миграции/инициализация, как было) ...
-
         fun getInstance(context: Context): AppDatabase {
             return INSTANCE ?: synchronized(this) {
                 val instance = Room.databaseBuilder(
@@ -30,7 +29,6 @@ abstract class AppDatabase : RoomDatabase() {
                     AppDatabase::class.java,
                     "ferment_tracker_db"
                 )
-                    // оставь миграции/фолбэки, которые у тебя были
                     .fallbackToDestructiveMigration()
                     .build()
                 INSTANCE = instance
@@ -45,8 +43,12 @@ abstract class AppDatabase : RoomDatabase() {
             synchronized(this) {
                 try {
                     INSTANCE?.close()
-                } catch (ignored: Exception) { }
-                INSTANCE = null
+                    Log.d("DB", "Database instance closed")
+                } catch (e: Exception) {
+                    Log.e("DB", "Error closing database: ${e.message}")
+                } finally {
+                    INSTANCE = null
+                }
             }
         }
     }

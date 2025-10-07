@@ -5,13 +5,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-import ru.wizand.fermenttracker.R  // Добавьте этот импорт
+import ru.wizand.fermenttracker.R
 import ru.wizand.fermenttracker.databinding.FragmentDashboardBinding
 import ru.wizand.fermenttracker.ui.dashboard.adapter.NotificationAdapter
+import ru.wizand.fermenttracker.vm.SharedViewModel
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -20,7 +21,8 @@ class DashboardFragment : Fragment() {
     private var _binding: FragmentDashboardBinding? = null
     private val binding get() = _binding!!
 
-    private val viewModel: DashboardViewModel by viewModels()
+    // Используем SharedViewModel
+    private val viewModel: SharedViewModel by activityViewModels()
     private lateinit var notificationAdapter: NotificationAdapter
 
     override fun onCreateView(
@@ -50,7 +52,7 @@ class DashboardFragment : Fragment() {
 
     private fun setupSwipeRefresh() {
         binding.swipeRefreshLayout.setOnRefreshListener {
-            viewModel.refreshData()
+            viewModel.refreshDashboardData()
         }
     }
 
@@ -120,5 +122,10 @@ class DashboardFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.refreshDashboardData()
     }
 }

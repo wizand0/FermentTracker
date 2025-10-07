@@ -34,6 +34,52 @@
     <string name="stage_not_completed">Этап не завершён</string>
 
 
+    <!-- Settings Categories -->
+    <string name="settings_category_database">База данных</string>
+    <string name="settings_category_notifications">Уведомления</string>
+    <string name="settings_category_display">Отображение</string>
+    <string name="settings_category_about">О приложении</string>
+
+    <!-- Database Settings -->
+    <string name="clear_all_data">Очистить все данные</string>
+
+    <!-- Notification Settings -->
+    <string name="notifications_enabled">Включить уведомления</string>
+    <string name="reminder_time">Время напоминаний</string>
+
+    <!-- Display Settings -->
+    <string name="weight_units">Единицы измерения веса</string>
+    <string name="dark_theme">Темная тема</string>
+
+    <!-- About Settings -->
+    <string name="version">Версия</string>
+    <string name="open_source_licenses">Лицензии</string>
+    <string name="version_format">%s</string>
+
+    <!-- Arrays -->
+    <string-array name="reminder_times">
+        <item>Утро</item>
+        <item>День</item>
+        <item>Вечер</item>
+    </string-array>
+
+    <string-array name="reminder_times_values">
+        <item>Утро</item>
+        <item>День</item>
+        <item>Вечер</item>
+    </string-array>
+
+    <string-array name="weight_units">
+        <item>Граммы</item>
+        <item>Килограммы</item>
+        <item>Фунты</item>
+    </string-array>
+
+    <string-array name="weight_units_values">
+        <item>Граммы</item>
+        <item>Килограммы</item>
+        <item>Фунты</item>
+    </string-array>
 
 
     <!-- Dashboard -->
@@ -46,6 +92,10 @@
     <string name="recent_notifications">Недавние уведомления</string>
     <string name="stage_completed_on">Этап завершён %s</string>
     <string name="completed">Завершено</string>
+
+    <!-- Dashboard values -->
+    <string name="zero_value">0</string>
+    <string name="zero_percent_value">0%</string>
 
     <!-- Navigation -->
     <string name="nav_home">Главная</string>
@@ -545,9 +595,10 @@
     <string name="edit_recipes">Редактировать рецепты</string>
     <string name="export_db">Экспорт БД</string>
     <string name="import_db">Импорт БД</string>
-    <string name="retry">Retry</string>
-    <string name="no_batches_yet">No batches yet</string>
-    <string name="create_first_batch_hint">Create first batch</string>
+    <string name="retry">Повторить</string>
+    <string name="no_batches_yet">Еще нет партий</string>
+    <string name="create_first_batch_hint">Создайте первую партию</string>
+    <string name="search">Поиск</string>
 
 
 </resources>

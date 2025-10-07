@@ -35,11 +35,13 @@
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/cardActiveBatches"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="0dp"
+                android:layout_marginEnd="@dimen/margin_medium"
                 android:layout_marginBottom="@dimen/margin_medium"
                 app:cardCornerRadius="@dimen/card_corner_radius"
                 app:cardElevation="@dimen/card_elevation"
                 app:strokeWidth="0dp"
+                app:layout_constraintDimensionRatio="H,1:1"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/tvDashboardTitle"
                 app:layout_constraintEnd_toStartOf="@+id/cardCompletedStages"
@@ -47,9 +49,10 @@
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:orientation="vertical"
-                    android:padding="@dimen/card_padding">
+                    android:padding="@dimen/card_padding"
+                    android:gravity="center">
 
                     <TextView
                         android:id="@+id/tvActiveBatchesLabel"
@@ -64,7 +67,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/margin_small"
-                        android:text="0"
+                        android:text="@string/zero_value"
                         android:textAppearance="?attr/textAppearanceHeadline4"
                         android:textStyle="bold"
                         tools:text="5" />
@@ -76,12 +79,12 @@
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/cardCompletedStages"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/margin_medium"
+                android:layout_height="0dp"
                 android:layout_marginBottom="@dimen/margin_medium"
                 app:cardCornerRadius="@dimen/card_corner_radius"
                 app:cardElevation="@dimen/card_elevation"
                 app:strokeWidth="0dp"
+                app:layout_constraintDimensionRatio="H,1:1"
                 app:layout_constraintStart_toEndOf="@+id/cardActiveBatches"
                 app:layout_constraintTop_toBottomOf="@id/tvDashboardTitle"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -89,9 +92,10 @@
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:orientation="vertical"
-                    android:padding="@dimen/card_padding">
+                    android:padding="@dimen/card_padding"
+                    android:gravity="center">
 
                     <TextView
                         android:id="@+id/tvCompletedStagesLabel"
@@ -106,7 +110,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/margin_small"
-                        android:text="0"
+                        android:text="@string/zero_value"
                         android:textAppearance="?attr/textAppearanceHeadline4"
                         android:textStyle="bold"
                         tools:text="12" />
@@ -118,10 +122,14 @@
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/cardAvgWeightLoss"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="0dp"
+                android:layout_marginTop="@dimen/margin_medium"
+                android:layout_marginEnd="@dimen/margin_medium"
+                android:layout_marginBottom="@dimen/margin_medium"
                 app:cardCornerRadius="@dimen/card_corner_radius"
                 app:cardElevation="@dimen/card_elevation"
                 app:strokeWidth="0dp"
+                app:layout_constraintDimensionRatio="H,1:1"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/cardActiveBatches"
                 app:layout_constraintEnd_toStartOf="@+id/cardNextEvent"
@@ -129,9 +137,10 @@
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:orientation="vertical"
-                    android:padding="@dimen/card_padding">
+                    android:padding="@dimen/card_padding"
+                    android:gravity="center">
 
                     <TextView
                         android:id="@+id/tvAvgWeightLossLabel"
@@ -146,7 +155,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/margin_small"
-                        android:text="0%"
+                        android:text="@string/zero_percent_value"
                         android:textAppearance="?attr/textAppearanceHeadline4"
                         android:textStyle="bold"
                         tools:text="12.5%" />
@@ -158,11 +167,13 @@
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/cardNextEvent"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/margin_medium"
+                android:layout_height="0dp"
+                android:layout_marginTop="@dimen/margin_medium"
+                android:layout_marginBottom="@dimen/margin_medium"
                 app:cardCornerRadius="@dimen/card_corner_radius"
                 app:cardElevation="@dimen/card_elevation"
                 app:strokeWidth="0dp"
+                app:layout_constraintDimensionRatio="H,1:1"
                 app:layout_constraintStart_toEndOf="@+id/cardAvgWeightLoss"
                 app:layout_constraintTop_toBottomOf="@id/cardCompletedStages"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -170,9 +181,10 @@
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:orientation="vertical"
-                    android:padding="@dimen/card_padding">
+                    android:padding="@dimen/card_padding"
+                    android:gravity="center">
 
                     <TextView
                         android:id="@+id/tvNextEventLabel"
@@ -222,6 +234,7 @@
                 android:id="@+id/rvNotifications"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:paddingBottom="72dp"
                 android:nestedScrollingEnabled="false"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                 app:layout_constraintStart_toStartOf="parent"

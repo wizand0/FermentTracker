@@ -6,6 +6,7 @@ import kotlinx.coroutines.launch
 import ru.wizand.fermenttracker.data.db.AppDatabase
 import ru.wizand.fermenttracker.data.db.entities.Batch
 import ru.wizand.fermenttracker.data.db.entities.Stage
+import ru.wizand.fermenttracker.data.repository.BatchRepository
 import java.util.*
 
 class DashboardViewModel(application: Application) : AndroidViewModel(application) {
@@ -13,6 +14,7 @@ class DashboardViewModel(application: Application) : AndroidViewModel(applicatio
     private val database = AppDatabase.getInstance(application)
     private val batchDao = database.batchDao()
     private val stageDao = database.stageDao()
+    private val repository = BatchRepository(batchDao, application.applicationContext)
 
     private val _activeBatchesCount = MutableLiveData<Int>()
     val activeBatchesCount: LiveData<Int> = _activeBatchesCount
@@ -33,7 +35,10 @@ class DashboardViewModel(application: Application) : AndroidViewModel(applicatio
     val isLoading: LiveData<Boolean> = _isLoading
 
     init {
-        refreshData()
+        // Наблюдаем за изменениями в партиях
+        repository.allBatches.observeForever { batches ->
+            refreshData()
+        }
     }
 
     fun refreshData() {
