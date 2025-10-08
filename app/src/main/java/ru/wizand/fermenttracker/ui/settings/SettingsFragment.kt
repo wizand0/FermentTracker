@@ -4,6 +4,7 @@ import android.app.AlertDialog
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.lifecycle.lifecycleScope
@@ -26,10 +27,10 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
         setPreferencesFromResource(R.xml.preferences, rootKey)
 
         // Установка версии приложения
-        findPreference<Preference>("version")?.summary = requireContext().packageManager
-            .getPackageInfo(requireContext().packageName, 0).versionName
+        findPreference<Preference>("version")?.summary =
+            requireContext().packageManager.getPackageInfo(requireContext().packageName, 0).versionName
 
-        // Обработка кликов на экспорт/импорт БД
+        // Экспорт / импорт БД
         findPreference<Preference>("export_db")?.setOnPreferenceClickListener {
             (activity as? MainActivity)?.performBackup()
             true
@@ -40,180 +41,158 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
             true
         }
 
-        // Обработка клика на очистку данных
+        // Очистка данных
         findPreference<Preference>("clear_all_data")?.setOnPreferenceClickListener {
             showClearDataDialog()
             true
         }
 
-        // Обработка клика на лицензии
+        // Лицензии
         findPreference<Preference>("licenses")?.setOnPreferenceClickListener {
             showLicensesDialog()
             true
         }
 
-        // Установка значений по умолчанию для ListPreference
+        // Настройка списков (единицы и время)
         setupListPreferences()
 
-        // Добавляем прямые обработчики для SwitchPreferenceCompat
-        findPreference<SwitchPreferenceCompat>("notifications_enabled")?.setOnPreferenceChangeListener { preference, newValue ->
+        // Уведомления
+        findPreference<SwitchPreferenceCompat>("notifications_enabled")?.setOnPreferenceChangeListener { _, newValue ->
             val isEnabled = newValue as Boolean
-            Log.d("Settings", "Notifications enabled changed to: $isEnabled")
-            Toast.makeText(requireContext(), "Уведомления ${if (isEnabled) "включены" else "выключены"}", Toast.LENGTH_SHORT).show()
-
-            // Здесь можно добавить логику для включения/выключения уведомлений
-
-            true // Возвращаем true, чтобы сохранить новое значение
+            Log.d("Settings", "Notifications: $isEnabled")
+            Toast.makeText(
+                requireContext(),
+                getString(R.string.notifications_status, if (isEnabled) getString(R.string.enabled) else getString(R.string.disabled)),
+                Toast.LENGTH_SHORT
+            ).show()
+            true
         }
 
-        findPreference<SwitchPreferenceCompat>("dark_theme")?.setOnPreferenceChangeListener { preference, newValue ->
-            val isDarkTheme = newValue as Boolean
-            Log.d("Settings", "Dark theme changed to: $isDarkTheme")
-            Toast.makeText(requireContext(), "Темная тема ${if (isDarkTheme) "включена" else "выключена"}", Toast.LENGTH_SHORT).show()
+        // Тёмная тема
+        findPreference<SwitchPreferenceCompat>("dark_theme")?.setOnPreferenceChangeListener { _, newValue ->
+            val isDark = newValue as Boolean
+            Log.d("Settings", "Dark theme: $isDark")
 
-            if (isDarkTheme) {
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-            } else {
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-            }
+            val mode = if (isDark) AppCompatDelegate.MODE_NIGHT_YES else AppCompatDelegate.MODE_NIGHT_NO
+            AppCompatDelegate.setDefaultNightMode(mode)
 
-            true // Возвращаем true, чтобы сохранить новое значение
+            Toast.makeText(
+                requireContext(),
+                getString(R.string.dark_theme_status, if (isDark) getString(R.string.enabled) else getString(R.string.disabled)),
+                Toast.LENGTH_SHORT
+            ).show()
+            true
         }
     }
 
     override fun onResume() {
         super.onResume()
-        // Регистрируем слушатель изменений SharedPreferences
-        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
-        sharedPreferences.registerOnSharedPreferenceChangeListener(this)
-        Log.d("Settings", "SharedPreferences listener registered")
+        PreferenceManager.getDefaultSharedPreferences(requireContext())
+            .registerOnSharedPreferenceChangeListener(this)
     }
 
     override fun onPause() {
         super.onPause()
-        // Отменяем регистрацию слушателя
-        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
-        sharedPreferences.unregisterOnSharedPreferenceChangeListener(this)
-        Log.d("Settings", "SharedPreferences listener unregistered")
+        PreferenceManager.getDefaultSharedPreferences(requireContext())
+            .unregisterOnSharedPreferenceChangeListener(this)
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        // Добавляем нижний отступ для списка
+        view.post {
+            view.findViewById<View>(android.R.id.list)?.apply {
+                setPadding(paddingLeft, paddingTop, paddingRight, paddingBottom + 150)
+            }
+        }
     }
 
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
-        Log.d("Settings", "Preference changed: $key")
-
         when (key) {
             "dark_theme" -> {
-                // Эта часть уже обрабатывается в setOnPreferenceChangeListener
-                // Но оставим для надежности
-                val isDarkTheme = sharedPreferences?.getBoolean(key, false) ?: false
-                Log.d("Settings", "Dark theme changed to: $isDarkTheme")
+                val dark = sharedPreferences?.getBoolean(key, false) ?: false
+                AppCompatDelegate.setDefaultNightMode(
+                    if (dark) AppCompatDelegate.MODE_NIGHT_YES else AppCompatDelegate.MODE_NIGHT_NO
+                )
+            }
 
-                if (isDarkTheme) {
-                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-                } else {
-                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-                }
-            }
             "weight_units" -> {
-                // Обработка изменения единиц измерения веса
-                val weightUnits = sharedPreferences?.getString(key, "grams")
-                Log.d("Settings", "Weight units changed to: $weightUnits")
-                Toast.makeText(requireContext(), "Единицы веса изменены на: $weightUnits", Toast.LENGTH_SHORT).show()
-                // Здесь можно добавить логику для обновления UI в соответствии с выбранными единицами
+                val units = sharedPreferences?.getString(key, "grams")
+                Toast.makeText(requireContext(), getString(R.string.weight_units_changed, units), Toast.LENGTH_SHORT).show()
             }
+
             "notifications_enabled" -> {
-                // Эта часть уже обрабатывается в setOnPreferenceChangeListener
-                // Но оставим для надежности
                 val enabled = sharedPreferences?.getBoolean(key, true) ?: true
-                Log.d("Settings", "Notifications enabled changed to: $enabled")
-                Toast.makeText(requireContext(), "Уведомления ${if (enabled) "включены" else "выключены"}", Toast.LENGTH_SHORT).show()
-                // Здесь можно добавить логику для включения/выключения уведомлений
+                Toast.makeText(
+                    requireContext(),
+                    getString(R.string.notifications_status, if (enabled) getString(R.string.enabled) else getString(R.string.disabled)),
+                    Toast.LENGTH_SHORT
+                ).show()
             }
+
             "reminder_time" -> {
                 val time = sharedPreferences?.getString(key, "morning")
-                Log.d("Settings", "Reminder time changed to: $time")
-                Toast.makeText(requireContext(), "Время напоминаний изменено на: $time", Toast.LENGTH_SHORT).show()
-                // Здесь можно добавить логику для изменения времени напоминаний
+                Toast.makeText(requireContext(), getString(R.string.reminder_time_changed, time), Toast.LENGTH_SHORT).show()
             }
         }
     }
 
     private fun setupListPreferences() {
-        // Настройка ListPreference для единиц измерения веса
-        val weightUnitsPreference = findPreference<ListPreference>("weight_units")
-        weightUnitsPreference?.summaryProvider = SummaryProvider<ListPreference> { preference ->
-            val index = preference.findIndexOfValue(preference.value)
-            if (index >= 0) preference.entries[index] else ""
+        // Единицы измерения
+        findPreference<ListPreference>("weight_units")?.apply {
+            summaryProvider = SummaryProvider<ListPreference> { pref ->
+                val index = pref.findIndexOfValue(pref.value)
+                if (index >= 0) pref.entries[index] else ""
+            }
         }
 
-        weightUnitsPreference?.setOnPreferenceChangeListener { preference, newValue ->
-            val value = newValue as String
-            Log.d("Settings", "Weight units preference changed to: $value")
-            Toast.makeText(requireContext(), "Единицы веса изменены", Toast.LENGTH_SHORT).show()
-            true
-        }
-
-        // Настройка ListPreference для времени напоминаний
-        val reminderTimePreference = findPreference<ListPreference>("reminder_time")
-        reminderTimePreference?.summaryProvider = SummaryProvider<ListPreference> { preference ->
-            val index = preference.findIndexOfValue(preference.value)
-            if (index >= 0) preference.entries[index] else ""
-        }
-
-        reminderTimePreference?.setOnPreferenceChangeListener { preference, newValue ->
-            val value = newValue as String
-            Log.d("Settings", "Reminder time preference changed to: $value")
-            Toast.makeText(requireContext(), "Время напоминаний изменено", Toast.LENGTH_SHORT).show()
-            true
+        // Время напоминаний
+        findPreference<ListPreference>("reminder_time")?.apply {
+            summaryProvider = SummaryProvider<ListPreference> { pref ->
+                val index = pref.findIndexOfValue(pref.value)
+                if (index >= 0) pref.entries[index] else ""
+            }
         }
     }
 
     private fun showClearDataDialog() {
-        AlertDialog.Builder(requireContext())
-            .setTitle("Очистить все данные")
-            .setMessage("Вы уверены, что хотите удалить все данные? Это действие нельзя отменить.")
-            .setPositiveButton("Да") { _, _ ->
+        AlertDialog.Builder(requireContext(), R.style.Theme_FermentTracker_Dialog)
+            .setTitle(R.string.clear_all_data_title)
+            .setMessage(R.string.clear_all_data_message)
+            .setPositiveButton(R.string.yes) { _, _ ->
                 lifecycleScope.launch {
                     try {
-                        // Показываем диалог в главном потоке
                         withContext(Dispatchers.Main) {
-                            Toast.makeText(context, "Очистка данных...", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, getString(R.string.clearing_data), Toast.LENGTH_SHORT).show()
                         }
 
-                        // Выполняем очистку в фоновом потоке
                         withContext(Dispatchers.IO) {
-                            // Закрываем базу данных
                             AppDatabase.closeInstance()
-
-                            // Удаляем файл базы данных
                             val dbFile = requireContext().getDatabasePath("ferment_tracker_db")
-                            if (dbFile.exists()) {
-                                dbFile.delete()
-                            }
-
+                            if (dbFile.exists()) dbFile.delete()
                             Log.d("DB", "Database cleared")
                         }
 
-                        // Показываем сообщение в главном потоке
                         withContext(Dispatchers.Main) {
-                            Toast.makeText(context, "Все данные удалены", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, getString(R.string.all_data_deleted), Toast.LENGTH_SHORT).show()
                         }
                     } catch (e: Exception) {
                         withContext(Dispatchers.Main) {
-                            Toast.makeText(context, "Ошибка при очистке данных: ${e.message}", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, getString(R.string.error_clearing_data, e.message), Toast.LENGTH_SHORT).show()
                             Log.e("DB", "Error clearing database: ${e.message}")
                         }
                     }
                 }
             }
-            .setNegativeButton("Отмена", null)
+            .setNegativeButton(R.string.cancel, null)
             .show()
     }
 
     private fun showLicensesDialog() {
-        AlertDialog.Builder(requireContext())
-            .setTitle("Лицензии открытого ПО")
-            .setMessage("Здесь будет информация об используемых open-source библиотеках")
-            .setPositiveButton("OK", null)
+        AlertDialog.Builder(requireContext(), R.style.Theme_FermentTracker_Dialog)
+            .setTitle(R.string.open_source_licenses_title)
+            .setMessage(R.string.open_source_licenses_text)
+            .setPositiveButton(android.R.string.ok, null)
             .show()
     }
 }

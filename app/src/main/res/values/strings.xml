@@ -593,4 +593,51 @@
     <string name="no_batches_yet">No batches yet</string>
     <string name="create_first_batch_hint">Create first batch</string>
     <string name="search">Search</string>
+
+    <!-- Dialog strings -->
+    <string name="clear_all_data_title">Clear All Data</string>
+    <string name="clear_all_data_message">Are you sure you want to delete all data? This action cannot be undone.</string>
+    <string name="yes">Yes</string>
+    <string name="clearing_data">Clearing data...</string>
+    <string name="all_data_deleted">All data deleted</string>
+    <string name="error_clearing_data">Error clearing data: %1$s</string>
+
+    <!-- Toast strings -->
+    <string name="notifications_status">Notifications %1$s</string>
+    <string name="dark_theme_status">Dark theme %1$s</string>
+    <string name="weight_units_changed">Weight units changed to: %1$s</string>
+    <string name="reminder_time_changed">Reminder time changed to: %1$s</string>
+    <string name="weight_units_changed_to">Weight units changed</string>
+    <string name="reminder_time_changed_to">Reminder time changed</string>
+
+    <!-- Common strings -->
+    <string name="enabled">enabled</string>
+    <string name="disabled">disabled</string>
+
+    <!-- Licenses -->
+    <string name="open_source_licenses_title">Open Source Licenses</string>
+    <string name="open_source_licenses_text">
+        This application uses the following open source libraries:\n\n
+        \n
+        AndroidX\n
+        Copyright © The Android Open Source Project\n
+        Licensed under the Apache License, Version 2.0\n\n
+        \n
+        Material Components\n
+        Copyright © Google, Inc.\n
+        Licensed under the Apache License, Version 2.0\n\n
+        \n
+        Room Database\n
+        Copyright © The Android Open Source Project\n
+        Licensed under the Apache License, Version 2.0\n\n
+        \n
+        Navigation Component\n
+        Copyright © The Android Open Source Project\n
+        Licensed under the Apache License, Version 2.0\n\n
+        \n
+        Kotlin Coroutines\n
+        Copyright © JetBrains s.r.o.\n
+        Licensed under the Apache License, Version 2.0
+    </string>
+
 </resources>

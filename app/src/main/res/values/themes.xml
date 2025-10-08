@@ -18,7 +18,22 @@
 
         <item name="colorSurface">@color/surface</item>
         <item name="colorOnSurface">@color/onSurface</item>
+        <item name="preferenceCategoryStyle">@style/FermentPreferenceCategory</item>
+
     </style>
+
+    <style name="FermentPreferenceCategory" parent="Preference.Category.Material">
+        <item name="android:textColor">?attr/colorOnSurfaceVariant</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:paddingTop">12dp</item>
+        <item name="android:paddingBottom">6dp</item>
+    </style>
+
+    <style name="PreferenceCategoryTitleText" parent="TextAppearance.Material3.TitleSmall">
+        <item name="android:textColor">?attr/colorOnSurfaceVariant</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
 
     <!-- Тема для окон/диалогов (если нужно) -->
     <style name="Theme.FermentTracker.Dialog" parent="Theme.Material3.DayNight.Dialog.Alert">

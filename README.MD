@@ -51,9 +51,24 @@ FermentTracker is an Android application designed to help users manage and track
 5. Build and run the app on an emulator or physical device with Android 5.0 (API 21) or higher.
 
 ### Current Version
-- Version: 1.21
+- Version: 1.22
 - Release Date: October 08, 2025
 - Notes: Initial release with core fermentation tracking features. Future updates will include data persistence improvements and additional export options.
+
+### Data Backup Policy
+
+- Android Auto Backup is **disabled** (`android:allowBackup="false"`).
+- Custom `backup_rules.xml` excludes:
+    - All databases
+    - SharedPreferences with sensitive data (auth, tokens, etc.)
+    - Cache directories
+
+### Data Export & Import
+
+- Export and import of data are handled **only through the app’s UI**.
+- Exported data does **not** contain secrets or authentication tokens.
+- Users can safely back up recipes and logs via UI options.
+
 
 ### Contributing
 We welcome contributions! To contribute:
@@ -79,80 +94,3 @@ git push origin feature-name
 This project is licensed under the MIT License. See the LICENSE file for details.
 ### Contact
 For questions or support, please open an issue on GitHub or contact the maintainer at makandrei@gmail.com.
-
-## Русская версия
-### Обзор
-FermentTracker — это приложение для Android, разработанное для помощи пользователям в управлении и отслеживании процессов ферментации, таких как приготовление пива или ферментация продуктов питания. Приложение позволяет создавать партии, отслеживать этапы, добавлять фотографии, генерировать QR-коды для деталей партий и экспортировать данные. Оно идеально подходит как для любителей, так и для профессионалов, которым нужен организованный способ контроля над проектами ферментации.
-### Функции
-
-- Управление партиями: Создание, просмотр и удаление партий ферментации с деталями, такими как название, тип продукта и дата начала.
-- Отслеживание этапов: Мониторинг нескольких этапов ферментации (например, Ферментация, Выдержка) с временем начала/окончания и обновлением веса.
-- Интеграция фотографий: Съёмка и хранение фотографий для каждого этапа с помощью камеры устройства.
-- Генерация QR-кодов: Создание QR-кодов для идентификаторов партий для обмена или сохранения информации.
-- Экспорт данных: Обмен QR-кодами через мессенджеры или сохранение на устройстве.
-- Swipe-to-Delete: Удобное удаление партий с помощью свайпа.
-- Редактирование шаблонов: Добавление и редактирование шаблонов подготовки для повторяющихся процессов.
-
-### Скриншоты
-
-| Главный экран (свайп)       | Детальная информация ч1     | Детальная информация ч2     | Создание нового продукта    |
-|-----------------------------|-----------------------------|-----------------------------|-----------------------------|
-| ![](images/screenshot1.png) | ![](images/screenshot3.png) | ![](images/screenshot3.png) | ![](images/screenshot4.png) |
-
-
-### Стек технологий
-
-- Язык: Kotlin
-- Фреймворк: Android Jetpack (Navigation, ViewModel, LiveData, Room)
-- Интерфейс: XML Layouts, Material Design Components
-- Библиотеки:
-- androidx.navigation:navigation-fragment-ktx
-- androidx.recyclerview:recyclerview
-- com.google.android.material:material
-- com.google.zxing:core (для генерации QR-кодов)
-- Инструменты сборки: Gradle
-- Контроль версий: Git
-
-### Установка
-
-1. Склонируйте репозиторий:
-```bash
-git clone https://github.com/yourusername/FermentTracker.git
-```
-
-2. Откройте проект в Android Studio.
-3. Синхронизируйте проект с файлами Gradle.
-4. Убедитесь, что установлены все необходимые зависимости (см. build.gradle).
-5. Соберите и запустите приложение на эмуляторе или физическом устройстве с Android 5.0 (API 21) или выше.
-
-### Текущая версия
-
-- Версия: 1.21
-- Дата выпуска: 08 октября 2025 года
-Примечания: Начальный релиз с основными функциями отслеживания ферментации. Будущие обновления включат улучшения хранения данных и дополнительные опции экспорта.
-
-### Участие в разработке
-Мы рады вкладам! Чтобы внести свой вклад:
-
-1. Сделайте форк репозитория.
-2. Создайте новую ветку для вашей функции или исправления ошибки:
-```bash
-git checkout -b feature-name
-```
-
-3. Зафиксируйте изменения:
-```bash
-git commit -m "Описание изменений"
-```
-
-4. Отправьте изменения в ветку:
-```bash 
-git push origin feature-name
-```
-
-5. Откройте pull request с чётким описанием ваших изменений.
-
-### Лицензия
-Этот проект лицензирован по лицензии MIT. См. файл LICENSE для деталей.
-### Контакты
-Для вопросов или поддержки, пожалуйста, откройте issue на GitHub или свяжитесь с автором по адресу makandre@gmail.com.

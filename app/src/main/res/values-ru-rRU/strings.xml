@@ -38,7 +38,6 @@
     <string name="settings_category_database">База данных</string>
     <string name="settings_category_notifications">Уведомления</string>
     <string name="settings_category_display">Отображение</string>
-    <string name="settings_category_about">О приложении</string>
 
     <!-- Database Settings -->
     <string name="clear_all_data">Очистить все данные</string>
@@ -50,11 +49,6 @@
     <!-- Display Settings -->
     <string name="weight_units">Единицы измерения веса</string>
     <string name="dark_theme">Темная тема</string>
-
-    <!-- About Settings -->
-    <string name="version">Версия</string>
-    <string name="open_source_licenses">Лицензии</string>
-    <string name="version_format">%s</string>
 
     <!-- Arrays -->
     <string-array name="reminder_times">
@@ -593,12 +587,66 @@
     <string name="complete">Завершить</string>
     <string name="remove">Удалить</string>
     <string name="edit_recipes">Редактировать рецепты</string>
-    <string name="export_db">Экспорт БД</string>
-    <string name="import_db">Импорт БД</string>
     <string name="retry">Повторить</string>
     <string name="no_batches_yet">Еще нет партий</string>
     <string name="create_first_batch_hint">Создайте первую партию</string>
     <string name="search">Поиск</string>
 
+
+    <!-- Settings strings -->
+
+    <string name="export_db">Экспорт базы данных</string>
+    <string name="import_db">Импорт базы данных</string>
+
+    <string name="settings_category_about">О приложении</string>
+    <string name="version">Версия</string>
+    <string name="version_format">Версия %1$s</string>
+    <string name="open_source_licenses">Лицензии открытого ПО</string>
+
+    <!-- Dialog strings -->
+    <string name="clear_all_data_title">Очистить все данные</string>
+    <string name="clear_all_data_message">Вы уверены, что хотите удалить все данные? Это действие нельзя отменить.</string>
+    <string name="yes">Да</string>
+    <string name="clearing_data">Очистка данных...</string>
+    <string name="all_data_deleted">Все данные удалены</string>
+    <string name="error_clearing_data">Ошибка при очистке данных: %1$s</string>
+
+    <!-- Toast strings -->
+    <string name="notifications_status">Уведомления %1$s</string>
+    <string name="dark_theme_status">Темная тема %1$s</string>
+    <string name="weight_units_changed">Единицы веса изменены на: %1$s</string>
+    <string name="reminder_time_changed">Время напоминаний изменено на: %1$s</string>
+    <string name="weight_units_changed_to">Единицы веса изменены</string>
+    <string name="reminder_time_changed_to">Время напоминаний изменено</string>
+
+    <!-- Common strings -->
+    <string name="enabled">включены</string>
+    <string name="disabled">выключены</string>
+
+    <!-- Licenses -->
+    <string name="open_source_licenses_title">Лицензии открытого ПО</string>
+    <string name="open_source_licenses_text">
+        Это приложение использует следующие библиотеки с открытым исходным кодом:\n\n
+        \n
+        AndroidX\n
+        Copyright © The Android Open Source Project\n
+        Лицензия Apache License, Version 2.0\n\n
+        \n
+        Material Components\n
+        Copyright © Google, Inc.\n
+        Лицензия Apache License, Version 2.0\n\n
+        \n
+        Room Database\n
+        Copyright © The Android Open Source Project\n
+        Лицензия Apache License, Version 2.0\n\n
+        \n
+        Navigation Component\n
+        Copyright © The Android Open Source Project\n
+        Лицензия Apache License, Version 2.0\n\n
+        \n
+        Kotlin Coroutines\n
+        Copyright © JetBrains s.r.o.\n
+        Лицензия Apache License, Version 2.0
+    </string>
 
 </resources>

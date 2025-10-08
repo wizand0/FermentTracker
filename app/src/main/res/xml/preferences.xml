@@ -2,22 +2,31 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <PreferenceCategory android:title="@string/settings_category_database">
+    <!-- =================== DATABASE =================== -->
+    <PreferenceCategory
+        android:title="@string/settings_category_database"
+        app:iconSpaceReserved="false">
         <Preference
             android:key="export_db"
             android:title="@string/export_db"
-            android:icon="@drawable/ic_export" />
+            android:icon="@drawable/ic_export"
+            android:tint="?attr/colorOnSurfaceVariant" />
         <Preference
             android:key="import_db"
             android:title="@string/import_db"
-            android:icon="@drawable/ic_import" />
+            android:icon="@drawable/ic_import"
+            android:tint="?attr/colorOnSurfaceVariant" />
         <Preference
             android:key="clear_all_data"
             android:title="@string/clear_all_data"
-            android:icon="@drawable/ic_delete" />
+            android:icon="@drawable/ic_delete"
+            android:tint="?attr/colorOnSurfaceVariant" />
     </PreferenceCategory>
 
-    <PreferenceCategory android:title="@string/settings_category_notifications">
+    <!-- =================== NOTIFICATIONS =================== -->
+    <PreferenceCategory
+        android:title="@string/settings_category_notifications"
+        app:iconSpaceReserved="false">
         <SwitchPreferenceCompat
             android:key="notifications_enabled"
             android:title="@string/notifications_enabled"
@@ -32,7 +41,10 @@
             android:icon="@drawable/ic_time" />
     </PreferenceCategory>
 
-    <PreferenceCategory android:title="@string/settings_category_display">
+    <!-- =================== DISPLAY =================== -->
+    <PreferenceCategory
+        android:title="@string/settings_category_display"
+        app:iconSpaceReserved="false">
         <ListPreference
             android:key="weight_units"
             android:title="@string/weight_units"
@@ -47,17 +59,28 @@
             android:icon="@drawable/ic_theme" />
     </PreferenceCategory>
 
-    <PreferenceCategory android:title="@string/settings_category_about">
+    <!-- =================== ABOUT =================== -->
+    <PreferenceCategory
+        android:title="@string/settings_category_about"
+        app:iconSpaceReserved="false">
         <Preference
             android:key="version"
             android:title="@string/version"
-            android:summary="@string/version_format"
             android:selectable="false"
             android:icon="@drawable/ic_info" />
         <Preference
             android:key="licenses"
             android:title="@string/open_source_licenses"
             android:icon="@drawable/ic_license" />
+    </PreferenceCategory>
+    <!-- =================== BLANK =================== -->
+    <PreferenceCategory
+        android:title=" "
+        app:iconSpaceReserved="false">
+        <Preference
+            android:key="version"
+            android:title=" "
+            android:selectable="false" />
     </PreferenceCategory>
 
 </PreferenceScreen>

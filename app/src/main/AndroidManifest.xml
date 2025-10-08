@@ -15,12 +15,6 @@
     <uses-permission
         android:name="android.permission.WRITE_EXTERNAL_STORAGE"
         android:maxSdkVersion="28" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
-        android:maxSdkVersion="28" />
-
-    <!-- Note: REQUEST_IGNORE_BATTERY_OPTIMIZATIONS можно запросить, но это может
-         привести к отклонению приложения в Google Play. Лучше направить пользователя
-         в настройки вручную, если нужна надежная работа фоновых задач -->
 
     <uses-feature
         android:name="android.hardware.camera"
@@ -28,8 +22,7 @@
 
     <application
         android:name=".FermentTrackerApp"
-        android:allowBackup="true"
-        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:allowBackup="false"
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -51,6 +44,7 @@
             </intent-filter>
         </activity>
 
+        <!-- FileProvider для экспорта PDF и файлов -->
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.fileprovider"
@@ -60,6 +54,7 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths" />
         </provider>
+
     </application>
 
 </manifest>

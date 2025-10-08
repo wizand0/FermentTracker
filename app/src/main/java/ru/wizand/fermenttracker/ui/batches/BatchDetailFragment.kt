@@ -99,6 +99,7 @@ class BatchDetailFragment : Fragment() {
                 updateBatchPlannedCompletion()
             }
         )
+
         binding.rvStages.adapter = stageAdapter
         binding.rvStages.layoutManager = LinearLayoutManager(requireContext())
 

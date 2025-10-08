@@ -84,7 +84,9 @@ class MainActivity : AppCompatActivity() {
                 R.id.dashboardFragment,
                 R.id.batchListFragment,
                 R.id.recipesFragment,
-                R.id.settingsFragment -> {
+                R.id.settingsFragment,
+                R.id.batchDetailFragment,
+                R.id.recipesFragment -> {
                     binding.bottomNavigation.visibility = View.VISIBLE
                 }
                 else -> {
