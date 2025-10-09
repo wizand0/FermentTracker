@@ -1,4 +1,3 @@
-// src/main/java/ru/wizand/fermenttracker/ui/adapters/PhotosAdapter.kt
 package ru.wizand.fermenttracker.ui.adapters
 
 import android.view.LayoutInflater
@@ -6,7 +5,8 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import coil.load
+import coil.ImageLoader
+import coil.request.ImageRequest
 import coil.transform.RoundedCornersTransformation
 import ru.wizand.fermenttracker.data.db.entities.Photo
 import ru.wizand.fermenttracker.databinding.ItemPhotoBinding
@@ -28,13 +28,29 @@ class PhotosAdapter : ListAdapter<Photo, PhotosAdapter.VH>(DIFF) {
 
     inner class VH(private val b: ItemPhotoBinding) : RecyclerView.ViewHolder(b.root) {
         fun bind(photo: Photo) {
-            b.ivPhoto.load(File(photo.filePath)) {
-                crossfade(true)
-                placeholder(R.drawable.ic_placeholder)
-                error(R.drawable.ic_error)
-                size(640, 480) // Изменение размера для экономии памяти
-                transformations(RoundedCornersTransformation(8f))
-            }
+            // Расчитываем размер на основе ширины ImageView (после inflate она известна)
+            val containerWidth = b.ivPhoto.width.takeIf { it > 0 } ?: 200 // Запасной размер, если ещё не измерено
+            val containerHeight = (containerWidth * 0.75f).toInt() // Пропорции 4:3, например; настройте под нужды
+
+            // Настраиваем ImageLoader для лучшей памяти и кэширования
+            val imageLoader = ImageLoader.Builder(b.root.context)
+                .memoryCachePolicy(coil.request.CachePolicy.ENABLED)  // Явное включение кэша памяти
+                .diskCachePolicy(coil.request.CachePolicy.ENABLED)    // Явное включение кэша диска
+                .build()
+
+            // Прогрессивная загрузка с Coil: плейсхолдер, crossfade, ограничения на размер
+            val request = ImageRequest.Builder(b.root.context)
+                .data(File(photo.filePath))
+                .target(b.ivPhoto)
+                .size(containerWidth, containerHeight)  // Размер на основе контейнера для экономии памяти
+                .crossfade(true)  // Плавное появление (прогрессивная загрузка)
+                .placeholder(R.drawable.ic_placeholder)  // Плейсхолдер во время загрузки
+                .error(R.drawable.ic_error)  // Изображение при ошибке
+                .allowHardware(false)  // Отключаем аппаратное ускорение для больших изображений (экономит память)
+                .transformations(RoundedCornersTransformation(8f))  // Трансформация для округления
+                .build()
+
+            imageLoader.enqueue(request)
 
             b.tvTimestamp.text = SimpleDateFormat(
                 "yyyy-MM-dd HH:mm",

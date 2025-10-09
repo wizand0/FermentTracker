@@ -3,8 +3,11 @@ package ru.wizand.fermenttracker.data.db.dao
 import androidx.lifecycle.LiveData
 import androidx.paging.PagingSource
 import androidx.room.*
+import androidx.sqlite.db.SimpleSQLiteQuery
+import androidx.sqlite.db.SupportSQLiteQuery
 import kotlinx.coroutines.flow.Flow
 import ru.wizand.fermenttracker.data.db.entities.*
+
 
 @Dao
 interface BatchDao {
@@ -149,4 +152,8 @@ interface BatchDao {
           AND currentWeightGr IS NOT NULL
     """)
     fun getAverageWeightLoss(): Double?
+
+
+    @RawQuery(observedEntities = [Batch::class])
+    fun getFilteredBatchesPaged(query: SupportSQLiteQuery): PagingSource<Int, Batch>
 }

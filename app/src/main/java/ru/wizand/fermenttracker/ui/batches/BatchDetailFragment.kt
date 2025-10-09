@@ -317,8 +317,11 @@ class BatchDetailFragment : Fragment() {
     }
 
     private fun exportToPdf() {
-        lifecycleScope.launch {
+        viewLifecycleOwner.lifecycleScope.launch {
             try {
+                // Проверяем состояние фрагмента
+                if (!isAdded()) return@launch
+
                 val batch = viewModel.batch.value
                 val stages = viewModel.stages.value ?: emptyList()
                 val logs = viewModel.logs.value ?: emptyList()
@@ -335,6 +338,9 @@ class BatchDetailFragment : Fragment() {
                 val file = pdfExporter.exportBatchToPdf(batch, stages, logs, photos, recipe)
 
                 withContext(Dispatchers.Main) {
+                    // Проверяем состояние фрагмента снова
+                    if (!isAdded()) return@withContext
+
                     if (file != null) {
 //                        pdfExporter.sharePdf(file)
                         pdfExporter.saveAndSharePdf(file)
@@ -345,8 +351,14 @@ class BatchDetailFragment : Fragment() {
                 }
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
-                    Toast.makeText(requireContext(), getString(R.string.pdf_export_error_detailed, e.message), Toast.LENGTH_LONG).show()
-                    android.util.Log.e("BatchDetailFragment", "PDF export error", e)
+                    if (isAdded()) {
+                        Toast.makeText(
+                            requireContext(),
+                            getString(R.string.pdf_export_error_detailed, e.message),
+                            Toast.LENGTH_LONG
+                        ).show()
+                        android.util.Log.e("BatchDetailFragment", "PDF export error", e)
+                    }
                 }
             }
         }
@@ -444,6 +456,17 @@ class BatchDetailFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
+
+        // Очищаем слушатели в адаптерах
+        if (::stageAdapter.isInitialized) {
+            stageAdapter.clearAllListeners()
+        }
+
+        // Отсоединяем адаптеры от RecyclerView
+        binding.rvStages.adapter = null
+        binding.rvLogs.adapter = null
+
+        // Очищаем binding
         _binding = null
     }
 }

@@ -7,7 +7,15 @@
     <fragment
         android:id="@+id/dashboardFragment"
         android:name="ru.wizand.fermenttracker.ui.dashboard.DashboardFragment"
-        android:label="@string/nav_home" />
+        android:label="@string/nav_home">
+        <action
+            android:id="@+id/action_dashboardFragment_to_batchDetailFragment"
+            app:destination="@id/batchDetailFragment">
+            <argument
+                android:name="batchId"
+                app:argType="string" />
+        </action>
+    </fragment>
 
 
     <fragment

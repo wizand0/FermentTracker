@@ -7,7 +7,6 @@ import ru.wizand.fermenttracker.data.db.AppDatabase
 import ru.wizand.fermenttracker.data.db.entities.Batch
 import ru.wizand.fermenttracker.data.db.entities.Stage
 import ru.wizand.fermenttracker.data.repository.BatchRepository
-import java.util.*
 
 class DashboardViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -25,8 +24,8 @@ class DashboardViewModel(application: Application) : AndroidViewModel(applicatio
     private val _avgWeightLoss = MutableLiveData<Double>()
     val avgWeightLoss: LiveData<Double> = _avgWeightLoss
 
-    private val _nextEvent = MutableLiveData<Pair<String, Long>?>()
-    val nextEvent: LiveData<Pair<String, Long>?> = _nextEvent
+    private val _nextEvent = MutableLiveData<Triple<String, Long, String>?>()
+    val nextEvent: LiveData<Triple<String, Long, String>?> = _nextEvent
 
     private val _recentCompletedStages = MutableLiveData<List<Stage>>()
     val recentCompletedStages: LiveData<List<Stage>> = _recentCompletedStages
@@ -34,11 +33,25 @@ class DashboardViewModel(application: Application) : AndroidViewModel(applicatio
     private val _isLoading = MutableLiveData<Boolean>()
     val isLoading: LiveData<Boolean> = _isLoading
 
+    private val batchesObserver = Observer<List<Batch>> {
+        refreshData()
+    }
+
     init {
-        // Наблюдаем за изменениями в партиях
-        repository.allBatches.observeForever { batches ->
-            refreshData()
-        }
+        refreshData()
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        repository.allBatches.removeObserver(batchesObserver)
+    }
+
+    fun startObservingBatches() {
+        repository.allBatches.observeForever(batchesObserver)
+    }
+
+    fun stopObservingBatches() {
+        repository.allBatches.removeObserver(batchesObserver)
     }
 
     fun refreshData() {
@@ -46,28 +59,26 @@ class DashboardViewModel(application: Application) : AndroidViewModel(applicatio
 
         viewModelScope.launch {
             try {
-                // Активные партии
                 val activeBatches = batchDao.getActiveBatchesCount()
                 _activeBatchesCount.postValue(activeBatches ?: 0)
 
-                // Завершённые этапы за неделю
                 val now = System.currentTimeMillis()
                 val weekAgo = now - (7 * 24 * 60 * 60 * 1000)
+
                 val completedStages = stageDao.getCompletedStagesThisWeek(weekAgo, now)
                 _completedStagesThisWeek.postValue(completedStages?.size ?: 0)
 
-                // Средняя потеря веса
                 val avgLoss = batchDao.getAverageWeightLoss()
                 _avgWeightLoss.postValue(avgLoss ?: 0.0)
 
-                // Ближайшее событие
+                // === Ближайшее событие ===
                 val nextStage = stageDao.getNextUpcomingStage(now)
                 if (nextStage != null) {
                     val batch = batchDao.getBatchByIdOnce(nextStage.batchId)
-                    val batchName = batch?.name ?: ""
-                    // Проверяем, что plannedEndTime не null
-                    nextStage.plannedEndTime?.let { plannedEndTime ->
-                        _nextEvent.postValue(Pair("$batchName: ${nextStage.name}", plannedEndTime))
+                    val batchName = batch?.name ?: "Неизвестная партия"
+
+                    nextStage.plannedEndTime?.let { plannedEnd ->
+                        _nextEvent.postValue(Triple("$batchName: ${nextStage.name}", plannedEnd, nextStage.batchId))
                     } ?: run {
                         _nextEvent.postValue(null)
                     }
@@ -75,12 +86,10 @@ class DashboardViewModel(application: Application) : AndroidViewModel(applicatio
                     _nextEvent.postValue(null)
                 }
 
-                // Недавние уведомления (топ-3 завершённых этапов)
                 val recentStages = stageDao.getRecentCompletedStages(3)
                 _recentCompletedStages.postValue(recentStages ?: emptyList())
 
             } catch (e: Exception) {
-                // Обработка ошибок
                 e.printStackTrace()
             } finally {
                 _isLoading.postValue(false)

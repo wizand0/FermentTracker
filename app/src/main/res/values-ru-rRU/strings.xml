@@ -33,6 +33,11 @@
     <string name="event_passed">Событие уже прошло</string>
     <string name="stage_not_completed">Этап не завершён</string>
 
+    <string name="filter_by">Filter by</string>
+    <string name="filter_by_name">Name</string>
+    <string name="filter_by_date">Date</string>
+    <string name="filter_by_status">Status</string>
+
 
     <!-- Settings Categories -->
     <string name="settings_category_database">База данных</string>

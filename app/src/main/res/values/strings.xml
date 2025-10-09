@@ -34,6 +34,11 @@
     <string name="event_passed">Event has already passed</string>
     <string name="stage_not_completed">Stage not completed</string>
 
+    <string name="filter_by">Filter by</string>
+    <string name="filter_by_name">Name</string>
+    <string name="filter_by_date">Date</string>
+    <string name="filter_by_status">Status</string>
+
     <!-- Settings Categories -->
     <string name="settings_category_database">Database</string>
     <string name="settings_category_notifications">Notifications</string>

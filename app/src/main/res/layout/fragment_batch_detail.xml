@@ -1,29 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Новый корневой элемент: FrameLayout -->
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="?attr/colorSurface">
 
-    <!-- ScrollView теперь внутри FrameLayout -->
+    <!-- ScrollView теперь содержит ConstraintLayout -->
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent">
 
-        <LinearLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
             android:padding="16dp">
 
-            <!-- Карточка информации -->
+            <!-- Информационная карточка (сохраняем CardView для визуального разделения) -->
             <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardBatchInfo"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:cardCornerRadius="12dp"
                 app:cardElevation="4dp"
-                android:layout_marginBottom="16dp">
+                android:layout_marginBottom="16dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintEnd_toEndOf="parent">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -72,11 +78,15 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Notes -->
+            <!-- Notes (без CardView) -->
             <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tilNotes"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Notes">
+                android:hint="Notes"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/cardBatchInfo"
+                app:layout_constraintEnd_toEndOf="parent">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etNotes"
@@ -84,26 +94,17 @@
                     android:layout_height="wrap_content" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- QR -->
-<!--            <com.google.android.material.textfield.TextInputLayout-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:hint="QR Code"-->
-<!--                android:layout_marginTop="12dp">-->
-
-<!--                <com.google.android.material.textfield.TextInputEditText-->
-<!--                    android:id="@+id/etQrCode"-->
-<!--                    android:layout_width="match_parent"-->
-<!--                    android:layout_height="wrap_content" />-->
-<!--            </com.google.android.material.textfield.TextInputLayout>-->
-
-            <!-- RecyclerView stages -->
+            <!-- RecyclerViewStages -->
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rvStages"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp" />
+                android:layout_marginTop="16dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tilNotes"
+                app:layout_constraintEnd_toEndOf="parent" />
 
+            <!-- Заголовок для логов -->
             <TextView
                 android:id="@+id/tvLogsTitle"
                 android:layout_width="wrap_content"
@@ -111,22 +112,31 @@
                 android:text="@string/journal"
                 android:textSize="18sp"
                 android:textStyle="bold"
-                android:layout_marginTop="16dp" />
+                android:layout_marginTop="16dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/rvStages" />
 
+            <!-- RecyclerViewLogs -->
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rvLogs"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp" />
+                android:layout_marginTop="8dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tvLogsTitle"
+                app:layout_constraintEnd_toEndOf="parent" />
 
-            <!-- Buttons -->
+            <!-- Кнопки (цепочкой снизу) -->
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnSaveBatch"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/save_batch"
                 style="@style/Widget.Material3.Button.IconButton.Filled"
-                android:layout_marginTop="16dp" />
+                android:layout_marginTop="16dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/rvLogs"
+                app:layout_constraintEnd_toEndOf="parent" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnAddPhoto"
@@ -134,7 +144,10 @@
                 android:layout_height="wrap_content"
                 android:text="@string/add_photo"
                 style="@style/Widget.Material3.Button.OutlinedButton"
-                android:layout_marginTop="8dp" />
+                android:layout_marginTop="8dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/btnSaveBatch"
+                app:layout_constraintEnd_toEndOf="parent" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnAddWeight"
@@ -142,7 +155,10 @@
                 android:layout_height="wrap_content"
                 android:text="@string/add_weight"
                 style="@style/Widget.Material3.Button.OutlinedButton"
-                android:layout_marginTop="8dp" />
+                android:layout_marginTop="8dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/btnAddPhoto"
+                app:layout_constraintEnd_toEndOf="parent" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnExportPdf"
@@ -150,7 +166,10 @@
                 android:layout_height="wrap_content"
                 android:text="@string/export_to_pdf"
                 style="@style/Widget.Material3.Button.OutlinedButton"
-                android:layout_marginTop="8dp" />
+                android:layout_marginTop="8dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/btnAddWeight"
+                app:layout_constraintEnd_toEndOf="parent" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnPrintLabel"
@@ -158,23 +177,12 @@
                 android:layout_height="wrap_content"
                 android:text="@string/print_label"
                 style="@style/Widget.Material3.Button.OutlinedButton"
-                android:layout_marginTop="8dp" />
+                android:layout_marginTop="8dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/btnExportPdf"
+                app:layout_constraintEnd_toEndOf="parent" />
 
-<!--            <com.google.android.material.button.MaterialButton-->
-<!--                android:id="@+id/btnAddStage"-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:text="Add Stage"-->
-<!--                style="@style/Widget.Material3.Button.OutlinedButton"-->
-<!--                android:layout_marginTop="8dp" />-->
-
-<!--            <Button-->
-<!--                android:id="@+id/btnTestNotification"-->
-<!--                android:layout_width="wrap_content"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:text="🔔 Test Notification (10s)"-->
-<!--                android:backgroundTint="@android:color/holo_orange_dark" />-->
-
-        </LinearLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
-</FrameLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

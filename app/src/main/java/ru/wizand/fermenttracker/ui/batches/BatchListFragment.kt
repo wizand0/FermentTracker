@@ -1,10 +1,9 @@
 package ru.wizand.fermenttracker.ui.batches
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
@@ -27,9 +26,7 @@ class BatchListFragment : Fragment() {
 
     private val adapter = BatchPagingAdapter(
         onItemClick = { batch ->
-            val bundle = Bundle().apply {
-                putString("batchId", batch.id)
-            }
+            val bundle = Bundle().apply { putString("batchId", batch.id) }
             findNavController().navigate(R.id.action_batchList_to_batchDetail, bundle)
         },
         onDeleteClick = { batch ->
@@ -37,9 +34,7 @@ class BatchListFragment : Fragment() {
             Toast.makeText(context, getString(R.string.batch_deleted), Toast.LENGTH_SHORT).show()
         },
         onEditClick = { batch ->
-            val bundle = Bundle().apply {
-                putString("batchId", batch.id)
-            }
+            val bundle = Bundle().apply { putString("batchId", batch.id) }
             findNavController().navigate(R.id.action_batchList_to_createBatch, bundle)
         }
     )
@@ -55,24 +50,71 @@ class BatchListFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
+        setHasOptionsMenu(true)
         setupRecyclerView()
         observeData()
         setupClickListeners()
     }
 
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.menu_main, menu)
+        val searchItem = menu.findItem(R.id.action_search)
+        val searchView = searchItem.actionView as androidx.appcompat.widget.SearchView
+        searchView.queryHint = getString(R.string.search)
+
+        searchView.setOnQueryTextListener(object :
+            androidx.appcompat.widget.SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                viewModel.updateFilterQuery(query ?: "")
+                return true
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                viewModel.updateFilterQuery(newText ?: "")
+                return true
+            }
+        })
+        super.onCreateOptionsMenu(menu, inflater)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.action_filter -> {
+                showFilterDialog()
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+
+    private fun showFilterDialog() {
+        val options = arrayOf(
+            getString(R.string.filter_by_name),
+            getString(R.string.filter_by_date),
+            getString(R.string.filter_by_status)
+        )
+
+        AlertDialog.Builder(requireContext())
+            .setTitle(R.string.filter_by)
+            .setItems(options) { _, which ->
+                when (which) {
+                    0 -> viewModel.updateFilterCriteria("name")
+                    1 -> viewModel.updateFilterCriteria("date")
+                    2 -> viewModel.updateFilterCriteria("status")
+                }
+            }
+            .show()
+    }
+
     private fun setupRecyclerView() {
         binding.rvBatches.layoutManager = LinearLayoutManager(requireContext())
-
         val footerAdapter = LoadStateAdapter { adapter.retry() }
         val concatAdapter = adapter.withLoadStateFooter(footerAdapter)
         binding.rvBatches.adapter = concatAdapter
 
         adapter.addLoadStateListener { loadState ->
-            binding.progressBar.visibility = when (loadState.refresh) {
-                is LoadState.Loading -> View.VISIBLE
-                else -> View.GONE
-            }
+            binding.progressBar.visibility =
+                if (loadState.refresh is LoadState.Loading) View.VISIBLE else View.GONE
 
             if (loadState.refresh is LoadState.Error) {
                 val error = (loadState.refresh as LoadState.Error).error
@@ -84,9 +126,10 @@ class BatchListFragment : Fragment() {
                 binding.btnRetry.visibility = View.GONE
             }
 
-            val isEmpty = loadState.refresh is LoadState.NotLoading &&
-                    loadState.append.endOfPaginationReached &&
-                    adapter.itemCount == 0
+            val isEmpty =
+                loadState.refresh is LoadState.NotLoading &&
+                        loadState.append.endOfPaginationReached &&
+                        adapter.itemCount == 0
             binding.cardEmpty.visibility = if (isEmpty) View.VISIBLE else View.GONE
         }
     }
@@ -100,10 +143,7 @@ class BatchListFragment : Fragment() {
     }
 
     private fun setupClickListeners() {
-        binding.btnRetry.setOnClickListener {
-            adapter.retry()
-        }
-
+        binding.btnRetry.setOnClickListener { adapter.retry() }
         binding.fabAddBatch.setOnClickListener {
             findNavController().navigate(R.id.action_batchList_to_createBatch)
         }

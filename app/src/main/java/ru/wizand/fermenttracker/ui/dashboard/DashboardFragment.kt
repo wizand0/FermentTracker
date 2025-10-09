@@ -7,8 +7,8 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import ru.wizand.fermenttracker.R
 import ru.wizand.fermenttracker.databinding.FragmentDashboardBinding
 import ru.wizand.fermenttracker.ui.dashboard.adapter.NotificationAdapter
@@ -21,7 +21,6 @@ class DashboardFragment : Fragment() {
     private var _binding: FragmentDashboardBinding? = null
     private val binding get() = _binding!!
 
-    // Используем SharedViewModel
     private val viewModel: SharedViewModel by activityViewModels()
     private lateinit var notificationAdapter: NotificationAdapter
 
@@ -36,10 +35,20 @@ class DashboardFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         setupRecyclerView()
         setupSwipeRefresh()
         observeViewModel()
+
+        // 👇 Клик по лейблу события
+        binding.tvNextEventName.setOnClickListener {
+            val event = viewModel.nextEvent.value
+            if (event != null) {
+                val batchId = event.third
+                val action = DashboardFragmentDirections
+                    .actionDashboardFragmentToBatchDetailFragment(batchId)
+                findNavController().navigate(action)
+            }
+        }
     }
 
     private fun setupRecyclerView() {
@@ -59,17 +68,17 @@ class DashboardFragment : Fragment() {
     private fun observeViewModel() {
         // Активные партии
         viewModel.activeBatchesCount.observe(viewLifecycleOwner, Observer { count ->
-            binding.tvActiveBatchesCount.text = count.toString()
+            if (isAdded()) binding.tvActiveBatchesCount.text = count.toString()
         })
 
         // Завершённые этапы за неделю
         viewModel.completedStagesThisWeek.observe(viewLifecycleOwner, Observer { count ->
-            binding.tvCompletedStagesCount.text = count.toString()
+            if (isAdded()) binding.tvCompletedStagesCount.text = count.toString()
         })
 
         // Средняя потеря веса
         viewModel.avgWeightLoss.observe(viewLifecycleOwner, Observer { weightLoss ->
-            binding.tvAvgWeightLossValue.text = String.format("%.1f%%", weightLoss)
+            if (isAdded()) binding.tvAvgWeightLossValue.text = String.format("%.1f%%", weightLoss)
         })
 
         // Ближайшее событие
@@ -85,12 +94,12 @@ class DashboardFragment : Fragment() {
 
         // Недавние уведомления
         viewModel.recentCompletedStages.observe(viewLifecycleOwner, Observer { stages ->
-            notificationAdapter.submitList(stages)
+            if (isAdded()) notificationAdapter.submitList(stages)
         })
 
         // Обновление состояния загрузки
         viewModel.isLoading.observe(viewLifecycleOwner, Observer { isLoading ->
-            binding.swipeRefreshLayout.isRefreshing = isLoading
+            if (isAdded()) binding.swipeRefreshLayout.isRefreshing = isLoading
         })
     }
 
@@ -121,11 +130,14 @@ class DashboardFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
+        // Очищаем адаптер перед отсоединением
+        binding.rvNotifications.adapter = null
         _binding = null
     }
 
-    override fun onResume() {
-        super.onResume()
-        viewModel.refreshDashboardData()
+    override fun onPause() {
+        super.onPause()
+        // Остановить наблюдение при паузе
+        viewModel.stopObservingBatches()
     }
 }

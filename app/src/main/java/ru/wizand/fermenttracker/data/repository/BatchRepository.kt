@@ -15,6 +15,9 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import java.util.concurrent.TimeUnit
 import ru.wizand.fermenttracker.workers.StageNotificationWorker
+import androidx.paging.PagingSource
+import androidx.sqlite.db.SimpleSQLiteQuery
+import androidx.sqlite.db.SupportSQLiteQuery
 
 class BatchRepository(
     private val batchDao: BatchDao,
@@ -150,5 +153,30 @@ class BatchRepository(
 
     suspend fun deleteStageTemplate(id: String) {
         batchDao.deleteStageTemplate(id)
+    }
+
+    fun getFilteredBatchesPaged(
+        filterQuery: String,
+        filterCriteria: String
+    ): PagingSource<Int, Batch> {
+        val baseQuery = StringBuilder("SELECT * FROM batches")
+        val args = mutableListOf<Any>()
+
+        // Поиск по названию
+        if (filterQuery.isNotBlank()) {
+            baseQuery.append(" WHERE name LIKE ?")
+            args.add("%$filterQuery%")
+        }
+
+        // Критерий сортировки
+        when (filterCriteria) {
+            "name" -> baseQuery.append(" ORDER BY name COLLATE NOCASE ASC")
+            "date" -> baseQuery.append(" ORDER BY startDate DESC")
+            "status" -> baseQuery.append(" ORDER BY isActive DESC, startDate DESC")
+            else -> baseQuery.append(" ORDER BY startDate DESC")
+        }
+
+        val query = SimpleSQLiteQuery(baseQuery.toString(), args.toTypedArray())
+        return batchDao.getFilteredBatchesPaged(query)
     }
 }

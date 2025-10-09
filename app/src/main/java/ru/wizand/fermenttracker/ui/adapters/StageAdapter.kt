@@ -10,22 +10,34 @@ import androidx.recyclerview.widget.RecyclerView
 import ru.wizand.fermenttracker.data.db.entities.Stage
 import ru.wizand.fermenttracker.databinding.ItemStageBinding
 import java.text.SimpleDateFormat
-import java.util.Locale
+import java.util.*
 import java.util.concurrent.TimeUnit
 import ru.wizand.fermenttracker.R
 
 /**
- * Sealed class для payloads, используемых при частичном обновлении элементов списка.
- * Это позволяет избежать полного перерисовки элемента и улучшает производительность.
+ * Sealed class для payloads.
  */
 sealed class StagePayload {
     data class DurationChanged(val newDuration: Long) : StagePayload()
-    data class ActiveChanged(val isActive: Boolean) : StagePayload()
+    data class ActiveChanged(val isActive: Boolean, val weight: Double?) : StagePayload()
     data class WeightChanged(val weight: Double?) : StagePayload()
     data class TimeLeftUpdated(val timeLeft: String) : StagePayload()
     data class StageCompleted(val isCompleted: Boolean) : StagePayload()
     data class StageStarted(val isStarted: Boolean) : StagePayload()
 }
+
+/**
+ * CompositePayload для передачи нескольких изменений за один раз,
+ * чтобы избежать множественных notifyItemChanged.
+ */
+data class CompositeStagePayload(
+    val durationChanged: StagePayload.DurationChanged? = null,
+    val activeChanged: StagePayload.ActiveChanged? = null,
+    val weightChanged: StagePayload.WeightChanged? = null,
+    val timeLeftUpdated: StagePayload.TimeLeftUpdated? = null,
+    val stageCompleted: StagePayload.StageCompleted? = null,
+    val stageStarted: StagePayload.StageStarted? = null
+)
 
 class StageAdapter(
     private val onStartClicked: (Stage) -> Unit = {},
@@ -33,79 +45,88 @@ class StageAdapter(
     private val onDurationChanged: (Stage) -> Unit = {}
 ) : ListAdapter<Stage, StageAdapter.VH>(StageDiffCallback()) {
 
-    // Хранит id активного этапа (тот, который сейчас выполняется). Устанавливается извне (фрагмент/VM).
+    private var recyclerView: RecyclerView? = null
+
+    override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
+        super.onAttachedToRecyclerView(recyclerView)
+        this.recyclerView = recyclerView
+    }
+
+    override fun onDetachedFromRecyclerView(recyclerView: RecyclerView) {
+        super.onDetachedFromRecyclerView(recyclerView)
+        this.recyclerView = null
+    }
+
     var activeStageId: String? = null
         private set
 
-    /**
-     * Устанавливает активный этап и обновляет только соответствующие элементы списка
-     * вместо полного обновления через notifyDataSetChanged()
-     */
     fun setActiveStage(id: String?) {
         val previousActiveId = activeStageId
         activeStageId = id
 
-        // Обновляем предыдущий активный этап
+        // Используем CompositePayload для двойного обновления
+        val composite = CompositeStagePayload(
+            activeChanged = StagePayload.ActiveChanged(false, batchCurrentWeight),
+            // Для нового активного — отдельно
+        )
+
         previousActiveId?.let { prevId ->
             val position = currentList.indexOfFirst { it.id == prevId }
             if (position != -1) {
-                notifyItemChanged(position, StagePayload.ActiveChanged(false))
+                notifyItemChanged(position, composite)
             }
         }
 
-        // Обновляем новый активный этап
         id?.let { newId ->
             val position = currentList.indexOfFirst { it.id == newId }
             if (position != -1) {
-                notifyItemChanged(position, StagePayload.ActiveChanged(true))
+                notifyItemChanged(position, CompositeStagePayload(
+                    activeChanged = StagePayload.ActiveChanged(true, batchCurrentWeight)
+                ))
             }
         }
     }
 
-    var batchCurrentWeight: Double? = null // держим текущий вес батча для отображения в активном этапе
+    var batchCurrentWeight: Double? = null
 
-    /**
-     * Обновляет вес и обновляет UI только для активного этапа
-     */
     fun updateBatchWeight(weight: Double?) {
         batchCurrentWeight = weight
         activeStageId?.let { id ->
             val position = currentList.indexOfFirst { it.id == id }
             if (position != -1) {
-                notifyItemChanged(position, StagePayload.WeightChanged(weight))
+                notifyItemChanged(position, CompositeStagePayload(
+                    weightChanged = StagePayload.WeightChanged(weight)
+                ))
             }
         }
     }
 
-    /**
-     * Обновляет оставшееся время для активного этапа
-     */
     fun updateTimeLeft(timeLeft: String) {
         activeStageId?.let { id ->
             val position = currentList.indexOfFirst { it.id == id }
             if (position != -1) {
-                notifyItemChanged(position, StagePayload.TimeLeftUpdated(timeLeft))
+                notifyItemChanged(position, CompositeStagePayload(
+                    timeLeftUpdated = StagePayload.TimeLeftUpdated(timeLeft)
+                ))
             }
         }
     }
 
-    /**
-     * Обновляет статус завершения этапа
-     */
     fun updateStageCompleted(stageId: String, isCompleted: Boolean) {
         val position = currentList.indexOfFirst { it.id == stageId }
         if (position != -1) {
-            notifyItemChanged(position, StagePayload.StageCompleted(isCompleted))
+            notifyItemChanged(position, CompositeStagePayload(
+                stageCompleted = StagePayload.StageCompleted(isCompleted)
+            ))
         }
     }
 
-    /**
-     * Обновляет статус начала этапа
-     */
     fun updateStageStarted(stageId: String, isStarted: Boolean) {
         val position = currentList.indexOfFirst { it.id == stageId }
         if (position != -1) {
-            notifyItemChanged(position, StagePayload.StageStarted(isStarted))
+            notifyItemChanged(position, CompositeStagePayload(
+                stageStarted = StagePayload.StageStarted(isStarted)
+            ))
         }
     }
 
@@ -118,9 +139,6 @@ class StageAdapter(
         holder.bind(getItem(position))
     }
 
-    /**
-     * Обрабатывает частичные обновления элементов списка через payloads
-     */
     override fun onBindViewHolder(holder: VH, position: Int, payloads: List<Any>) {
         if (payloads.isEmpty()) {
             onBindViewHolder(holder, position)
@@ -128,8 +146,10 @@ class StageAdapter(
             val item = getItem(position)
             payloads.forEach { payload ->
                 when (payload) {
+                    is CompositeStagePayload -> holder.bindCompositePayload(item, payload)
+                    // Остальные для обратной совместимости
                     is StagePayload.DurationChanged -> holder.bindDurationChanged(item, payload.newDuration)
-                    is StagePayload.ActiveChanged -> holder.bindActiveChanged(item, payload.isActive)
+                    is StagePayload.ActiveChanged -> holder.bindActiveChanged(item, payload.isActive, payload.weight)
                     is StagePayload.WeightChanged -> holder.bindWeightChanged(item, payload.weight)
                     is StagePayload.TimeLeftUpdated -> holder.bindTimeLeftUpdated(item, payload.timeLeft)
                     is StagePayload.StageCompleted -> holder.bindStageCompleted(item, payload.isCompleted)
@@ -142,21 +162,15 @@ class StageAdapter(
     inner class VH(private val binding: ItemStageBinding) : RecyclerView.ViewHolder(binding.root) {
 
         init {
-            // Устанавливаем слушатели один раз в init блоке, а не при каждом bind()
             binding.etDuration.setOnFocusChangeListener { _, hasFocus ->
                 if (!hasFocus) {
-                    // Когда поле теряет фокус, обрабатываем изменение длительности
                     val adapterPosition = bindingAdapterPosition
                     if (adapterPosition != RecyclerView.NO_POSITION) {
                         val stage = currentList[adapterPosition]
                         val newDuration = binding.etDuration.text.toString().toLongOrNull() ?: 0L
-
                         if (newDuration != stage.durationHours) {
-                            // Обновляем модель
                             val updatedStage = stage.copy(durationHours = newDuration)
-                            val newList = currentList.toMutableList()
-                            newList[adapterPosition] = updatedStage
-                            submitList(newList)   // триггерит перерисовку
+                            submitList(currentList.map { if (it.id == stage.id) updatedStage else it })
                             onDurationChanged(updatedStage)
                         }
                     }
@@ -165,20 +179,19 @@ class StageAdapter(
         }
 
         fun bind(stage: Stage) {
+            // То же, что и прежде, с небольшими упрощениями
             binding.tvStageName.text = stage.name
             binding.tvDuration.text = binding.root.context.getString(R.string.duration_format, stage.durationHours.toDouble())
             binding.etDuration.setText(stage.durationHours.toString())
 
-            // Определяем состояние "выполняется" по activeStageId (приоритет) либо по полям startTime/endTime
             val isThisActive = activeStageId != null && activeStageId == stage.id
             val inferredActive = (stage.startTime != null && stage.endTime == null)
             val isActive = isThisActive || inferredActive
 
-            // Показываем вес только для активного этапа (если известен)
             binding.tvCurrentWeight.text = if (isActive) {
                 batchCurrentWeight?.let { binding.root.context.getString(R.string.weight_format, it) } ?: binding.root.context.getString(R.string.weight_na)
             } else {
-                binding.root.context.getString(R.string.na) // используем существующую строку
+                binding.root.context.getString(R.string.na)
             }
 
             binding.tvPlannedStartTime.text = stage.plannedStartTime?.let {
@@ -196,33 +209,28 @@ class StageAdapter(
 
             binding.tvTimeLeft.text = binding.root.context.getString(R.string.time_left_format_text, computeTimeLeftText(stage))
 
-            val btnStartStage = binding.btnStartStage
-            val btnCompleteStage = binding.btnCompleteStage
-
-            // Если есть активный этап (activeStageId != null), то Start доступен только если нет активного,
-            // а Complete доступен только у активного этапа
             val anyRunning = activeStageId != null
-            btnStartStage.isVisible = !anyRunning && stage.startTime == null
-            btnCompleteStage.isVisible = isActive && stage.endTime == null
+            binding.btnStartStage.isVisible = !anyRunning && stage.startTime == null
+            binding.btnCompleteStage.isVisible = isActive && stage.endTime == null
 
-            btnStartStage.setOnClickListener {
+            binding.btnStartStage.setOnClickListener {
                 val context = binding.root.context
                 AlertDialog.Builder(context)
-                    .setTitle(binding.root.context.getString(R.string.start_stage_title))
-                    .setMessage(binding.root.context.getString(R.string.start_stage_message))
-                    .setPositiveButton(binding.root.context.getString(R.string.start_stage_confirm)) { _, _ ->
+                    .setTitle(context.getString(R.string.start_stage_title))
+                    .setMessage(context.getString(R.string.start_stage_message))
+                    .setPositiveButton(context.getString(R.string.start_stage_confirm)) { _, _ ->
                         onStartClicked(stage)
                     }
                     .setNegativeButton("Cancel", null)
                     .show()
             }
 
-            btnCompleteStage.setOnClickListener {
+            binding.btnCompleteStage.setOnClickListener {
                 val context = binding.root.context
                 AlertDialog.Builder(context)
-                    .setTitle(binding.root.context.getString(R.string.complete_stage_title))
-                    .setMessage(binding.root.context.getString(R.string.complete_stage_message))
-                    .setPositiveButton(binding.root.context.getString(R.string.complete_stage_confirm)) { _, _ ->
+                    .setTitle(context.getString(R.string.complete_stage_title))
+                    .setMessage(context.getString(R.string.complete_stage_message))
+                    .setPositiveButton(context.getString(R.string.complete_stage_confirm)) { _, _ ->
                         onCompleteClicked(stage)
                     }
                     .setNegativeButton("Cancel", null)
@@ -230,65 +238,46 @@ class StageAdapter(
             }
         }
 
-        /**
-         * Обрабатывает изменение длительности через payload
-         */
+        fun bindCompositePayload(stage: Stage, payload: CompositeStagePayload) {
+            payload.durationChanged?.let { bindDurationChanged(stage, it.newDuration) }
+            payload.activeChanged?.let { bindActiveChanged(stage, it.isActive, it.weight) }
+            payload.weightChanged?.let { bindWeightChanged(stage, it.weight) }
+            payload.timeLeftUpdated?.let { bindTimeLeftUpdated(stage, it.timeLeft) }
+            payload.stageCompleted?.let { bindStageCompleted(stage, it.isCompleted) }
+            payload.stageStarted?.let { bindStageStarted(stage, it.isStarted) }
+        }
+
         fun bindDurationChanged(stage: Stage, newDuration: Long) {
             binding.tvDuration.text = binding.root.context.getString(R.string.duration_format, newDuration.toDouble())
             binding.etDuration.setText(newDuration.toString())
-
-            // Обновляем оставшееся время
             binding.tvTimeLeft.text = binding.root.context.getString(R.string.time_left_format_text, computeTimeLeftText(stage.copy(durationHours = newDuration)))
         }
 
-        /**
-         * Обрабатывает изменение активности через payload
-         */
-        fun bindActiveChanged(stage: Stage, isActive: Boolean) {
-            val btnStartStage = binding.btnStartStage
-            val btnCompleteStage = binding.btnCompleteStage
-
-            // Показываем вес только для активного этапа
+        fun bindActiveChanged(stage: Stage, isActive: Boolean, weight: Double?) {
             binding.tvCurrentWeight.text = if (isActive) {
-                batchCurrentWeight?.let { binding.root.context.getString(R.string.weight_format, it) } ?: binding.root.context.getString(R.string.weight_na)
+                weight?.let { binding.root.context.getString(R.string.weight_format, it) } ?: binding.root.context.getString(R.string.weight_na)
             } else {
                 binding.root.context.getString(R.string.na)
             }
 
-            // Обновляем видимость кнопок
             val anyRunning = activeStageId != null
-            btnStartStage.isVisible = !anyRunning && stage.startTime == null
-            btnCompleteStage.isVisible = isActive && stage.endTime == null
-
-            // Обновляем оставшееся время
+            binding.btnStartStage.isVisible = !anyRunning && stage.startTime == null
+            binding.btnCompleteStage.isVisible = isActive && stage.endTime == null
             binding.tvTimeLeft.text = binding.root.context.getString(R.string.time_left_format_text, computeTimeLeftText(stage))
         }
 
-        /**
-         * Обрабатывает изменение веса через payload
-         */
         fun bindWeightChanged(stage: Stage, weight: Double?) {
-            // Показываем вес только для активного этапа
             binding.tvCurrentWeight.text = weight?.let {
                 binding.root.context.getString(R.string.weight_format, it)
             } ?: binding.root.context.getString(R.string.weight_na)
         }
 
-        /**
-         * Обрабатывает обновление оставшегося времени через payload
-         */
         fun bindTimeLeftUpdated(stage: Stage, timeLeft: String) {
             binding.tvTimeLeft.text = binding.root.context.getString(R.string.time_left_format_text, timeLeft)
         }
 
-        /**
-         * Обрабатывает изменение статуса завершения через payload
-         */
         fun bindStageCompleted(stage: Stage, isCompleted: Boolean) {
-            val btnCompleteStage = binding.btnCompleteStage
-            btnCompleteStage.isVisible = !isCompleted && activeStageId == stage.id
-
-            // Обновляем текст времени окончания
+            binding.btnCompleteStage.isVisible = !isCompleted && activeStageId == stage.id
             binding.tvEndTime.text = if (isCompleted) {
                 binding.root.context.getString(R.string.end_format, formatDate(System.currentTimeMillis()))
             } else {
@@ -296,14 +285,8 @@ class StageAdapter(
             }
         }
 
-        /**
-         * Обрабатывает изменение статуса начала через payload
-         */
         fun bindStageStarted(stage: Stage, isStarted: Boolean) {
-            val btnStartStage = binding.btnStartStage
-            btnStartStage.isVisible = !isStarted && activeStageId == null
-
-            // Обновляем текст времени начала
+            binding.btnStartStage.isVisible = !isStarted && activeStageId == null
             binding.tvStartTime.text = if (isStarted) {
                 binding.root.context.getString(R.string.start_format, formatDate(System.currentTimeMillis()))
             } else {
@@ -311,18 +294,14 @@ class StageAdapter(
             }
         }
 
-        /**
-         * Очищает слушатели для предотвращения утечек памяти
-         */
         fun clearListeners() {
             binding.etDuration.setOnFocusChangeListener(null)
             binding.btnStartStage.setOnClickListener(null)
             binding.btnCompleteStage.setOnClickListener(null)
         }
 
-        private fun formatDate(timestamp: Long): String {
-            return SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault()).format(java.util.Date(timestamp))
-        }
+        private fun formatDate(timestamp: Long): String =
+            SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault()).format(Date(timestamp))
 
         private fun computeTimeLeftText(stage: Stage): String {
             val now = System.currentTimeMillis()
@@ -352,12 +331,37 @@ class StageAdapter(
         override fun areContentsTheSame(oldItem: Stage, newItem: Stage): Boolean = oldItem == newItem
 
         override fun getChangePayload(oldItem: Stage, newItem: Stage): Any? {
-            // Определяем, что именно изменилось, чтобы передать соответствующий payload
-            return when {
-                oldItem.durationHours != newItem.durationHours -> StagePayload.DurationChanged(newItem.durationHours)
-                oldItem.startTime != newItem.startTime -> StagePayload.StageStarted(newItem.startTime != null)
-                oldItem.endTime != newItem.endTime -> StagePayload.StageCompleted(newItem.endTime != null)
-                else -> null
+            // Собираем изменения как переменные (не val в data class)
+            var durationChanged: StagePayload.DurationChanged? = null
+            var stageStarted: StagePayload.StageStarted? = null
+            var stageCompleted: StagePayload.StageCompleted? = null
+
+            if (oldItem.durationHours != newItem.durationHours) {
+                durationChanged = StagePayload.DurationChanged(newItem.durationHours)
+            }
+            if (oldItem.startTime != newItem.startTime) {
+                stageStarted = StagePayload.StageStarted(newItem.startTime != null)
+            }
+            if (oldItem.endTime != newItem.endTime) {
+                stageCompleted = StagePayload.StageCompleted(newItem.endTime != null)
+            }
+
+            // Создаём объект в конце
+            val composite = CompositeStagePayload(
+                durationChanged = durationChanged,
+                stageStarted = stageStarted,
+                stageCompleted = stageCompleted
+            )
+
+            // Возвращаем null, если изменений нет
+            return composite.takeIf { it != CompositeStagePayload() }
+        }
+    }
+
+    fun clearAllListeners() {
+        recyclerView?.let { rv ->
+            for (i in 0 until rv.childCount) {
+                (rv.getChildViewHolder(rv.getChildAt(i)) as? VH)?.clearListeners()
             }
         }
     }
