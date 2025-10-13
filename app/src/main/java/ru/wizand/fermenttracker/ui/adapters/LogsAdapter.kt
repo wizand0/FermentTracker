@@ -1,4 +1,3 @@
-// src/main/java/ru/wizand/fermenttracker/ui/adapters/LogsAdapter.kt
 package ru.wizand.fermenttracker.ui.adapters
 
 import android.view.LayoutInflater
@@ -15,18 +14,23 @@ import java.text.SimpleDateFormat
 import java.util.*
 import ru.wizand.fermenttracker.R
 
-class LogsAdapter : ListAdapter<BatchLog, LogsAdapter.VH>(DIFF) {
+class LogsAdapter(
+    private val onPhotoClicked: ((String) -> Unit)? = null
+) : ListAdapter<BatchLog, LogsAdapter.VH>(DIFF) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VH {
         val binding = ItemLogBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return VH(binding)
+        return VH(binding, onPhotoClicked)
     }
 
     override fun onBindViewHolder(holder: VH, position: Int) {
         holder.bind(getItem(position))
     }
 
-    inner class VH(private val b: ItemLogBinding) : RecyclerView.ViewHolder(b.root) {
+    inner class VH(
+        private val b: ItemLogBinding,
+        private val onPhotoClicked: ((String) -> Unit)?
+    ) : RecyclerView.ViewHolder(b.root) {
         fun bind(log: BatchLog) {
             b.tvTimestamp.text = SimpleDateFormat(
                 "yyyy-MM-dd HH:mm",
@@ -43,8 +47,10 @@ class LogsAdapter : ListAdapter<BatchLog, LogsAdapter.VH>(DIFF) {
                     size(640, 480) // Изменение размера для экономии памяти
                     transformations(RoundedCornersTransformation(8f))
                 }
+                b.ivPhoto.setOnClickListener { onPhotoClicked?.invoke(path) } // Обработчик клика
             } ?: run {
                 b.ivPhoto.setImageDrawable(null)
+                b.ivPhoto.setOnClickListener(null) // Убрать клик, если фото нет
             }
         }
     }

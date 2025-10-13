@@ -653,5 +653,6 @@
         Copyright © JetBrains s.r.o.\n
         Лицензия Apache License, Version 2.0
     </string>
+    <string name="close">Close</string>
 
 </resources>

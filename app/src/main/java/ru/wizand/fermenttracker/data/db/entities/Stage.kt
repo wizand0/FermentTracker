@@ -28,9 +28,10 @@ data class Stage(
 ) {
     val status: String
         get() = when {
+            endTime != null -> "Completed"
             startTime == null -> "Not started"
-            endTime == null -> "Ongoing"
-            else -> "Completed"
+            plannedEndTime != null && System.currentTimeMillis() > plannedEndTime -> "Overdue"
+            else -> "Ongoing"
         }
 }
 

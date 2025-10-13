@@ -1,24 +1,30 @@
 package ru.wizand.fermenttracker.ui.batches
 
 import android.Manifest
+import android.app.Dialog
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.os.Bundle
+import android.os.Environment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
 import android.widget.EditText
+import android.widget.ImageView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
+import coil.load
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -68,8 +74,44 @@ class BatchDetailFragment : Fragment() {
         else Toast.makeText(context, getString(R.string.camera_permission_denied), Toast.LENGTH_SHORT).show()
     }
 
-    private val takePicture = registerForActivityResult(ActivityResultContracts.TakePicturePreview()) { bitmap ->
-        bitmap?.let { saveAndAddPhoto(it) }
+    private val requestStorage = registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+        if (!granted) {
+            Toast.makeText(context, "Разрешение на хранение отклонено", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private val takePicture = registerForActivityResult(ActivityResultContracts.TakePicture()) { success ->
+        if (success) {
+            // Декодировать полный Bitmap из временного файла
+            lastTempUri?.let { uri ->
+                try {
+                    val inputStream = requireContext().contentResolver.openInputStream(uri)
+                    val bitmap = android.graphics.BitmapFactory.decodeStream(inputStream)
+                    inputStream?.close()
+                    bitmap?.let { saveAndAddPhoto(it) }
+                    // Очистить временный файл после использования
+                    requireContext().contentResolver.delete(uri, null, null)
+                } catch (e: Exception) {
+                    android.util.Log.e("BatchDetailFragment", "Error decoding bitmap", e)
+                    Toast.makeText(context, "Ошибка обработки фото", Toast.LENGTH_SHORT).show()
+                } finally {
+                    lastTempUri = null
+                }
+            }
+        }
+    }
+
+    // Добавить переменную для хранения временного URI
+    private var lastTempUri: android.net.Uri? = null
+
+    // Добавить функцию для создания временного URI
+    private fun createTempUri(): android.net.Uri {
+        val tempFile = File(requireContext().cacheDir, "temp_photo_${System.currentTimeMillis()}.jpg")
+        return FileProvider.getUriForFile(
+            requireContext(),
+            "${requireContext().packageName}.fileprovider",  // Убедитесь, что FileProvider настроен в AndroidManifest.xml и res/xml/file_paths.xml
+            tempFile
+        )
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -103,7 +145,7 @@ class BatchDetailFragment : Fragment() {
         binding.rvStages.adapter = stageAdapter
         binding.rvStages.layoutManager = LinearLayoutManager(requireContext())
 
-        logsAdapter = LogsAdapter()
+        logsAdapter = LogsAdapter { photoPath -> showFullScreenPhoto(photoPath) } // Передали колбэк для открытия фото
         binding.rvLogs.adapter = logsAdapter
         binding.rvLogs.layoutManager = LinearLayoutManager(requireContext())
     }
@@ -192,7 +234,8 @@ class BatchDetailFragment : Fragment() {
             val currentStage = viewModel.stages.value?.find { it.endTime == null }
             if (currentStage != null) {
                 if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
-                    takePicture.launch(null)
+                    lastTempUri = createTempUri()  // Создать временный URI
+                    takePicture.launch(lastTempUri)  // Запустить камеру с URI
                 } else {
                     requestCamera.launch(Manifest.permission.CAMERA)
                 }
@@ -259,7 +302,104 @@ class BatchDetailFragment : Fragment() {
         viewModel.addLog(log)
         lastPhotoPath = file.absolutePath
         lastWeight = weightToLog
+
+        // Сохранить копию в галерею
+        val hasStoragePermission = if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.Q) {
+            ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
+        } else {
+            true // Для Q+ разрешение не требуется
+        }
+
+        if (hasStoragePermission) {
+            lifecycleScope.launch {
+                val saved = savePhotoToGallery(bitmap)
+                withContext(Dispatchers.Main) {
+                    if (saved) {
+                        Toast.makeText(context, "Сохранено в галерею", Toast.LENGTH_SHORT).show()
+                    } else {
+                        Toast.makeText(context, "Ошибка сохранения в галерею", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+        } else {
+            requestStorage.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+        }
+
         Toast.makeText(context, getString(R.string.photo_added_to_log_success), Toast.LENGTH_SHORT).show()
+    }
+
+    private suspend fun savePhotoToGallery(bitmap: Bitmap): Boolean = withContext(Dispatchers.IO) {
+        try {
+            val fileName = "ferment_photo_${System.currentTimeMillis()}.jpg"
+
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
+                val contentValues = android.content.ContentValues().apply {
+                    put(android.provider.MediaStore.MediaColumns.DISPLAY_NAME, fileName)
+                    put(android.provider.MediaStore.MediaColumns.MIME_TYPE, "image/jpeg")
+                    put(android.provider.MediaStore.MediaColumns.RELATIVE_PATH, "${Environment.DIRECTORY_PICTURES}/FermentTracker")
+                }
+
+                val resolver = requireContext().contentResolver
+                val uri = resolver.insert(android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
+
+                uri?.let {
+                    resolver.openOutputStream(it)?.use { outputStream ->
+                        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
+                    }
+                    return@withContext true
+                }
+            } else {
+                val picturesDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
+                val fermentDir = File(picturesDir, "FermentTracker")
+                if (!fermentDir.exists()) {
+                    fermentDir.mkdirs()
+                }
+
+                val file = File(fermentDir, fileName)
+                FileOutputStream(file).use { outputStream ->
+                    bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
+                }
+
+                val intent = Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE)
+                intent.data = android.net.Uri.fromFile(file)
+                requireContext().sendBroadcast(intent)
+
+                return@withContext true
+            }
+
+            false
+        } catch (e: Exception) {
+            android.util.Log.e("BatchDetailFragment", "Error saving photo to gallery", e)
+            false
+        }
+    }
+
+    private fun showFullScreenPhoto(photoPath: String) {
+        val dialog = Dialog(requireContext(), android.R.style.Theme_Black_NoTitleBar_Fullscreen).apply {
+            setContentView(R.layout.dialog_fullscreen_photo)  // Используем кастомный layout
+            window?.setLayout(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT
+            )
+            window?.setFlags(
+                WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                WindowManager.LayoutParams.FLAG_FULLSCREEN
+            )
+        }
+
+        // Загрузить изображение через Coil
+        val imageView = dialog.findViewById<ImageView>(R.id.ivFullscreenPhoto)
+        imageView.load(File(photoPath)) {
+            crossfade(true)
+            placeholder(R.drawable.ic_placeholder)
+            error(R.drawable.ic_error)
+            // Без ограничений size — загружаем оригинал
+        }
+
+        // Клик на изображение закрывает диалог
+        imageView.setOnClickListener { dialog.dismiss() }
+
+        dialog.show()
     }
 
     private fun startStageManual(stage: Stage) {

@@ -304,9 +304,9 @@ class StageAdapter(
             SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault()).format(Date(timestamp))
 
         private fun computeTimeLeftText(stage: Stage): String {
+            if (stage.endTime != null) return "Completed"
             val now = System.currentTimeMillis()
             val expectedEnd = when {
-                stage.endTime != null -> stage.endTime
                 stage.startTime != null -> stage.startTime!! + TimeUnit.HOURS.toMillis(stage.durationHours)
                 stage.plannedEndTime != null -> stage.plannedEndTime
                 else -> null
