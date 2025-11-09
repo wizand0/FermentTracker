@@ -104,6 +104,40 @@ class BatchListViewModel(application: Application) : AndroidViewModel(applicatio
                     _activeStageId.postValue(it.id)
                 }
             }
+
+            // Изменение: Добавлена логика для проверки, все ли этапы партии завершены.
+            // Если да, то устанавливаем isActive = false для партии, чтобы она автоматически становилась завершенной.
+            // Это вспомогательный метод checkAndCompleteBatch, вызываемый после завершения любого этапа,
+            // чтобы гарантировать своевременное обновление состояния партии.
+            // Метод использует Dao для получения всех этапов и обновления партии через repository.
+            // Это решает проблему, когда партия остается активной после завершения всех этапов.
+            checkAndCompleteBatch(batchId)
+        }
+    }
+
+    // Добавлен: Вспомогательный метод для проверки и завершения партии.
+    // Проверяет, все ли этапы имеют endTime != null. Если да и партия активна, устанавливает isActive = false.
+    // Вызывается после завершения любого этапа в completeStageAndMaybeStartNext.
+    // Фикс: Используем новый метод getStagesForBatchOnce вместо несуществующего.
+    // Явная типизация для Lambda, чтобы избежать ошибок компилятора.
+    private fun checkAndCompleteBatch(batchId: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val stages = batchDao.getStagesForBatchOnce(batchId)
+                val allCompleted = stages.all { it: Stage -> it.endTime != null }
+                if (allCompleted) {
+                    val batch = repository.getBatchByIdOnce(batchId)
+                    batch?.let {
+                        if (it.isActive) {
+                            val updatedBatch = it.copy(isActive = false)
+                            repository.updateBatch(updatedBatch)
+                        }
+                    }
+                }
+            } catch (e: Exception) {
+                // Логируем ошибку, но не прерываем поток, чтобы не нарушать завершение этапа
+                android.util.Log.e("BatchListViewModel", "Error in checkAndCompleteBatch", e)
+            }
         }
     }
 

@@ -18,10 +18,11 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
 import ru.wizand.fermenttracker.data.db.AppDatabase
 import ru.wizand.fermenttracker.data.db.entities.Batch
-import ru.wizand.fermenttracker.data.db.entities.Stage
+import ru.wizand.fermenttracker.data.db.entities.Stage  // ← Этот импорт всё ещё нужен для других частей кода (например, методы addStage, getStagesForBatchLive и т.д.), так что не удаляем
 import ru.wizand.fermenttracker.data.repository.BatchRepository
 
 import kotlinx.coroutines.flow.*
+import ru.wizand.fermenttracker.data.models.StageWithBatch
 import kotlin.time.Duration.Companion.milliseconds
 
 class SharedViewModel(application: Application) : AndroidViewModel(application) {
@@ -82,8 +83,9 @@ class SharedViewModel(application: Application) : AndroidViewModel(application) 
     private val _nextEvent = MutableLiveData<Triple<String, Long, String>?>()
     val nextEvent: LiveData<Triple<String, Long, String>?> = _nextEvent
 
-    private val _recentCompletedStages = MutableLiveData<List<Stage>>()
-    val recentCompletedStages: LiveData<List<Stage>> = _recentCompletedStages
+    // Изменено на List<Triple<String, String, Long>>
+    private val _recentCompletedStages = MutableLiveData<List<StageWithBatch>>()
+    val recentCompletedStages: LiveData<List<StageWithBatch>> = _recentCompletedStages
 
     private val _isLoading = MutableLiveData<Boolean>()
     val isLoading: LiveData<Boolean> = _isLoading
@@ -142,7 +144,8 @@ class SharedViewModel(application: Application) : AndroidViewModel(application) 
                     _nextEvent.postValue(null)
                 }
 
-                val recentStages = stageDao.getRecentCompletedStages(3)
+                // Изменено на вызов batchDao с новым методом
+                val recentStages = batchDao.getRecentCompletedStagesWithBatchNames(3)
                 _recentCompletedStages.postValue(recentStages ?: emptyList())
             } catch (e: Exception) {
                 Log.e("Dashboard", "Error refreshing dashboard", e)
@@ -152,10 +155,63 @@ class SharedViewModel(application: Application) : AndroidViewModel(application) 
         }
     }
 
+
+    // Добавлен: Аналогичный вспомогательный метод checkAndCompleteBatch для синхронизации состояния партии.
+    // Этот метод нужен для SharedViewModel, чтобы в случае, если обновления партии происходят через этот ViewModel,
+    // состояние isActive тоже проверялось и обновлялось. Хотя основная логика в BatchListViewModel,
+    // этот метод обеспечивает целостность данных, если SharedViewModel используется для CRUD операций.
+    // Вызывается после операций, которые могут повлиять на состояние этапов, например, после updateBatch или удаления/обновления этапов.
+    // Метод проверяет все этапы и, если нужно, завершает партию.
+    // Фикс: Используем batchDao.getStagesForBatchOnce (новый метод).
+    // Явная типизация для Lambda.
+    fun checkAndCompleteBatch(batchId: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val stages = batchDao.getStagesForBatchOnce(batchId)
+                val allCompleted = stages.all { it: Stage -> it.endTime != null }
+                if (allCompleted) {
+                    val batch = repository.getBatchByIdOnce(batchId)
+                    if (batch != null && batch.isActive) {
+                        repository.updateBatch(batch.copy(isActive = false))
+                        // После обновления партии, обновляем dashboard данные, если они зависят от активности
+                        refreshDashboardData()
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e("SharedViewModel", "Error in checkAndCompleteBatch", e)
+            }
+        }
+    }
+
+
+
+
+
+
+
     // --- CRUD операции ---
     fun addBatch(batch: Batch) = viewModelScope.launch { repository.addBatch(batch) }
 
-    fun updateBatch(batch: Batch) = viewModelScope.launch { repository.updateBatch(batch) }
+    // Изменение: В updateBatch добавлен вызов checkAndCompleteBatch, если isActive истинно,
+    // чтобы синхронизировать состояние после любого обновления партии.
+    // Это обеспечивает, что если этапы были завершены ранее, но isActive не был сброшен,
+    // то после update (например, редактирования notes) будет выполнена проверка.
+    fun updateBatch(batch: Batch) = viewModelScope.launch(Dispatchers.IO) {
+        repository.updateBatch(batch)
+        // Синхронизируем состояние: проверяем, нужно ли завершить партию после обновления
+        if (batch.isActive) {
+            checkAndCompleteBatch(batch.id)
+        }
+    }
+
+    // Изменение: Аналогично, в deleteStage добавлен вызов, чтобы после удаления этапа проверить завершенность.
+    // Фикс: Добавлен полный launch с suspend, чтобы получить stage и проверить batchId.
+    // Используем новый метод stageDao.getStageById для получения Stage.
+    fun deleteStage(stageId: String) = viewModelScope.launch(Dispatchers.IO) {
+        val stage = stageDao.getStageById(stageId)
+        repository.deleteStage(stageId)
+        stage?.let { checkAndCompleteBatch(it.batchId) }
+    }
 
     fun deleteBatch(batchId: String) = viewModelScope.launch { repository.deleteBatch(batchId) }
 
@@ -164,7 +220,6 @@ class SharedViewModel(application: Application) : AndroidViewModel(application) 
 
     fun addStage(stage: Stage) = viewModelScope.launch { repository.addStage(stage) }
 
-    fun deleteStage(stageId: String) = viewModelScope.launch { repository.deleteStage(stageId) }
 
     fun scheduleStageNotification(stage: Stage, batch: Batch) {
         repository.scheduleStageNotification(stage, batch)

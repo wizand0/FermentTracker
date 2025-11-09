@@ -66,6 +66,12 @@ class BatchRepository(
 
     suspend fun addLog(log: BatchLog) {
         batchDao.insertLog(log)
+
+        // Обновляем currentWeightGr на последний вес из логов (чтобы дашборд обновил среднее авто)
+        val lastWeight = batchDao.getLastLogWeight(log.batchId)
+        if (lastWeight != null) {
+            batchDao.updateBatchWeight(log.batchId, lastWeight)
+        }
     }
 
     fun getLogs(batchId: String) = batchDao.getLogsForBatch(batchId)

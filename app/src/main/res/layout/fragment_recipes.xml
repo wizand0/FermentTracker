@@ -47,6 +47,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_margin="16dp"
+        android:layout_marginBottom="100dp"
         android:src="@drawable/ic_add"
         android:contentDescription="@string/add_new_recipe" />
 
@@ -56,6 +57,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|start"
         android:layout_margin="16dp"
+        android:layout_marginBottom="100dp"
         android:text="@string/delete_selected"
         android:visibility="gone" />
 

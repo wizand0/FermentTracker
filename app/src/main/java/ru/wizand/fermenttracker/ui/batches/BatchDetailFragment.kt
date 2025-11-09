@@ -437,8 +437,11 @@ class BatchDetailFragment : Fragment() {
             batchListViewModel.completeStageAndMaybeStartNext(args.batchId, stage.id, stage.orderIndex, autoStartNext = true)
             Toast.makeText(requireContext(), getString(R.string.stage_completed_next_started1), Toast.LENGTH_SHORT).show()
         } else {
+            // Изменение: Когда это последний этап (next == null), устанавливаем isActive = false,
+            // чтобы партия автоматически становилась завершенной, и очищаем currentStage.
+            // Это предотвращает ситуацию, когда партия остается активной после завершения всех этапов.
             viewModel.batch.value?.let { batch ->
-                val updatedBatch = batch.copy(currentStage = "")
+                val updatedBatch = batch.copy(currentStage = "", isActive = false)
                 viewModel.updateBatch(updatedBatch)
             }
             batchListViewModel.completeStageAndMaybeStartNext(args.batchId, stage.id, stage.orderIndex, autoStartNext = false)

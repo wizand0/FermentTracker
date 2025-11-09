@@ -5,11 +5,10 @@ import androidx.lifecycle.*
 import kotlinx.coroutines.launch
 import ru.wizand.fermenttracker.data.db.AppDatabase
 import ru.wizand.fermenttracker.data.db.entities.Batch
-import ru.wizand.fermenttracker.data.db.entities.Stage
+import ru.wizand.fermenttracker.data.models.StageWithBatch // Добавлен импорт для StageWithBatch
 import ru.wizand.fermenttracker.data.repository.BatchRepository
 
 class DashboardViewModel(application: Application) : AndroidViewModel(application) {
-
     private val database = AppDatabase.getInstance(application)
     private val batchDao = database.batchDao()
     private val stageDao = database.stageDao()
@@ -27,8 +26,9 @@ class DashboardViewModel(application: Application) : AndroidViewModel(applicatio
     private val _nextEvent = MutableLiveData<Triple<String, Long, String>?>()
     val nextEvent: LiveData<Triple<String, Long, String>?> = _nextEvent
 
-    private val _recentCompletedStages = MutableLiveData<List<Stage>>()
-    val recentCompletedStages: LiveData<List<Stage>> = _recentCompletedStages
+    // Изменено на List<StageWithBatch> (вместо List<Triple<String, String, Long>>)
+    private val _recentCompletedStages = MutableLiveData<List<StageWithBatch>>()
+    val recentCompletedStages: LiveData<List<StageWithBatch>> = _recentCompletedStages
 
     private val _isLoading = MutableLiveData<Boolean>()
     val isLoading: LiveData<Boolean> = _isLoading
@@ -86,7 +86,8 @@ class DashboardViewModel(application: Application) : AndroidViewModel(applicatio
                     _nextEvent.postValue(null)
                 }
 
-                val recentStages = stageDao.getRecentCompletedStages(3)
+                // Изменено: вызов batchDao с новым методом (возвращает List<StageWithBatch>)
+                val recentStages = batchDao.getRecentCompletedStagesWithBatchNames(3)
                 _recentCompletedStages.postValue(recentStages ?: emptyList())
 
             } catch (e: Exception) {

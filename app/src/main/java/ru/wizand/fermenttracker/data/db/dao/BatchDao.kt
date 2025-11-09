@@ -7,6 +7,7 @@ import androidx.sqlite.db.SimpleSQLiteQuery
 import androidx.sqlite.db.SupportSQLiteQuery
 import kotlinx.coroutines.flow.Flow
 import ru.wizand.fermenttracker.data.db.entities.*
+import ru.wizand.fermenttracker.data.models.StageWithBatch
 
 
 @Dao
@@ -58,6 +59,13 @@ interface BatchDao {
 
     @Query("SELECT * FROM stages WHERE batchId = :batchId ORDER BY orderIndex ASC")
     fun getStagesForBatch(batchId: String): LiveData<List<Stage>>
+
+    // Этот метод добавлен для использования в ViewModels (например, BatchListViewModel.checkAndCompleteBatch),
+// где нужна синхронная загрузка списка этапов без LiveData. Он позволяет проверить,
+// все ли этапы завершены, и установить isActive = false для партии.
+// Метод аналогичен getStagesForBatch, но suspend и возвращает List<Stage>.
+    @Query("SELECT * FROM stages WHERE batchId = :batchId ORDER BY orderIndex ASC")
+    suspend fun getStagesForBatchOnce(batchId: String): List<Stage>
 
     @Query("SELECT * FROM stages WHERE batchId = :batchId ORDER BY orderIndex ASC")
     fun getStagesForBatchFlow(batchId: String): Flow<List<Stage>>
@@ -144,16 +152,31 @@ interface BatchDao {
     fun getActiveBatchesCount(): Int?
 
     @Query("""
-        SELECT AVG((initialWeightGr - currentWeightGr) / initialWeightGr * 100)
-        FROM batches
-        WHERE type IN ('Dry-cured meat', 'Dry-cured sausage')
-          AND isActive = 0
-          AND initialWeightGr IS NOT NULL
-          AND currentWeightGr IS NOT NULL
-    """)
+    SELECT AVG((initialWeightGr - currentWeightGr) / initialWeightGr * 100)
+    FROM batches
+    WHERE type IN ('Dry-cured meat', 'Dry-cured sausage')
+      AND isActive IN (0, 1)  -- Изменено: теперь включает активные (1) и завершенные (0) партии
+      AND initialWeightGr IS NOT NULL
+      AND currentWeightGr IS NOT NULL
+""")
     fun getAverageWeightLoss(): Double?
 
 
     @RawQuery(observedEntities = [Batch::class])
     fun getFilteredBatchesPaged(query: SupportSQLiteQuery): PagingSource<Int, Batch>
+
+    @Query("""
+        SELECT b.name AS batchName, s.name AS stageName, s.endTime AS endTime
+        FROM stages s
+        INNER JOIN batches b ON s.batchId = b.id
+        WHERE s.endTime IS NOT NULL AND s.endTime > 0
+        ORDER BY s.endTime DESC
+        LIMIT :limit
+    """)
+    suspend fun getRecentCompletedStagesWithBatchNames(limit: Int): List<StageWithBatch>?  // Возвращает List<StageWithBatch>
+
+    // Обновляет текущий вес партии на основе последнего лога
+    @Query("UPDATE batches SET currentWeightGr = :newWeight WHERE id = :batchId")
+    suspend fun updateBatchWeight(batchId: String, newWeight: Double)
+
 }

@@ -14,4 +14,10 @@ interface StageDao {
 
     @Query("SELECT * FROM stages WHERE endTime IS NOT NULL ORDER BY endTime DESC LIMIT :limit")
     suspend fun getRecentCompletedStages(limit: Int): List<Stage>?
+
+    // Этот метод добавлен для использования в SharedViewModel.deleteStage,
+    // чтобы получить Stage по id и проверить batchId после удаления этапа.
+    // Это помогает синхронизировать состояние партии.
+    @Query("SELECT * FROM stages WHERE id = :stageId LIMIT 1")
+    suspend fun getStageById(stageId: String): Stage?
 }
