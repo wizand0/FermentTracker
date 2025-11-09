@@ -39,6 +39,8 @@
     <string name="filter_by_date">Date</string>
     <string name="filter_by_status">Status</string>
 
+    <string name="initial_weight_formatted">Initial Weight: %s</string>
+
     <!-- Settings Categories -->
     <string name="settings_category_database">Database</string>
     <string name="settings_category_notifications">Notifications</string>
@@ -431,9 +433,9 @@
 
     <!-- =============== PDF EXPORT STRINGS =============== -->
     <string name="weight_info_title">Weight Information</string>
-    <string name="initial_weight_text">Initial weight: %.1f g</string>
-    <string name="current_weight_text">Current weight: %.1f g</string>
-    <string name="total_weight_loss_text" formatted="false">Total weight loss: %.1f g (%.1f%%)</string>
+    <string name="initial_weight_text">Initial Weight: %s</string>
+    <string name="current_weight_text">Current Weight: %s</string>
+    <string name="total_weight_loss_text">Total Weight Loss: %s (%d%%)</string>
     <string name="stages_production_title">Production Stages</string>
     <string name="stage_column_header">Stage</string>
     <string name="duration_column_header">Duration</string>

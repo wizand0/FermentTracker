@@ -9,6 +9,8 @@ import coil.load
 import coil.transform.RoundedCornersTransformation
 import ru.wizand.fermenttracker.data.db.entities.BatchLog
 import ru.wizand.fermenttracker.databinding.ItemLogBinding
+import ru.wizand.fermenttracker.utils.WeightConverter  // Добавленный импорт для поддержки конвертации веса
+import ru.wizand.fermenttracker.utils.WeightUnit      // Добавленный импорт для перечислений единиц измерения
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
@@ -37,7 +39,11 @@ class LogsAdapter(
                 Locale.getDefault()
             ).format(Date(log.timestamp))
 
-            b.tvWeight.text = log.weightGr?.toString() ?: "N/A"
+            // Изменение: Отображение веса с конвертацией в выбранные единицы
+            b.tvWeight.text = log.weightGr?.let {
+                val unit = WeightConverter.getCurrentUnit(b.root.context)  // Получаем текущую единицу
+                WeightConverter.formatWeight(it, unit)  // Форматируем вес
+            } ?: "N/A"
 
             log.photoPath?.let { path ->
                 b.ivPhoto.load(File(path)) {

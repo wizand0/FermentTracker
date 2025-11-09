@@ -153,11 +153,13 @@ interface BatchDao {
 
     @Query("""
     SELECT AVG((initialWeightGr - currentWeightGr) / initialWeightGr * 100)
-    FROM batches
-    WHERE type IN ('Dry-cured meat', 'Dry-cured sausage')
-      AND isActive IN (0, 1)  -- Изменено: теперь включает активные (1) и завершенные (0) партии
-      AND initialWeightGr IS NOT NULL
-      AND currentWeightGr IS NOT NULL
+FROM batches
+WHERE type IN ('Dry-cured meat', 'Dry-cured meat (basic)', 'Dry-cured meat (spicy)', 'Dry-cured sausage')
+  AND initialWeightGr IS NOT NULL
+  AND initialWeightGr > 0
+  AND currentWeightGr IS NOT NULL
+  AND currentWeightGr > 0
+  AND currentWeightGr < initialWeightGr
 """)
     fun getAverageWeightLoss(): Double?
 

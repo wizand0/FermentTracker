@@ -22,6 +22,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import coil.load
@@ -39,6 +40,8 @@ import ru.wizand.fermenttracker.ui.adapters.StageAdapter
 import ru.wizand.fermenttracker.utils.LabelGenerator
 import ru.wizand.fermenttracker.utils.NotificationHelper
 import ru.wizand.fermenttracker.utils.PdfExporter
+import ru.wizand.fermenttracker.utils.WeightConverter
+import ru.wizand.fermenttracker.utils.WeightUnit
 import ru.wizand.fermenttracker.vm.BatchDetailViewModel
 import ru.wizand.fermenttracker.vm.BatchListViewModel
 import java.io.File
@@ -174,8 +177,11 @@ class BatchDetailFragment : Fragment() {
                 binding.tvType.text = it.type
                 binding.currentStageName.text = it.currentStage
                 binding.tvBatchStartDate.text = formatDate(it.startDate)
+                // Изменение: Теперь отображаем начальный вес с поддержкой выбранных единиц измерения
                 binding.tvInitialWeight.text = it.initialWeightGr?.let { w ->
-                    getString(R.string.initial_weight, w)
+                    val unit = WeightConverter.getCurrentUnit(requireContext())  // Получаем текущую единицу измерения
+                    getString(R.string.initial_weight_formatted,  // Используем новую строку для форматированного вывода
+                        WeightConverter.formatWeight(w, unit))  // Форматируем вес с учетом единицы
                 } ?: getString(R.string.initial_weight_na)
                 binding.etNotes.setText(it.notes ?: "")
 //                binding.etQrCode.setText(it.qrCode ?: "")
@@ -255,21 +261,35 @@ class BatchDetailFragment : Fragment() {
 
     private fun showWeightDialog() {
         val initial = viewModel.batch.value?.initialWeightGr
+        // Изменение: В диалоге ввода веса теперь конвертируем начальный/последний вес в выбранные единицы для отображения
         val input = EditText(requireContext()).apply {
             inputType = android.text.InputType.TYPE_CLASS_NUMBER or android.text.InputType.TYPE_NUMBER_FLAG_DECIMAL
-            setText((lastWeight ?: initial)?.toString() ?: "")
+            val unit = WeightConverter.getCurrentUnit(requireContext())  // Получаем текущую единицу
+            val convertedWeight = lastWeight?.let {
+                WeightConverter.convertFromGrams(it, unit)  // Конвертируем последний вес
+            } ?: initial?.let {
+                WeightConverter.convertFromGrams(it, unit)  // Или начальный, если последний отсутствует
+            }
+            setText(convertedWeight?.toString() ?: "")
         }
         AlertDialog.Builder(requireContext())
             .setTitle(getString(R.string.add_weight))
             .setView(input)
             .setPositiveButton(getString(R.string.ok)) { _, _ ->
-                val weight = input.text.toString().toDoubleOrNull()
-                if (weight == null) {
+                val weightInput = input.text.toString().toDoubleOrNull()
+                if (weightInput == null) {
                     Toast.makeText(context, getString(R.string.invalid_weight), Toast.LENGTH_SHORT).show()
                     return@setPositiveButton
                 }
-                batchListViewModel.addWeightChecked(args.batchId, weight, lastPhotoPath)
-                lastWeight = weight
+                // Изменение: Конвертируем введенный вес обратно в граммы перед сохранением
+                val unit = WeightConverter.getCurrentUnit(requireContext())  // Получаем текущую единицу
+                val weightInGrams = when(unit) {  // Конвертируем в граммы в зависимости от единицы
+                    WeightUnit.GRAMS -> weightInput
+                    WeightUnit.KILOGRAMS -> weightInput * 1000.0
+                    WeightUnit.POUNDS -> weightInput * 453.592
+                }
+                batchListViewModel.addWeightChecked(args.batchId, weightInGrams, lastPhotoPath)  // Сохраняем в граммах
+                lastWeight = weightInGrams  // Обновляем lastWeight в граммах
             }
             .setNegativeButton(getString(R.string.cancel), null)
             .show()
@@ -544,10 +564,10 @@ class BatchDetailFragment : Fragment() {
             .show()
     }
 
-    private fun saveLabelToGallery(bitmap: Bitmap, batch: Batch) {
+    private fun saveLabelToGallery(labelBitmap: Bitmap, batch: Batch) {
         lifecycleScope.launch {
             try {
-                val result = labelGenerator.saveLabelToGallery(bitmap, batch.name)
+                val result = labelGenerator.saveLabelToGallery(labelBitmap, batch.name)
                 withContext(Dispatchers.Main) {
                     if (result) {
                         Toast.makeText(requireContext(), getString(R.string.label_saved_success), Toast.LENGTH_SHORT).show()
@@ -563,10 +583,10 @@ class BatchDetailFragment : Fragment() {
         }
     }
 
-    private fun shareLabelImage(bitmap: Bitmap, batch: Batch) {
+    private fun shareLabelImage(labelBitmap: Bitmap, batch: Batch) {
         lifecycleScope.launch {
             try {
-                val uri = labelGenerator.saveLabelToCache(bitmap, batch.name)
+                val uri = labelGenerator.saveLabelToCache(labelBitmap, batch.name)
                 withContext(Dispatchers.Main) {
                     if (uri != null) {
                         val shareIntent = Intent(Intent.ACTION_SEND).apply {

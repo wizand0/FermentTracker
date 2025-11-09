@@ -9,6 +9,8 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import ru.wizand.fermenttracker.data.db.entities.Stage
 import ru.wizand.fermenttracker.databinding.ItemStageBinding
+import ru.wizand.fermenttracker.utils.WeightConverter  // Добавленный импорт для поддержки конвертации веса
+import ru.wizand.fermenttracker.utils.WeightUnit      // Добавленный импорт для перечислений единиц измерения
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -188,8 +190,12 @@ class StageAdapter(
             val inferredActive = (stage.startTime != null && stage.endTime == null)
             val isActive = isThisActive || inferredActive
 
+            // Изменение: Теперь отображение текущего веса с учетом выбранных единиц измерения
             binding.tvCurrentWeight.text = if (isActive) {
-                batchCurrentWeight?.let { binding.root.context.getString(R.string.weight_format, it) } ?: binding.root.context.getString(R.string.weight_na)
+                batchCurrentWeight?.let {
+                    val unit = WeightConverter.getCurrentUnit(binding.root.context)  // Получаем текущую единицу
+                    WeightConverter.formatWeight(it, unit)  // Форматируем вес
+                } ?: binding.root.context.getString(R.string.weight_na)
             } else {
                 binding.root.context.getString(R.string.na)
             }
@@ -209,8 +215,13 @@ class StageAdapter(
 
             binding.tvTimeLeft.text = binding.root.context.getString(R.string.time_left_format_text, computeTimeLeftText(stage))
 
+            // Определяем, нет ли активных этапов (никакой этап не запущен)
             val anyRunning = activeStageId != null
-            binding.btnStartStage.isVisible = !anyRunning && stage.startTime == null
+
+            // Кнопка "Начать" показывается ТОЛЬКО если этап не начат (startTime == null), не завершен (endTime == null) и нет активных этапов (!anyRunning)
+            binding.btnStartStage.isVisible = !anyRunning && stage.startTime == null && stage.endTime == null
+
+            // Кнопка "Завершить" показывается ТОЛЬКО если этап активен (isActive) и не завершен (endTime == null)
             binding.btnCompleteStage.isVisible = isActive && stage.endTime == null
 
             binding.btnStartStage.setOnClickListener {
@@ -254,21 +265,28 @@ class StageAdapter(
         }
 
         fun bindActiveChanged(stage: Stage, isActive: Boolean, weight: Double?) {
+            // Изменение: Аналогично bind() - отображение веса с конвертацией
             binding.tvCurrentWeight.text = if (isActive) {
-                weight?.let { binding.root.context.getString(R.string.weight_format, it) } ?: binding.root.context.getString(R.string.weight_na)
+                weight?.let {
+                    val unit = WeightConverter.getCurrentUnit(binding.root.context)
+                    WeightConverter.formatWeight(it, unit)
+                } ?: binding.root.context.getString(R.string.weight_na)
             } else {
                 binding.root.context.getString(R.string.na)
             }
 
             val anyRunning = activeStageId != null
-            binding.btnStartStage.isVisible = !anyRunning && stage.startTime == null
+            // Исправлено: добавлена проверка stage.endTime == null для кнопки "Начать", чтобы она не показывалась для завершенных этапов
+            binding.btnStartStage.isVisible = !anyRunning && stage.startTime == null && stage.endTime == null
             binding.btnCompleteStage.isVisible = isActive && stage.endTime == null
             binding.tvTimeLeft.text = binding.root.context.getString(R.string.time_left_format_text, computeTimeLeftText(stage))
         }
 
         fun bindWeightChanged(stage: Stage, weight: Double?) {
+            // Изменение: Отображение веса с конвертацией
             binding.tvCurrentWeight.text = weight?.let {
-                binding.root.context.getString(R.string.weight_format, it)
+                val unit = WeightConverter.getCurrentUnit(binding.root.context)
+                WeightConverter.formatWeight(it, unit)
             } ?: binding.root.context.getString(R.string.weight_na)
         }
 
@@ -277,6 +295,7 @@ class StageAdapter(
         }
 
         fun bindStageCompleted(stage: Stage, isCompleted: Boolean) {
+            // При завершении этапа кнопка "Завершить" скрывается, и при проверках status по временным полям оно автоматически скроется
             binding.btnCompleteStage.isVisible = !isCompleted && activeStageId == stage.id
             binding.tvEndTime.text = if (isCompleted) {
                 binding.root.context.getString(R.string.end_format, formatDate(System.currentTimeMillis()))
@@ -286,6 +305,7 @@ class StageAdapter(
         }
 
         fun bindStageStarted(stage: Stage, isStarted: Boolean) {
+            // При старте этапа кнопка "Начать" скрывается
             binding.btnStartStage.isVisible = !isStarted && activeStageId == null
             binding.tvStartTime.text = if (isStarted) {
                 binding.root.context.getString(R.string.start_format, formatDate(System.currentTimeMillis()))

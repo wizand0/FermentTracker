@@ -38,6 +38,8 @@
     <string name="filter_by_date">Date</string>
     <string name="filter_by_status">Status</string>
 
+    <string name="initial_weight_formatted">Начальный вес: %s</string>
+
 
     <!-- Settings Categories -->
     <string name="settings_category_database">База данных</string>
@@ -432,9 +434,9 @@
 
     <!-- =============== PDF EXPORT STRINGS =============== -->
     <string name="weight_info_title">Информация о весе</string>
-    <string name="initial_weight_text">Начальный вес: %.1f г</string>
-    <string name="current_weight_text">Текущий вес: %.1f г</string>
-    <string name="total_weight_loss_text">Общая потеря веса: %.1f г (%.1f%%)</string>
+    <string name="initial_weight_text">Initial Weight: %s</string>
+    <string name="current_weight_text">Current Weight: %s</string>
+    <string name="total_weight_loss_text">Total Weight Loss: %s (%d%%)</string>
     <string name="stages_production_title">Этапы производства</string>
     <string name="stage_column_header">Этап</string>
     <string name="duration_column_header">Длительность</string>

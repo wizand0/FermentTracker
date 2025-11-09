@@ -56,7 +56,7 @@ class PdfExporter(private val context: Context) {
             // Add all sections
             addTitle(document, batch)
             addProductInfo(document, batch, recipe)
-            addWeightInfo(document, batch, logs)
+            addWeightInfo(document, batch, logs)  // Изменение: Передаем контекст в метод
             addStagesTable(document, stages)
 
             if (logs.any { it.weightGr != null }) {
@@ -168,9 +168,6 @@ class PdfExporter(private val context: Context) {
     // ========== PRIVATE HELPER METHODS ==========
 
     private fun addTitle(document: Document, batch: Batch) {
-//        val titleFont = PdfFontFactory.createFont(StandardFonts.HELVETICA_BOLD)
-//        val dateFont = PdfFontFactory.createFont(StandardFonts.HELVETICA)
-
         val titleFont = getFontFromAssets(isBold = true)
         val dateFont = getFontFromAssets(isBold = false)
 
@@ -191,9 +188,6 @@ class PdfExporter(private val context: Context) {
     }
 
     private fun addProductInfo(document: Document, batch: Batch, recipe: Recipe?) {
-//        val boldFont = PdfFontFactory.createFont(StandardFonts.HELVETICA_BOLD)
-//        val regularFont = PdfFontFactory.createFont(StandardFonts.HELVETICA)
-
         val boldFont = getFontFromAssets(isBold = true)
         val regularFont = getFontFromAssets(isBold = false)
 
@@ -241,9 +235,6 @@ class PdfExporter(private val context: Context) {
     }
 
     private fun addWeightInfo(document: Document, batch: Batch, logs: List<BatchLog>) {
-//        val boldFont = PdfFontFactory.createFont(StandardFonts.HELVETICA_BOLD)
-//        val regularFont = PdfFontFactory.createFont(StandardFonts.HELVETICA)
-
         val boldFont = getFontFromAssets(isBold = true)
         val regularFont = getFontFromAssets(isBold = false)
 
@@ -253,29 +244,28 @@ class PdfExporter(private val context: Context) {
             .setMarginTop(15f)
             .setMarginBottom(10f))
 
+        val unit = WeightConverter.getCurrentUnit(context)
         val initialWeight = batch.initialWeightGr ?: 0.0
         val currentWeight = batch.currentWeightGr ?: initialWeight
         val weightLoss = initialWeight - currentWeight
         val weightLossPercent = if (initialWeight > 0) (weightLoss / initialWeight * 100) else 0.0
+        val percentage = weightLossPercent.toInt()  // Округляем до Int для %d
 
-        document.add(Paragraph(context.getString(R.string.initial_weight_text, initialWeight))
+        document.add(Paragraph(context.getString(R.string.initial_weight_text, WeightConverter.formatWeight(initialWeight, unit)))
             .setFont(regularFont)
             .setFontSize(11f))
 
-        document.add(Paragraph(context.getString(R.string.current_weight_text, currentWeight))
+        document.add(Paragraph(context.getString(R.string.current_weight_text, WeightConverter.formatWeight(currentWeight, unit)))
             .setFont(regularFont)
             .setFontSize(11f))
 
-        document.add(Paragraph(context.getString(R.string.total_weight_loss_text, weightLoss, weightLossPercent))
+        document.add(Paragraph(context.getString(R.string.total_weight_loss_text, WeightConverter.formatWeight(weightLoss, unit), percentage))
             .setFont(regularFont)
             .setFontSize(11f)
             .setMarginBottom(15f))
     }
 
     private fun addStagesTable(document: Document, stages: List<Stage>) {
-//        val boldFont = PdfFontFactory.createFont(StandardFonts.HELVETICA_BOLD)
-//        val regularFont = PdfFontFactory.createFont(StandardFonts.HELVETICA)
-
         val boldFont = getFontFromAssets(isBold = true)
         val regularFont = getFontFromAssets(isBold = false)
 
@@ -320,8 +310,6 @@ class PdfExporter(private val context: Context) {
     }
 
     private fun addWeightChart(document: Document, logs: List<BatchLog>) {
-//        val boldFont = PdfFontFactory.createFont(StandardFonts.HELVETICA_BOLD)
-
         val boldFont = getFontFromAssets(isBold = true)
 
         document.add(Paragraph(context.getString(R.string.weight_chart_title))
@@ -344,9 +332,6 @@ class PdfExporter(private val context: Context) {
     }
 
     private fun addPhotosSection(document: Document, photos: List<Photo>) {
-//        val boldFont = PdfFontFactory.createFont(StandardFonts.HELVETICA_BOLD)
-//        val regularFont = PdfFontFactory.createFont(StandardFonts.HELVETICA)
-
         val boldFont = getFontFromAssets(isBold = true)
         val regularFont = getFontFromAssets(isBold = false)
 
@@ -434,13 +419,15 @@ class PdfExporter(private val context: Context) {
             color = android.graphics.Color.BLACK
         }
 
+        val unit = WeightConverter.getCurrentUnit(context)  // Получаем текущую единицу для графика
         for (i in 0..5) {
             val y = height - margin - (chartHeight * i / 5)
             canvas.drawLine(margin, y, width - margin, y, paint)
 
             val weight = minWeight - weightPadding + (weightRange + 2 * weightPadding) * i / 5
-            val label = String.format("%.0f", weight)
-            canvas.drawText(label, 10f, y + 5f, textPaint)
+            // Изменение: Форматируем метки Y-оси с учетом единицы, но поскольку это график, добавляем единицу для ясности
+            val formattedWeight = WeightConverter.formatWeight(weight, unit)
+            canvas.drawText(formattedWeight, 10f, y + 5f, textPaint)
         }
 
         // Draw X-axis labels (dates)

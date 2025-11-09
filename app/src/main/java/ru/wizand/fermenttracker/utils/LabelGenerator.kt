@@ -91,7 +91,9 @@ class LabelGenerator(private val context: Context) {
         textPaint.textSize = 10f * scaledDensity
         val fmWeight = textPaint.fontMetrics
         val lineHeightWeight = Math.ceil((fmWeight.descent - fmWeight.ascent).toDouble()).toFloat() + fmWeight.leading
-        val weightText = context.getString(R.string.initial_weight, batch.initialWeightGr ?: 0.0)
+        // Изменение: Форматируем начальный вес с учетом выбранных единиц
+        val unit = WeightConverter.getCurrentUnit(context)  // Получаем текущую единицу
+        val weightText = WeightConverter.formatWeight(batch.initialWeightGr ?: 0.0, unit)  // Конвертируем и форматируем
         val weightLines = wrapText(weightText, textPaint, maxTextWidth)
         weightLines.forEach { line ->
             canvas.drawText(line, centerX, y, textPaint)
@@ -303,7 +305,9 @@ class LabelGenerator(private val context: Context) {
         textPaint.textSize = 10f * scaledDensity
         val fmWeight = textPaint.fontMetrics
         val lineHeightWeight = Math.ceil((fmWeight.descent - fmWeight.ascent).toDouble()).toFloat() + fmWeight.leading
-        val weightText = context.getString(R.string.initial_weight, batch.initialWeightGr ?: 0.0)
+        // Изменение: Используем форматированный вес для расчета высоты
+        val unit = WeightConverter.getCurrentUnit(context)
+        val weightText = WeightConverter.formatWeight(batch.initialWeightGr ?: 0.0, unit)
         val weightLines = wrapText(weightText, textPaint, maxTextWidth)
         totalHeight += weightLines.size * lineHeightWeight * 0.95f + sectionSpacing * 0.7f
 
