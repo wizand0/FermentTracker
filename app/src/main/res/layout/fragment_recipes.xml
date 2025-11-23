@@ -12,7 +12,7 @@
         android:layout_height="match_parent"
         android:clipToPadding="false"
         android:paddingTop="8dp"
-        android:paddingBottom="72dp"
+        android:paddingBottom="130dp"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         tools:listitem="@layout/item_recipe" />
 
@@ -46,18 +46,18 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
-        android:layout_margin="16dp"
-        android:layout_marginBottom="100dp"
-        android:src="@drawable/ic_add"
-        android:contentDescription="@string/add_new_recipe" />
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="88dp"
+        android:contentDescription="@string/add_new_recipe"
+        android:src="@drawable/ic_add" />
 
     <Button
         android:id="@+id/btnDeleteSelectedRecipes"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|start"
-        android:layout_margin="16dp"
-        android:layout_marginBottom="100dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginBottom="88dp"
         android:text="@string/delete_selected"
         android:visibility="gone" />
 

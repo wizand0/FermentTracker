@@ -647,5 +647,7 @@
         Licensed under the Apache License, Version 2.0
     </string>
     <string name="close">Close</string>
+    <string name="no_batches_found">No batches found</string>
+    <string name="press_plus_to_add">Press plus to add</string>
 
 </resources>

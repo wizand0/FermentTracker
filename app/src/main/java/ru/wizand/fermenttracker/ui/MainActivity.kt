@@ -1,18 +1,21 @@
 package ru.wizand.fermenttracker.ui
 
+import android.Manifest
 import android.app.ProgressDialog
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.updateLayoutParams
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
@@ -41,6 +44,7 @@ class MainActivity : AppCompatActivity() {
     companion object {
         private const val CREATE_FILE_REQUEST_CODE = 1001
         private const val PICK_FILE_REQUEST_CODE = 1002
+        private const val REQUEST_NOTIFICATION_PERMISSION = 1003
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -85,8 +89,7 @@ class MainActivity : AppCompatActivity() {
                 R.id.batchListFragment,
                 R.id.recipesFragment,
                 R.id.settingsFragment,
-                R.id.batchDetailFragment,
-                R.id.recipesFragment -> {
+                R.id.batchDetailFragment -> {
                     binding.bottomNavigation.visibility = View.VISIBLE
                 }
                 else -> {
@@ -95,15 +98,11 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        // Устанавливаем отступ снизу для фрагментов
-        binding.navHostFragment.post {
-            val bottomNavHeight = binding.bottomNavigation.height
-            binding.navHostFragment.setPadding(
-                binding.navHostFragment.paddingLeft,
-                binding.navHostFragment.paddingTop,
-                binding.navHostFragment.paddingRight,
-                bottomNavHeight
-            )
+        // Запрос разрешения на уведомления для Android 13+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.POST_NOTIFICATIONS), REQUEST_NOTIFICATION_PERMISSION)
+            }
         }
 
         // === Добавляем шаблоны рецептов при первом запуске ===
@@ -114,6 +113,18 @@ class MainActivity : AppCompatActivity() {
             val recipeCount = dao.getRecipeCount()
             if (recipeCount == 0) {
                 RecipeTemplates.saveToDatabase(this@MainActivity)
+            }
+        }
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == REQUEST_NOTIFICATION_PERMISSION) {
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Log.d("Permissions", "Notification permission granted")
+            } else {
+                Toast.makeText(this, "Уведомления отключены. Вы можете включить их в настройках приложения.", Toast.LENGTH_LONG).show()
+                Log.d("Permissions", "Notification permission denied")
             }
         }
     }

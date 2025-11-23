@@ -152,17 +152,15 @@ interface BatchDao {
     fun getActiveBatchesCount(): Int?
 
     @Query("""
-    SELECT AVG((initialWeightGr - currentWeightGr) / initialWeightGr * 100)
-FROM batches
-WHERE type IN ('Dry-cured meat', 'Dry-cured meat (basic)', 'Dry-cured meat (spicy)', 'Dry-cured sausage')
-  AND initialWeightGr IS NOT NULL
-  AND initialWeightGr > 0
-  AND currentWeightGr IS NOT NULL
-  AND currentWeightGr > 0
-  AND currentWeightGr < initialWeightGr
-""")
+        SELECT AVG((initialWeightGr - currentWeightGr) / initialWeightGr * 100)
+        FROM batches
+        WHERE initialWeightGr IS NOT NULL
+          AND initialWeightGr > 0
+          AND currentWeightGr IS NOT NULL
+          AND currentWeightGr > 0
+          AND currentWeightGr < initialWeightGr
+    """)
     fun getAverageWeightLoss(): Double?
-
 
     @RawQuery(observedEntities = [Batch::class])
     fun getFilteredBatchesPaged(query: SupportSQLiteQuery): PagingSource<Int, Batch>
