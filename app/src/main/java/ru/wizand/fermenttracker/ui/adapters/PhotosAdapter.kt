@@ -5,15 +5,14 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import coil.ImageLoader
-import coil.request.ImageRequest
+import coil.load
 import coil.transform.RoundedCornersTransformation
+import ru.wizand.fermenttracker.R
 import ru.wizand.fermenttracker.data.db.entities.Photo
 import ru.wizand.fermenttracker.databinding.ItemPhotoBinding
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
-import ru.wizand.fermenttracker.R
 
 class PhotosAdapter : ListAdapter<Photo, PhotosAdapter.VH>(DIFF) {
 
@@ -28,40 +27,28 @@ class PhotosAdapter : ListAdapter<Photo, PhotosAdapter.VH>(DIFF) {
 
     inner class VH(private val b: ItemPhotoBinding) : RecyclerView.ViewHolder(b.root) {
         fun bind(photo: Photo) {
-            // Расчитываем размер на основе ширины ImageView (после inflate она известна)
-            val containerWidth = b.ivPhoto.width.takeIf { it > 0 } ?: 200 // Запасной размер, если ещё не измерено
-            val containerHeight = (containerWidth * 0.75f).toInt() // Пропорции 4:3, например; настройте под нужды
+            // Оптимизация: используем глобальный Coil через extension-функцию load.
+            // Coil сам определит размер View и подгонит картинку, экономя память.
+            b.ivPhoto.load(File(photo.filePath)) {
+                crossfade(true)                         // Плавное появление
+                placeholder(R.drawable.ic_placeholder)  // Плейсхолдер
+                error(R.drawable.ic_error)              // Ошибка
+                // allowHardware(false) - можно добавить, если битмапы слишком большие и вызывают краши,
+                // но обычно Coil справляется сам с downsampling.
+                transformations(RoundedCornersTransformation(8f))
+            }
 
-            // Настраиваем ImageLoader для лучшей памяти и кэширования
-            val imageLoader = ImageLoader.Builder(b.root.context)
-                .memoryCachePolicy(coil.request.CachePolicy.ENABLED)  // Явное включение кэша памяти
-                .diskCachePolicy(coil.request.CachePolicy.ENABLED)    // Явное включение кэша диска
-                .build()
-
-            // Прогрессивная загрузка с Coil: плейсхолдер, crossfade, ограничения на размер
-            val request = ImageRequest.Builder(b.root.context)
-                .data(File(photo.filePath))
-                .target(b.ivPhoto)
-                .size(containerWidth, containerHeight)  // Размер на основе контейнера для экономии памяти
-                .crossfade(true)  // Плавное появление (прогрессивная загрузка)
-                .placeholder(R.drawable.ic_placeholder)  // Плейсхолдер во время загрузки
-                .error(R.drawable.ic_error)  // Изображение при ошибке
-                .allowHardware(false)  // Отключаем аппаратное ускорение для больших изображений (экономит память)
-                .transformations(RoundedCornersTransformation(8f))  // Трансформация для округления
-                .build()
-
-            imageLoader.enqueue(request)
-
-            b.tvTimestamp.text = SimpleDateFormat(
-                "yyyy-MM-dd HH:mm",
-                Locale.getDefault()
-            ).format(Date(photo.timestamp))
+            // Используем статический форматтер
+            b.tvTimestamp.text = DATE_FORMATTER.format(Date(photo.timestamp))
 
             b.ivPhoto.contentDescription = "Photo at ${b.tvTimestamp.text}"
         }
     }
 
     companion object {
+        // Вынесли форматтер, чтобы не создавать его на каждый bind
+        private val DATE_FORMATTER = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault())
+
         private val DIFF = object : DiffUtil.ItemCallback<Photo>() {
             override fun areItemsTheSame(oldItem: Photo, newItem: Photo) =
                 oldItem.id == newItem.id

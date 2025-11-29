@@ -7,14 +7,13 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
 import coil.transform.RoundedCornersTransformation
+import ru.wizand.fermenttracker.R
 import ru.wizand.fermenttracker.data.db.entities.BatchLog
 import ru.wizand.fermenttracker.databinding.ItemLogBinding
-import ru.wizand.fermenttracker.utils.WeightConverter  // Добавленный импорт для поддержки конвертации веса
-import ru.wizand.fermenttracker.utils.WeightUnit      // Добавленный импорт для перечислений единиц измерения
+import ru.wizand.fermenttracker.utils.WeightConverter
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
-import ru.wizand.fermenttracker.R
 
 class LogsAdapter(
     private val onPhotoClicked: ((String) -> Unit)? = null
@@ -34,15 +33,13 @@ class LogsAdapter(
         private val onPhotoClicked: ((String) -> Unit)?
     ) : RecyclerView.ViewHolder(b.root) {
         fun bind(log: BatchLog) {
-            b.tvTimestamp.text = SimpleDateFormat(
-                "yyyy-MM-dd HH:mm",
-                Locale.getDefault()
-            ).format(Date(log.timestamp))
+            // Используем статический форматтер
+            b.tvTimestamp.text = DATE_FORMATTER.format(Date(log.timestamp))
 
-            // Изменение: Отображение веса с конвертацией в выбранные единицы
+            // Отображение веса с конвертацией
             b.tvWeight.text = log.weightGr?.let {
-                val unit = WeightConverter.getCurrentUnit(b.root.context)  // Получаем текущую единицу
-                WeightConverter.formatWeight(it, unit)  // Форматируем вес
+                val unit = WeightConverter.getCurrentUnit(b.root.context)
+                WeightConverter.formatWeight(it, unit)
             } ?: "N/A"
 
             log.photoPath?.let { path ->
@@ -50,18 +47,25 @@ class LogsAdapter(
                     crossfade(true)
                     placeholder(R.drawable.ic_placeholder)
                     error(R.drawable.ic_error)
-                    size(640, 480) // Изменение размера для экономии памяти
+                    // size(640, 480) - Coil сам определит размер view в списке,
+                    // но если view слишком маленькое, а грузится 4k фото, можно оставить явный size
+                    // для уменьшения потребления памяти при декодировании.
+                    size(300, 300) // Пример оптимизации для превью в списке логов
                     transformations(RoundedCornersTransformation(8f))
                 }
-                b.ivPhoto.setOnClickListener { onPhotoClicked?.invoke(path) } // Обработчик клика
+                b.ivPhoto.setOnClickListener { onPhotoClicked?.invoke(path) }
             } ?: run {
+                // Обязательно очищаем view при переиспользовании, если фото нет
                 b.ivPhoto.setImageDrawable(null)
-                b.ivPhoto.setOnClickListener(null) // Убрать клик, если фото нет
+                b.ivPhoto.setOnClickListener(null)
             }
         }
     }
 
     companion object {
+        // Вынесли форматтер в companion object
+        private val DATE_FORMATTER = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault())
+
         private val DIFF = object : DiffUtil.ItemCallback<BatchLog>() {
             override fun areItemsTheSame(oldItem: BatchLog, newItem: BatchLog) =
                 oldItem.id == newItem.id
