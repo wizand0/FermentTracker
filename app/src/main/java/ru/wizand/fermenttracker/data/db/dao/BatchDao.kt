@@ -3,7 +3,6 @@ package ru.wizand.fermenttracker.data.db.dao
 import androidx.lifecycle.LiveData
 import androidx.paging.PagingSource
 import androidx.room.*
-import androidx.sqlite.db.SimpleSQLiteQuery
 import androidx.sqlite.db.SupportSQLiteQuery
 import kotlinx.coroutines.flow.Flow
 import ru.wizand.fermenttracker.data.db.entities.*
@@ -57,13 +56,13 @@ interface BatchDao {
     @Query("DELETE FROM stages WHERE id = :stageId")
     suspend fun deleteStage(stageId: String)
 
+    // !!! ВОТ ЭТОТ МЕТОД НУЖНО БЫЛО ДОБАВИТЬ !!!
+    @Query("SELECT * FROM stages WHERE id = :stageId LIMIT 1")
+    suspend fun getStageById(stageId: String): Stage?
+
     @Query("SELECT * FROM stages WHERE batchId = :batchId ORDER BY orderIndex ASC")
     fun getStagesForBatch(batchId: String): LiveData<List<Stage>>
 
-    // Этот метод добавлен для использования в ViewModels (например, BatchListViewModel.checkAndCompleteBatch),
-// где нужна синхронная загрузка списка этапов без LiveData. Он позволяет проверить,
-// все ли этапы завершены, и установить isActive = false для партии.
-// Метод аналогичен getStagesForBatch, но suspend и возвращает List<Stage>.
     @Query("SELECT * FROM stages WHERE batchId = :batchId ORDER BY orderIndex ASC")
     suspend fun getStagesForBatchOnce(batchId: String): List<Stage>
 
@@ -173,7 +172,7 @@ interface BatchDao {
         ORDER BY s.endTime DESC
         LIMIT :limit
     """)
-    suspend fun getRecentCompletedStagesWithBatchNames(limit: Int): List<StageWithBatch>?  // Возвращает List<StageWithBatch>
+    suspend fun getRecentCompletedStagesWithBatchNames(limit: Int): List<StageWithBatch>?
 
     // Обновляет текущий вес партии на основе последнего лога
     @Query("UPDATE batches SET currentWeightGr = :newWeight WHERE id = :batchId")

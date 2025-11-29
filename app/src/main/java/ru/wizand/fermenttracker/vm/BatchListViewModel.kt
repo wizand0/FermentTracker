@@ -1,9 +1,9 @@
 package ru.wizand.fermenttracker.vm
 
 import android.app.Application
-import android.content.Context
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
@@ -13,21 +13,19 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import ru.wizand.fermenttracker.R
 import ru.wizand.fermenttracker.data.db.AppDatabase
 import ru.wizand.fermenttracker.data.db.entities.Batch
 import ru.wizand.fermenttracker.data.db.entities.Stage
 import ru.wizand.fermenttracker.data.repository.BatchRepository
-import java.util.concurrent.TimeUnit
-import androidx.lifecycle.MutableLiveData
 import java.util.UUID
-import ru.wizand.fermenttracker.R
+import java.util.concurrent.TimeUnit
 
 class BatchListViewModel(application: Application) : AndroidViewModel(application) {
-    val repository: BatchRepository // public
+    val repository: BatchRepository
     private val batchDao = AppDatabase.getInstance(application).batchDao()
     val batches: LiveData<List<Batch>>
 
-    // Добавляем Flow с PagingData для Paging 3
     val batchesPaged: Flow<PagingData<Batch>> = Pager(
         config = PagingConfig(
             pageSize = 20,
@@ -37,11 +35,9 @@ class BatchListViewModel(application: Application) : AndroidViewModel(applicatio
         pagingSourceFactory = { batchDao.getAllBatchesPaged() }
     ).flow.cachedIn(viewModelScope)
 
-    // Added: LiveData состояния активного этапа
     private val _activeStageId = MutableLiveData<String?>(null)
     val activeStageId: LiveData<String?> = _activeStageId
 
-    // Result of weight save operation
     sealed class WeightSaveResult {
         object Success : WeightSaveResult()
         data class Failure(val reason: String) : WeightSaveResult()
@@ -56,7 +52,6 @@ class BatchListViewModel(application: Application) : AndroidViewModel(applicatio
         batches = repository.allBatches
     }
 
-    // Вызывать при старте приложения/открытии батча, чтобы инициализировать текущее активное состояние
     fun refreshActiveStage(batchId: String) {
         viewModelScope.launch(Dispatchers.IO) {
             val active = batchDao.getActiveStage(batchId)
@@ -79,6 +74,15 @@ class BatchListViewModel(application: Application) : AndroidViewModel(applicatio
             val plannedEnd = now + TimeUnit.HOURS.toMillis(durationHours)
             batchDao.startStage(stageId, now, plannedEnd)
 
+            // Также обновляем название текущего этапа в самой партии
+            val stage = batchDao.getStageById(stageId)
+            if (stage != null) {
+                val batch = repository.getBatchByIdOnce(batchId)
+                batch?.let {
+                    repository.updateBatch(it.copy(currentStage = stage.name))
+                }
+            }
+
             _activeStageId.postValue(stageId)
         }
     }
@@ -86,58 +90,72 @@ class BatchListViewModel(application: Application) : AndroidViewModel(applicatio
     fun completeStageAndMaybeStartNext(batchId: String, stageId: String, orderIndex: Int, autoStartNext: Boolean = false) {
         viewModelScope.launch(Dispatchers.IO) {
             val now = System.currentTimeMillis()
+            // 1. Завершаем активный этап
             batchDao.completeStage(stageId, now)
 
-            // check active and reset if needed
+            // 2. Сбрасываем локальный ID активного этапа
             val active = batchDao.getActiveStage(batchId)
-            if (active == null || active.id != stageId) {
-                // ok
+            if (active != null && active.id == stageId) {
+                _activeStageId.postValue(null) // сброс, так как этап завершен
+            } else if (active != null) {
+                // Если активен другой этап (странная ситуация), не трогаем его
             } else {
                 _activeStageId.postValue(null)
             }
 
+            var nextStageStarted = false
+
+            // 3. Пытаемся запустить следующий этап
             if (autoStartNext) {
                 val next = batchDao.getStageByOrder(batchId, orderIndex + 1)
-                next?.let {
-                    val plannedEnd = now + TimeUnit.HOURS.toMillis(it.durationHours)
-                    batchDao.startStage(it.id, now, plannedEnd)
-                    _activeStageId.postValue(it.id)
+                if (next != null) {
+                    val plannedEnd = now + TimeUnit.HOURS.toMillis(next.durationHours)
+                    batchDao.startStage(next.id, now, plannedEnd)
+                    _activeStageId.postValue(next.id)
+
+                    // Обновляем имя этапа в батче
+                    val batch = repository.getBatchByIdOnce(batchId)
+                    batch?.let {
+                        repository.updateBatch(it.copy(currentStage = next.name))
+                    }
+                    nextStageStarted = true
                 }
             }
 
-            // Изменение: Добавлена логика для проверки, все ли этапы партии завершены.
-            // Если да, то устанавливаем isActive = false для партии, чтобы она автоматически становилась завершенной.
-            // Это вспомогательный метод checkAndCompleteBatch, вызываемый после завершения любого этапа,
-            // чтобы гарантировать своевременное обновление состояния партии.
-            // Метод использует Dao для получения всех этапов и обновления партии через repository.
-            // Это решает проблему, когда партия остается активной после завершения всех этапов.
-            checkAndCompleteBatch(batchId)
+            // 4. Если следующий этап НЕ начат (либо это был последний, либо autoStart=false),
+            // проверяем, нужно ли закрыть партию целиком.
+            if (!nextStageStarted) {
+                checkAndCompleteBatch(batchId)
+            }
         }
     }
 
-    // Добавлен: Вспомогательный метод для проверки и завершения партии.
-    // Проверяет, все ли этапы имеют endTime != null. Если да и партия активна, устанавливает isActive = false.
-    // Вызывается после завершения любого этапа в completeStageAndMaybeStartNext.
-    // Фикс: Используем новый метод getStagesForBatchOnce вместо несуществующего.
-    // Явная типизация для Lambda, чтобы избежать ошибок компилятора.
-    private fun checkAndCompleteBatch(batchId: String) {
-        viewModelScope.launch(Dispatchers.IO) {
-            try {
-                val stages = batchDao.getStagesForBatchOnce(batchId)
-                val allCompleted = stages.all { it: Stage -> it.endTime != null }
-                if (allCompleted) {
-                    val batch = repository.getBatchByIdOnce(batchId)
-                    batch?.let {
-                        if (it.isActive) {
-                            val updatedBatch = it.copy(isActive = false)
-                            repository.updateBatch(updatedBatch)
-                        }
+    /**
+     * Проверяет, завершены ли все этапы. Если да — переводит партию в статус isActive = false.
+     * Метод suspend, выполняется в контексте вызывающей корутины (IO).
+     */
+    private suspend fun checkAndCompleteBatch(batchId: String) {
+        try {
+            val stages = batchDao.getStagesForBatchOnce(batchId)
+
+            // Проверка: список не пуст И у всех этапов есть endTime
+            val allCompleted = stages.isNotEmpty() && stages.all { it.endTime != null }
+
+            if (allCompleted) {
+                val batch = repository.getBatchByIdOnce(batchId)
+                batch?.let {
+                    if (it.isActive) {
+                        // Обновляем статус и очищаем поле текущего этапа
+                        val updatedBatch = it.copy(
+                            isActive = false,
+                            currentStage = "" // Очищаем, так как активных этапов больше нет
+                        )
+                        repository.updateBatch(updatedBatch)
                     }
                 }
-            } catch (e: Exception) {
-                // Логируем ошибку, но не прерываем поток, чтобы не нарушать завершение этапа
-                android.util.Log.e("BatchListViewModel", "Error in checkAndCompleteBatch", e)
             }
+        } catch (e: Exception) {
+            android.util.Log.e("BatchListViewModel", "Error in checkAndCompleteBatch", e)
         }
     }
 
@@ -146,12 +164,6 @@ class BatchListViewModel(application: Application) : AndroidViewModel(applicatio
     }
 
     // ===================== weight validation and saving =====================
-    /**
-     * Проверка и сохранение веса:
-     * - prevWeight: последняя запись в BatchLog.weightGr, иначе batch.currentWeightGr, иначе batch.initialWeightGr
-     * - запрещаем увеличение: newWeight <= prev
-     * - запрещаем уменьшение более чем на 40%: newWeight >= prev * 0.6
-     */
     fun addWeightChecked(batchId: String, newWeight: Double, photoPath: String? = null) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
@@ -159,40 +171,20 @@ class BatchListViewModel(application: Application) : AndroidViewModel(applicatio
                 var prevWeight: Double? = lastLogWeight
 
                 if (prevWeight == null) {
-                    // try fetch batch snapshot
                     val batch = repository.getBatchByIdOnce(batchId)
                     prevWeight = batch?.currentWeightGr ?: batch?.initialWeightGr
                 }
 
-                // if no previous weight known — accept
+                // Если предыдущего веса нет совсем — принимаем любой
                 if (prevWeight == null) {
-                    // insert log
-                    val log = ru.wizand.fermenttracker.data.db.entities.BatchLog(
-                        id = UUID.randomUUID().toString(),
-                        batchId = batchId,
-                        timestamp = System.currentTimeMillis(),
-                        weightGr = newWeight,
-                        photoPath = photoPath
-                    )
-                    repository.addLog(log)
-                    // try update batch currentWeight
-                    try {
-                        val batch = repository.getBatchByIdOnce(batchId)
-                        batch?.let {
-                            val updated = it.copy(currentWeightGr = newWeight)
-                            repository.updateBatch(updated)
-                        }
-                    } catch (_: Exception) { /* ignore */ }
-
-                    _weightSaveResult.postValue(WeightSaveResult.Success)
+                    saveLogAndUpdateBatch(batchId, newWeight, photoPath)
                     return@launch
                 }
 
                 val prev = prevWeight
                 if (newWeight > prev) {
                     val message = getApplication<Application>().getString(
-                        R.string.weight_cannot_increase_error,
-                        prev
+                        R.string.weight_cannot_increase_error, prev
                     )
                     _weightSaveResult.postValue(WeightSaveResult.Failure(message))
                     return@launch
@@ -200,45 +192,48 @@ class BatchListViewModel(application: Application) : AndroidViewModel(applicatio
                 val diffPercent = (prev - newWeight) / prev
                 if (diffPercent > 0.40) {
                     val message = getApplication<Application>().getString(
-                        R.string.weight_diff_too_large_error,
-                        prev
+                        R.string.weight_diff_too_large_error, prev
                     )
                     _weightSaveResult.postValue(WeightSaveResult.Failure(message))
                     return@launch
                 }
 
-                // ok — save log and update batch.currentWeightGr
-                val log = ru.wizand.fermenttracker.data.db.entities.BatchLog(
-                    id = UUID.randomUUID().toString(),
-                    batchId = batchId,
-                    timestamp = System.currentTimeMillis(),
-                    weightGr = newWeight,
-                    photoPath = photoPath
-                )
-                repository.addLog(log)
+                saveLogAndUpdateBatch(batchId, newWeight, photoPath)
 
-                try {
-                    val batch = repository.getBatchByIdOnce(batchId)
-                    batch?.let {
-                        val updated = it.copy(currentWeightGr = newWeight)
-                        repository.updateBatch(updated)
-                    }
-                } catch (_: Exception) { /* ignore */ }
-
-                _weightSaveResult.postValue(WeightSaveResult.Success)
             } catch (e: Exception) {
                 val message = getApplication<Application>().getString(
-                    R.string.weight_save_error,
-                    e.message ?: e.toString()
+                    R.string.weight_save_error, e.message ?: e.toString()
                 )
                 _weightSaveResult.postValue(WeightSaveResult.Failure(message))
             }
         }
     }
 
+    private suspend fun saveLogAndUpdateBatch(batchId: String, weight: Double, photoPath: String?) {
+        val log = ru.wizand.fermenttracker.data.db.entities.BatchLog(
+            id = UUID.randomUUID().toString(),
+            batchId = batchId,
+            timestamp = System.currentTimeMillis(),
+            weightGr = weight,
+            photoPath = photoPath
+        )
+        repository.addLog(log)
+
+        try {
+            val batch = repository.getBatchByIdOnce(batchId)
+            batch?.let {
+                val updated = it.copy(currentWeightGr = weight)
+                repository.updateBatch(updated)
+            }
+        } catch (_: Exception) { }
+
+        _weightSaveResult.postValue(WeightSaveResult.Success)
+    }
+
     // ============ existing methods (create/delete etc.) =============
+
     fun createBatchWithStages(batch: Batch, stages: List<Stage>) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             try {
                 repository.insertBatchWithStages(batch, stages)
             } catch (e: Exception) {
