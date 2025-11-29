@@ -69,6 +69,7 @@ class BatchDetailFragment : Fragment() {
     private lateinit var pdfExporter: PdfExporter
     private lateinit var labelGenerator: LabelGenerator
 
+
     private var lastPhotoPath: String? = null
     private var lastWeight: Double? = null
 

@@ -5,8 +5,8 @@
     android:layout_height="match_parent"
     android:background="?attr/colorSurface">
 
-    <!-- ScrollView теперь содержит ConstraintLayout -->
-    <ScrollView
+    <!-- ScrollView заменен на NestedScrollView для лучшей работы с вложенными скроллами -->
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:clipToPadding="false"
@@ -21,7 +21,7 @@
             android:layout_height="wrap_content"
             android:padding="16dp">
 
-            <!-- Информационная карточка (сохраняем CardView для визуального разделения) -->
+            <!-- Информационная карточка -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/cardBatchInfo"
                 android:layout_width="match_parent"
@@ -80,7 +80,7 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Notes (без CardView) -->
+            <!-- Notes -->
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/tilNotes"
                 android:layout_width="match_parent"
@@ -96,12 +96,13 @@
                     android:layout_height="wrap_content" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- RecyclerViewStages -->
+            <!-- RecyclerViewStages: отключен вложенный скролл -->
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rvStages"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
+                android:nestedScrollingEnabled="false"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/tilNotes"
                 app:layout_constraintEnd_toEndOf="parent" />
@@ -118,17 +119,18 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/rvStages" />
 
-            <!-- RecyclerViewLogs -->
+            <!-- RecyclerViewLogs: отключен вложенный скролл -->
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rvLogs"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
+                android:nestedScrollingEnabled="false"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/tvLogsTitle"
                 app:layout_constraintEnd_toEndOf="parent" />
 
-            <!-- Кнопки (цепочкой снизу) -->
+            <!-- Кнопки -->
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnSaveBatch"
                 android:layout_width="match_parent"
@@ -185,6 +187,6 @@
                 app:layout_constraintEnd_toEndOf="parent" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
-    </ScrollView>
+    </androidx.core.widget.NestedScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
